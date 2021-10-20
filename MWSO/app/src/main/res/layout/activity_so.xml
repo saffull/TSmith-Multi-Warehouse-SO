@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SOActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/llbottom"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/llSOToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:background="@null"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_person" />
+
+            <TextView
+                android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:fontFamily="@font/fabrica"
+                android:text=""
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:gravity="right"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="25px"
+                android:paddingTop="10px"
+                android:paddingRight="25px"
+                android:paddingBottom="10px">
+
+                <!--                <EditText-->
+                <!--                    android:id="@+id/etItemSearchSOActivity"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:background="@drawable/et_roundedbox_bg"-->
+                <!--                    android:padding="@dimen/edittextsearch_padding"-->
+
+
+                <AutoCompleteTextView
+                    android:id="@+id/acvItemSearchSOActivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/et_roundedbox_bg"
+                    android:padding="5dp"
+                    android:singleLine="true" />
+
+                <!--                    android:singleLine="true"/>-->
+                <!--android:paddingLeft="10px"-->
+                <!--android:layout_height="80px"-->
+
+                <ImageButton
+                    android:id="@+id/imgBtnSearchClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10px"
+                    android:layout_toLeftOf="@+id/imgBtnSearchItem"
+                    android:background="@null"
+                    android:onClick="ClearSearch"
+                    android:paddingTop="5px"
+                    android:src="@drawable/ic_baseline_close_24px"/>
+
+                <!--                android:layout_alignBottom="@+id/acvItemSearchSOActivity"-->
+
+                <ImageButton
+                    android:id="@+id/imgBtnSearchItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@+id/acvItemSearchSOActivity"
+                    android:layout_alignBottom="@+id/acvItemSearchSOActivity"
+                    android:background="@null"
+                    android:onClick="SearchItem"
+                    android:paddingTop="5px"
+                    android:paddingBottom="5dp"
+                    android:src="@drawable/ic_search" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/activity_bg_color"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:fontFamily="@font/fabrica"
+                        android:text="#"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:fontFamily="@font/fabrica"
+                        android:text="Description"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:fontFamily="@font/fabrica"
+                        android:gravity="center"
+                        android:text="MRP"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <!--.2 .3 .4 .1-->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:text="ALLOC WH"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:gravity="left"
+                        android:text="REG QTY"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:gravity="center"
+                        android:paddingRight="5px"
+                        android:text="FREE QTY"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/raleway"
+                        android:gravity="center"
+                        android:paddingRight="5px"
+                        android:text="Vol Disc%"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/raleway"
+                        android:gravity="center"
+                        android:paddingRight="5px"
+                        android:text="Cash Disc%"
+                        android:textColor="@color/black"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:paddingLeft="5dp"
+                        android:text="1"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:fontFamily="@font/fabrica"
+                        android:text="Combiflam 5ml Eye drops 1s"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:text="9999"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <!--.2 .3 .4 .1-->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:text="APPL-12"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:gravity="left"
+                        android:text="9999"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:gravity="center"
+                        android:paddingRight="5px"
+                        android:text="9999"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/raleway"
+                        android:gravity="center"
+                        android:paddingRight="5px"
+                        android:text="23.2%"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/raleway"
+                        android:gravity="center"
+                        android:paddingRight="5px"
+                        android:text="10.3%"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="15dp"
+                android:visibility="gone" />
+
+            <!--android:stackFromBottom="true"-->
+
+            <ListView
+                android:id="@+id/lvProductlist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/ll1"
+                android:layout_marginBottom="15dp"
+                android:transcriptMode="alwaysScroll" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llbottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvNoOfPrescrptnsAdded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="@color/black"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:id="@+id/llSOBottombar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal"
+            android:padding="15dp">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:orientation="vertical"
+                android:padding="20px">
+                <!--android:background="#00FFFF"-->
+
+                <LinearLayout
+                    android:id="@+id/llAddRx"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!--android:background="#FF0000"-->
+
+                    <ImageButton
+                        android:id="@+id/imgBtnRemarksPrescrptn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="0.2"
+                        android:background="@null" />
+
+
+                    <RelativeLayout
+                        android:id="@+id/rl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/llAddRx"
+                        android:layout_marginTop="10px"
+                        android:paddingLeft="10px"
+                        android:paddingRight="20px">
+                        <!--android:background="#00FF00"-->
+
+                        <TextView
+                            android:id="@+id/tvAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:fontFamily="@font/ukt"
+                            android:text="Approx.Amount:₹ "
+                            android:textStyle="bold" />
+                        <!--   android:text="Approx.Amount:₹ "-->
+                        <TextView
+                            android:id="@+id/tvAmountValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="25dp"
+                            android:layout_toRightOf="@+id/tvAmount"
+                            android:background="#4A7BCB"
+                            android:padding="15dp"
+                            android:maxLength="5"
+                            android:text=""
+                            android:inputType="numberDecimal"
+                            android:textColor="@color/white" />
+                        <!--android:layout_alignParentRight="true"-->
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <!--  <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_bg_color"
+              android:orientation="horizontal"
+              android:padding="20dp"
+              android:weightSum="3">
+
+              <Button
+                  android:id="@+id/btnAllClear"
+                  android:layout_width="match_parent"
+                  android:layout_height="50dp"
+                  android:layout_margin="5dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/corners_round_btn"
+                  android:drawableLeft="@drawable/ic_remove"
+                  android:drawablePadding="5px"
+                  android:fontFamily="@font/ukt"
+                  android:onClick="listClear"
+                  android:paddingLeft="15px"
+                  android:text="Clear"
+                  android:textColor="@color/whites" />
+
+              <Button
+                  android:id="@+id/btnNew"
+                  android:layout_width="match_parent"
+                  android:layout_height="50dp"
+                  android:layout_margin="5dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/corners_round_btn"
+                  android:drawableLeft="@drawable/ic_add_24px"
+                  android:drawablePadding="5px"
+                  android:fontFamily="@font/ukt"
+                  android:paddingLeft="15px"
+                  android:text="NEW"
+                  android:textColor="@color/whites" />
+
+              <Button
+                  android:id="@+id/btnSave"
+                  android:layout_width="match_parent"
+                  android:layout_height="50dp"
+                  android:layout_margin="5dp"
+                  android:layout_weight="1"
+                  android:background="@drawable/corners_round_btn"
+                  android:drawableLeft="@drawable/ic_save_24px"
+                  android:drawablePadding="5px"
+                  android:fontFamily="@font/ukt"
+                  android:paddingLeft="15px"
+                  android:text="SAVE"
+                  android:textColor="@color/whites" />
+
+
+          </LinearLayout>-->
+
+    </LinearLayout>
+
+</RelativeLayout>

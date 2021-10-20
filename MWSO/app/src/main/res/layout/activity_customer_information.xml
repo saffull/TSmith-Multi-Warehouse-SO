@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CustomerInformation">
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom|top"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/llCustInfoToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="20px"
+            android:paddingRight="10px">
+
+            <TextView
+                android:id="@+id/tvUsername"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"
+                android:text=""
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:gravity="right"
+                android:text=""
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="20px">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Customer Name"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/acvCustomerName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter Customer Name"
+                        android:textColor="@color/custinfo_edittext_color" />
+                    <!--                    android:singleLine="true"-->
+
+
+                    <!--                    <EditText-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        android:id="@+id/etCustomerName"-->
+                    <!--                        android:singleLine="true"-->
+                    <!--                        android:inputType="numberDecimal"-->
+                    <!--                        android:textColor="@color/custinfo_edittext_color"-->
+                    <!--                        android:hint="Enter Customer Name"/>-->
+                    <ImageButton
+                        android:id="@+id/imgBtnCustSearchbyName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@+id/acvCustomerName"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:src="@drawable/ic_search" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Customer ID"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/etCustomerId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter Cust Id"
+                        android:singleLine="true"
+                        android:textColor="@color/custinfo_edittext_color" />
+
+                    <ImageButton
+                        android:id="@+id/imgBtnSearchbyHUID"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@+id/etCustomerId"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:src="@drawable/ic_search" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Customer Address"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etCustomerAdrs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter address"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Customer Mobile"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etCustomerMobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter customer mobile"
+                    android:inputType="textCapSentences"
+                    android:singleLine="true"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="GST NO"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etGSTIN"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint=""
+                    android:inputType="textCapSentences"
+                    android:singleLine="true"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Receivables"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etReceivables"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint=""
+                    android:inputType="textCapSentences"
+                    android:singleLine="true"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:id="@+id/llCustInfoBottombar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal"
+            android:padding="15px">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="vertical"
+                android:padding="10px">
+
+                <Button
+                    android:id="@+id/btnPayables"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/corners_round_btn_black"
+                    android:onClick="GetReceivables"
+                    android:paddingLeft="10px"
+                    android:text="RECEIVABLES"
+                    android:textColor="@color/white"
+                    tools:ignore="OnClick" />
+
+                <Button
+                    android:id="@+id/btnClear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10px"
+                    android:background="@drawable/corners_round_btn_black"
+                    android:paddingLeft="10px"
+                    android:text="CLEAR"
+                    android:onClick="ClearAll"
+                    android:textColor="@color/white" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="vertical"
+                android:padding="10px">
+
+                <Button
+                    android:id="@+id/btnSOReport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.4"
+                    android:background="@drawable/corners_round_btn_black"
+                    android:enabled="false"
+                    android:paddingLeft="10px"
+                    android:text="SO REPORT"
+                    android:textColor="@color/white" />
+
+
+                <Button
+                    android:id="@+id/btnCreateSO"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10px"
+                    android:onClick="CreateSO"
+                    android:background="@drawable/corners_round_btn"
+                    android:paddingLeft="10px"
+                    android:text="CREATE SO"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
