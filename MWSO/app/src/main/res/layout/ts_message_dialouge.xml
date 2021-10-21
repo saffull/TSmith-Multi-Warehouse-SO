@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dialogwindow_bg"
+    android:background="@color/new_blue"
     android:orientation="vertical"
     android:paddingLeft="20dp"
     android:paddingRight="20dp">
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="31.33dp"
         android:layout_marginTop="39.33dp"
-        android:background="@drawable/ic_baseline_close_24px" />
+        android:background="@drawable/ic_cancel" />
 
     <TextView
         android:id="@+id/tvTsMessageDisplay"

@@ -81,7 +81,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/et_roundedbox_bg"
                     android:padding="5dp"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:textSize="16sp" />
 
                 <!--                    android:singleLine="true"/>-->
                 <!--android:paddingLeft="10px"-->
@@ -92,12 +93,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="10px"
+                    android:layout_marginRight="20dp"
                     android:layout_toLeftOf="@+id/imgBtnSearchItem"
                     android:background="@null"
                     android:onClick="ClearSearch"
-                    android:paddingTop="5px"
-                    android:src="@drawable/ic_baseline_close_24px"/>
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:src="@drawable/ic_baseline_close_24px" />
 
                 <!--                android:layout_alignBottom="@+id/acvItemSearchSOActivity"-->
 
@@ -108,8 +110,9 @@
                     android:layout_alignRight="@+id/acvItemSearchSOActivity"
                     android:layout_alignBottom="@+id/acvItemSearchSOActivity"
                     android:background="@null"
+                    android:layout_marginRight="5dp"
                     android:onClick="SearchItem"
-                    android:paddingTop="5px"
+                    android:paddingTop="5dp"
                     android:paddingBottom="5dp"
                     android:src="@drawable/ic_search" />
 
@@ -197,7 +200,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.1"
-                        android:fontFamily="@font/raleway"
+                        android:fontFamily="@font/fabrica"
                         android:gravity="center"
                         android:paddingRight="5px"
                         android:text="Vol Disc%"
@@ -208,7 +211,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.1"
-                        android:fontFamily="@font/raleway"
+                        android:fontFamily="@font/fabrica"
                         android:gravity="center"
                         android:paddingRight="5px"
                         android:text="Cash Disc%"
@@ -422,7 +425,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:fontFamily="@font/ukt"
-                            android:text="Approx.Amount:₹ "
+                            android:text="Total MRP:₹ "
                             android:textStyle="bold" />
                         <!--   android:text="Approx.Amount:₹ "-->
                         <TextView
@@ -432,10 +435,9 @@
                             android:layout_marginLeft="25dp"
                             android:layout_toRightOf="@+id/tvAmount"
                             android:background="#4A7BCB"
-                            android:padding="15dp"
-                            android:maxLength="5"
-                            android:text=""
                             android:inputType="numberDecimal"
+                            android:padding="15dp"
+                            android:text=""
                             android:textColor="@color/white" />
                         <!--android:layout_alignParentRight="true"-->
 

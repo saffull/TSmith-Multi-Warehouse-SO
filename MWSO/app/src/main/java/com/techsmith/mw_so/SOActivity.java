@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -26,15 +28,12 @@ import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
 import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.AutoCompleteProductListCustomAdapter;
-import com.techsmith.mw_so.utils.CustomerReceivables;
 import com.techsmith.mw_so.utils.ItemDetails;
 import com.techsmith.mw_so.utils.ItemList;
-import com.techsmith.mw_so.utils.SOActivityAdapter;
 import com.techsmith.mw_so.utils.SOActivityArrayAdapter;
 import com.techsmith.mw_so.utils.SOPL;
 import com.techsmith.mw_so.utils.UserPL;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -61,10 +60,10 @@ public class SOActivity extends AppCompatActivity {
     ImageButton ic_search;
     ItemList itemList;
     ItemDetails itemDetails;
-    TextView cashDisc, volDisc, allocStore, tvSOH, whText, tvSelectedItemName, tvMrp, whSoh, offers;
+    TextView cashDisc, volDisc, allocStore, tvRate, whText, tvSelectedItemName, tvMrp, whSoh, offers;
     public TextView tvAmountValue; // item made public so that to access in its adapter class
     SOPL soplObj;
-    Button caculate;
+    Button caculate, btnAdd;
     List<String> offerList, houseList, sohList;
     TextView tvCustomerName, tvDate, Freeqty;
     AutoCompleteTextView acvItemSearchSOActivity;
@@ -277,7 +276,7 @@ public class SOActivity extends AppCompatActivity {
                     tvSelectedItemName = qtydialog.findViewById(R.id.tvSelectedItemName);
                     offers = qtydialog.findViewById(R.id.offers);
                     tvMrp = qtydialog.findViewById(R.id.tvMrpInQtySelection);
-                    tvSOH = qtydialog.findViewById(R.id.tvSOHInQtySelection);
+                    tvRate = qtydialog.findViewById(R.id.tvSOHInQtySelection);
                     Freeqty = qtydialog.findViewById(R.id.Freeqty);
                     allocStore = qtydialog.findViewById(R.id.allocStore);
                     whText = qtydialog.findViewById(R.id.whText);
@@ -290,7 +289,7 @@ public class SOActivity extends AppCompatActivity {
                     ImageButton btnPlus = qtydialog.findViewById(R.id.imgBtnPlusPack);
                     ImageButton btnMinus = qtydialog.findViewById(R.id.imgBtnMinusPack);
                     caculate = qtydialog.findViewById(R.id.caculate);
-                    Button btnAdd = qtydialog.findViewById(R.id.btnAddItem_qtySelection);
+                    btnAdd = qtydialog.findViewById(R.id.btnAddItem_qtySelection);
 
                     etQty = qtydialog.findViewById(R.id.etQty);
                     WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -300,6 +299,24 @@ public class SOActivity extends AppCompatActivity {
 
                     lp.gravity = Gravity.CENTER;
                     qtydialog.getWindow().setAttributes(lp);
+
+                    etQty.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            System.out.println(s.toString());
+                            btnAdd.setEnabled(false);
+                        }
+                    });
 
                     etQty.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -401,8 +418,6 @@ public class SOActivity extends AppCompatActivity {
                                     listSODetailPL.add(allocateQty.data);
                                     total = total + (allocateQty.data.qty * Double.parseDouble(itemMrp));
 
-                                    //SOActivityAdapter soActivityAdapter = new SOActivityAdapter(SOActivity.this, strGetTotal, itemName, offerList, itemMrp, houseList, itemId, sohList, jsonArray);
-                                    //lvProductlist.setAdapter(soActivityAdapter);
                                     String[] from = {"SlNo,ItemName", "BatchCode", "ExpiryDate", "MRP", "BillingRate", "TaxPer", "TaxAmount", "TotalDisc", "LineTotalAmount"};
                                     int[] to = {R.id.itemcode, R.id.name, R.id.batchcode, R.id.batchbarcode, R.id.location, R.id.uperpack, R.id.expiry, R.id.sysstock, R.id.currentsoh};
 
@@ -524,7 +539,7 @@ public class SOActivity extends AppCompatActivity {
                         caculate.setEnabled(true);
                         cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
                         volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
-                        tvSOH.setText("Soh : " + String.format("%.2f", allocateQty.data.soh));
+                        tvRate.setText("Rate : " + String.format("%.2f", allocateQty.data.rate));
                         allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
                         Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
                         tvSelectedItemName.setText("" + itemName);

@@ -2,18 +2,23 @@ package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -38,6 +43,7 @@ public class CustomerInformation extends AppCompatActivity {
     String loginResponse, Url, strCustomer, strErrorMsg, selectedCustomerId, strReceivables;
     ProgressDialog pDialog;
     CustomerList customerList;
+    Double tsMsgDialogWindowHeight;
     CustomerReceivables customerReceivables;
     UserPL userPLObj;
 
@@ -46,6 +52,12 @@ public class CustomerInformation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_information);
         getSupportActionBar().hide();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screen_height = displayMetrics.heightPixels;
+        int screen_width = displayMetrics.widthPixels;
+        tsMsgDialogWindowHeight = Double.valueOf((screen_height * 38) / 100);
+
         prefs = PreferenceManager.getDefaultSharedPreferences(CustomerInformation.this);
         acvCustomerName = findViewById(R.id.acvCustomerName);
         imgBtnCustSearchbyName = findViewById(R.id.imgBtnCustSearchbyName);
@@ -206,10 +218,19 @@ public class CustomerInformation extends AppCompatActivity {
             if (strReceivables == null || strReceivables.isEmpty()) {
                 Toast.makeText(CustomerInformation.this, "No result from web", Toast.LENGTH_SHORT).show();
             } else {
-                Gson gson = new Gson();
-                customerReceivables = gson.fromJson(strReceivables, CustomerReceivables.class);
-                String var = String.valueOf(customerReceivables.data.get(0).receivables);
-                etReceivables.setText(var);
+                try {
+                    Gson gson = new Gson();
+                    customerReceivables = gson.fromJson(strReceivables, CustomerReceivables.class);
+                    if (customerReceivables.statusFlag == 0) {
+                        String var = String.valueOf(customerReceivables.data.get(0).receivables);
+                        etReceivables.setText(var);
+                    } else {
+                        tsMessages(customerReceivables.errorMessage);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -320,10 +341,45 @@ public class CustomerInformation extends AppCompatActivity {
                     }
 
                 } else {
-                    Toast.makeText(CustomerInformation.this, "" + customerList.errorMessage, Toast.LENGTH_SHORT).show();
+                    tsMessages(customerList.errorMessage);
                 }
             }
 
         }
+    }
+
+    private void tsMessages(String msg) {
+
+        try {
+            final Dialog dialog = new Dialog(CustomerInformation.this);
+            dialog.setContentView(R.layout.ts_message_dialouge);
+//            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCanceledOnTouchOutside(true);
+//            dialog.setTitle("Save");
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+            ImageButton imgBtnCloseSaveWindow = dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
+            TextView tvMsgTodisplay = dialog.findViewById(R.id.tvTsMessageDisplay);
+
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = Gravity.CENTER;
+            dialog.getWindow().setAttributes(lp);
+
+            imgBtnCloseSaveWindow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+            tvMsgTodisplay.setText(msg);
+            dialog.show();
+        } catch (Exception ex) {
+            Toast.makeText(this, "" + ex, Toast.LENGTH_SHORT).show();
+        }
+
     }
 }

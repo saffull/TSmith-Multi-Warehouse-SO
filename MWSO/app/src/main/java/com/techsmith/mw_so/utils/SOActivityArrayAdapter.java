@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,13 +62,13 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
     UserPL userPLObj;
 
 
-    public SOActivityArrayAdapter(Context context, int resource, List<AllocateQtyPL> listSODetailPL, int size, ArrayList<AllocateQtyPL> detailList,Double total ) {
+    public SOActivityArrayAdapter(Context context, int resource, List<AllocateQtyPL> listSODetailPL, int size, ArrayList<AllocateQtyPL> detailList, Double total) {
         super(context, resource);
         this.context = context;
         this.itemArraylist = detailList;
         this.listSODetailPL = listSODetailPL;
         this.size = size;
-        this.total=total;
+        this.total = total;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         loginResponse = prefs.getString("loginResponse", "");
@@ -83,6 +85,15 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         try {
+            System.out.println("item size coming is" + itemArraylist.size());
+            itemDetail = itemArraylist.get(position);
+        } catch (Exception e) {
+            e.printStackTrace();
+            itemArraylist.remove(itemArraylist.size());
+            itemDetail = itemArraylist.get(position);
+        }
+
+        try {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_lv_saleorder, parent, false);
             tvProductName = convertView.findViewById(R.id.tvProductName);
             tvmrp = convertView.findViewById(R.id.tvmrp);
@@ -97,7 +108,6 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
             btnDelete = convertView.findViewById(R.id.btnDeleteItem);
 
 
-            itemDetail = itemArraylist.get(position);
             tvProductName.setText(itemDetail.productName);
             tvmrp.setText(String.valueOf(itemDetail.MRP));
             tvMrp.setText(String.valueOf(itemDetail.allocStoreCode));
@@ -115,17 +125,17 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                     alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int arg1) {
-                            System.out.println("Clicked Position is "+position);
-                            total=total-(itemArraylist.get(position).qty*itemArraylist.get(position).MRP);
+                            System.out.println("Clicked Position is " + position);
+                            total = total - (itemArraylist.get(position).qty * itemArraylist.get(position).MRP);
 
                             itemArraylist.remove(position);
                             SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(context,
-                                    R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist,total);
+                                    R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist, total);
                             ((SOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                            ((SOActivity)context).tvAmountValue.setText(String.valueOf(total));
+                            ((SOActivity) context).tvAmountValue.setText(String.valueOf(total));
                             arrayAdapter.notifyDataSetChanged();
                             if (itemArraylist.isEmpty())
-                                itemArraylist=new ArrayList<AllocateQtyPL>();
+                                itemArraylist = new ArrayList<AllocateQtyPL>();
 
                         }
                     });
@@ -251,21 +261,18 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
             try {
                 Gson gson = new Gson();
                 allocateQty = gson.fromJson(strGetTotal, AllocateQty.class);
-                cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
-                volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
-                tvSOH.setText("Soh : " + String.format("%.2f", allocateQty.data.soh));
-                allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
-                Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
-                try {
-                    //tvSelectedItemName.setText("" + map.get(String.valueOf(itemDetail.itemId)));
-                    //tvMrp.setText("MRP : " + rateMap.get(String.valueOf(itemDetail.itemId)));
+                if (allocateQty.statusFlag == 0) {
+                    cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
+                    volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
+                    tvSOH.setText("Rate : " + String.format("%.2f", allocateQty.data.rate));
+                    allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
+                    Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    listSODetailPL.add(allocateQty.data);
+                    // detailList.add(allocateQty.data);
+                } else {
+                    tsMessages(allocateQty.errorMessage);
                 }
-
-                listSODetailPL.add(allocateQty.data);
-                // detailList.add(allocateQty.data);
 
 
             } catch (Exception e) {
@@ -274,6 +281,41 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
 
 
         }
+    }
+
+    private void tsMessages(String msg) {
+
+        try {
+            final Dialog dialog = new Dialog(context);
+            dialog.setContentView(R.layout.ts_message_dialouge);
+//            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCanceledOnTouchOutside(true);
+//            dialog.setTitle("Save");
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+            ImageButton imgBtnCloseSaveWindow = dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
+            TextView tvMsgTodisplay = dialog.findViewById(R.id.tvTsMessageDisplay);
+
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = Gravity.CENTER;
+            dialog.getWindow().setAttributes(lp);
+
+            imgBtnCloseSaveWindow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+            tvMsgTodisplay.setText(msg);
+            dialog.show();
+        } catch (Exception ex) {
+            Toast.makeText(context, "" + ex, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private class GetItemDetailsTask extends AsyncTask<String, String, String> {
@@ -417,11 +459,28 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
 
                         lp.gravity = Gravity.CENTER;
                         qtydialog.getWindow().setAttributes(lp);
+                        etQty.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                System.out.println(s.toString());
+                                btnAdd.setEnabled(false);
+                            }
+                        });
                         etQty.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                etQty.setSelection(0,etQty.getText().toString().length());
+                                btnAdd.setEnabled(false);
+                                etQty.setSelection(0, etQty.getText().toString().length());
 
                             }
                         });
@@ -430,7 +489,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                             etQty.setText(current_qty);
                             tvSelectedItemName.setText(itemArraylist.get(pos).productName);
                             tvMrp.setText(String.valueOf(itemArraylist.get(pos).MRP));
-                            tvSOH.setText("SOH: " + (int) itemArraylist.get(pos).soh);
+                            tvSOH.setText("Rate: " + (int) itemArraylist.get(pos).rate);
                             allocStore.setText(offerList.toString());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -449,7 +508,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                                 if (selectedQty < 1)
                                     Toast.makeText(context, "Add atleast 1", Toast.LENGTH_LONG).show();
                                 else
-                                new ChangeQtyTask().execute();
+                                    new ChangeQtyTask().execute();
 
                             }
                         });
@@ -525,9 +584,9 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                                         }
 
                                         SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(context,
-                                                R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist,total);
+                                                R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist, total);
                                         ((SOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                                        ((SOActivity)context).tvAmountValue.setText(String.valueOf(total));
+                                        ((SOActivity) context).tvAmountValue.setText(String.valueOf(total));
                                         arrayAdapter.notifyDataSetChanged();
                                         qtydialog.dismiss();
 
@@ -657,10 +716,10 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                 itemArraylist.get(pos).cashDiscPer = Allocateqty.data.cashDiscPer;
                 itemArraylist.get(pos).freeQty = Allocateqty.data.freeQty;
                 itemArraylist.get(pos).soh = Allocateqty.data.soh;
-                total=0.0;
+                total = 0.0;
                 for (int i = 0; i < itemArraylist.size(); i++) {
 
-                    total=total+(itemArraylist.get(i).qty*itemArraylist.get(i).MRP);
+                    total = total + (itemArraylist.get(i).qty * itemArraylist.get(i).MRP);
                     System.out.println("New total is \t" + i + "-------" + total);
                 }
             } catch (Exception e) {
