@@ -221,8 +221,8 @@ public class MainActivity extends AppCompatActivity {
 //            dialog.setTitle("Save");
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-            ImageButton imgBtnCloseSaveWindow = (ImageButton) dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
-            TextView tvMsgTodisplay = (TextView) dialog.findViewById(R.id.tvTsMessageDisplay);
+            ImageButton imgBtnCloseSaveWindow = dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
+            TextView tvMsgTodisplay = dialog.findViewById(R.id.tvTsMessageDisplay);
 
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(dialog.getWindow().getAttributes());

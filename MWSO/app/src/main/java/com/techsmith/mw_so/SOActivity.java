@@ -56,6 +56,7 @@ public class SOActivity extends AppCompatActivity {
     public Double itemSoh, total = 0.0;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
     Boolean isRepeat = false;
+    EditText etQty;
     int CustomerId, itemId, itemQty, selectedQty;
     ImageButton ic_search;
     ItemList itemList;
@@ -291,7 +292,7 @@ public class SOActivity extends AppCompatActivity {
                     caculate = qtydialog.findViewById(R.id.caculate);
                     Button btnAdd = qtydialog.findViewById(R.id.btnAddItem_qtySelection);
 
-                    EditText etQty = qtydialog.findViewById(R.id.etQty);
+                    etQty = qtydialog.findViewById(R.id.etQty);
                     WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                     lp.copyFrom(qtydialog.getWindow().getAttributes());
                     lp.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -299,6 +300,14 @@ public class SOActivity extends AppCompatActivity {
 
                     lp.gravity = Gravity.CENTER;
                     qtydialog.getWindow().setAttributes(lp);
+
+                    etQty.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            etQty.setSelection(0, etQty.getText().toString().length());
+
+                        }
+                    });
 
                     tvSelectedItemName.setText("" + itemName);
                     selectedQty = Integer.parseInt(etQty.getText().toString());
@@ -310,7 +319,10 @@ public class SOActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             btnAdd.setEnabled(true);
                             selectedQty = Integer.parseInt(etQty.getText().toString());
-                            new AllocateQtyTask().execute();
+                            if (selectedQty < 1)
+                                Toast.makeText(SOActivity.this, "Add atleast 1", Toast.LENGTH_LONG).show();
+                            else
+                                new AllocateQtyTask().execute();
 
                         }
                     });
@@ -372,6 +384,8 @@ public class SOActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             try {
+                                if (pDialog.isShowing())
+                                    pDialog.dismiss();
                                 if (etQty.getText().toString().equals("")) {
                                     Toast.makeText(SOActivity.this, "Qty cannot be empty", Toast.LENGTH_SHORT).show();
                                     return;
@@ -504,34 +518,44 @@ public class SOActivity extends AppCompatActivity {
 
                 Gson gson = new Gson();
                 allocateQty = gson.fromJson(strGetTotal, AllocateQty.class);
-                cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
-                volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
-                tvSOH.setText("Soh : " + String.format("%.2f", allocateQty.data.soh));
-                allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
-                Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
+                if (allocateQty.statusFlag == 0) {
 
-                try {
-                    tvSelectedItemName.setText("" + itemName);
-                    tvMrp.setText("MRP : " + itemMrp);
+                    try {
+                        caculate.setEnabled(true);
+                        cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
+                        volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
+                        tvSOH.setText("Soh : " + String.format("%.2f", allocateQty.data.soh));
+                        allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
+                        Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
+                        tvSelectedItemName.setText("" + itemName);
+                        tvMrp.setText("MRP : " + itemMrp);
 
-                    StringBuilder builder = new StringBuilder();
-                    for (String details : houseList) {
-                        builder.append(details.subSequence(0, 9) + "\n\n");
+                        StringBuilder builder = new StringBuilder();
+                        for (String details : houseList) {
+                            builder.append(details.subSequence(0, 9) + "\n\n");
+                        }
+                        StringBuilder sbuilder = new StringBuilder();
+                        for (String soh : sohList) {
+                            sbuilder.append(soh + "\n\n");
+                        }
+                        whText.setText(builder.toString());
+                        whSoh.setText(sbuilder
+                                .toString());
+
+
+                        offers.setText(offerList.toString().replace("[", "").replace("]", ""));
+                        offerMap.put(String.valueOf(itemId), offerList.toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    StringBuilder sbuilder = new StringBuilder();
-                    for (String soh : sohList) {
-                        sbuilder.append(soh + "\n\n");
-                    }
-                    whText.setText(builder.toString());
-                    whSoh.setText(sbuilder
-                            .toString());
+                } else {
+                    qtydialog.dismiss();
+                    acvItemSearchSOActivity.setText("");
+                    acvItemSearchSOActivity.setAdapter(null);
+                    tsMessages(allocateQty.errorMessage);
 
-
-                    offers.setText(offerList.toString().replace("[", "").replace("]", ""));
-                    offerMap.put(String.valueOf(itemId), offerList.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -632,6 +656,9 @@ public class SOActivity extends AppCompatActivity {
                         acvItemSearchSOActivity.setAdapter(myAdapter);
                         acvItemSearchSOActivity.showDropDown();
                     } else {
+                        tsMessages(itemList.errorMessage);
+                        acvItemSearchSOActivity.setText("");
+                        acvItemSearchSOActivity.setAdapter(null);
 
                     }
 
@@ -654,8 +681,8 @@ public class SOActivity extends AppCompatActivity {
 //            dialog.setTitle("Save");
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-            ImageButton imgBtnCloseSaveWindow = (ImageButton) dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
-            TextView tvMsgTodisplay = (TextView) dialog.findViewById(R.id.tvTsMessageDisplay);
+            ImageButton imgBtnCloseSaveWindow = dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
+            TextView tvMsgTodisplay = dialog.findViewById(R.id.tvTsMessageDisplay);
 
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(dialog.getWindow().getAttributes());

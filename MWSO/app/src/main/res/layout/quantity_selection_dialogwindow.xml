@@ -138,6 +138,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:layout_weight="0.2"
+                    android:selectAllOnFocus="true"
                     android:background="@drawable/et_roundedbox_bg"
                     android:gravity="center"
                     android:inputType="numberSigned"
@@ -159,6 +160,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:enabled="false"
                 android:id="@+id/caculate"
                 android:text="@string/calculate"
                 android:textColor="@color/white" />

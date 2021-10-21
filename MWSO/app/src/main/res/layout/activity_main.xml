@@ -40,11 +40,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="30dp"
-                    android:onClick="SaveUrl"
                     android:layout_marginRight="30dp"
                     android:background="@drawable/ic_settings"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true"
+                    android:onClick="SaveUrl" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 

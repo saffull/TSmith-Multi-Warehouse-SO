@@ -418,11 +418,19 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                         lp.gravity = Gravity.CENTER;
                         qtydialog.getWindow().setAttributes(lp);
 
+                        etQty.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                etQty.setSelection(0,etQty.getText().toString().length());
+
+                            }
+                        });
+
                         try {
                             etQty.setText(current_qty);
                             tvSelectedItemName.setText(itemArraylist.get(pos).productName);
                             tvMrp.setText(String.valueOf(itemArraylist.get(pos).MRP));
-                            tvSOH.setText("SOH: " + String.valueOf((int) itemArraylist.get(pos).soh));
+                            tvSOH.setText("SOH: " + (int) itemArraylist.get(pos).soh);
                             allocStore.setText(offerList.toString());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -438,6 +446,9 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                             public void onClick(View v) {
                                 btnAdd.setEnabled(true);
                                 selectedQty = Integer.parseInt(etQty.getText().toString());
+                                if (selectedQty < 1)
+                                    Toast.makeText(context, "Add atleast 1", Toast.LENGTH_LONG).show();
+                                else
                                 new ChangeQtyTask().execute();
 
                             }
