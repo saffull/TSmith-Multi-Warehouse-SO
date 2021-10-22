@@ -220,7 +220,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/corners_round_btn_black"
                     android:onClick="GetReceivables"
-                    android:paddingLeft="10px"
+                    android:paddingLeft="10dp"
+                    android:drawableLeft="@drawable/ic_rec"
                     android:text="RECEIVABLES"
                     android:textColor="@color/white"
                     tools:ignore="OnClick" />
@@ -229,9 +230,10 @@
                     android:id="@+id/btnClear"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10px"
+                    android:layout_marginTop="10dp"
+                    android:drawableLeft="@drawable/ic_list_clear"
                     android:background="@drawable/corners_round_btn_black"
-                    android:paddingLeft="10px"
+                    android:paddingLeft="10dp"
                     android:text="CLEAR"
                     android:onClick="ClearAll"
                     android:textColor="@color/white" />
@@ -253,7 +255,7 @@
                     android:alpha="0.4"
                     android:background="@drawable/corners_round_btn_black"
                     android:enabled="false"
-                    android:paddingLeft="10px"
+                    android:paddingLeft="10dp"
                     android:text="SO REPORT"
                     android:textColor="@color/white" />
 
@@ -262,10 +264,11 @@
                     android:id="@+id/btnCreateSO"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10px"
+                    android:layout_marginTop="10dp"
                     android:onClick="CreateSO"
+                    android:drawableLeft="@drawable/ic_so"
                     android:background="@drawable/corners_round_btn"
-                    android:paddingLeft="10px"
+                    android:paddingLeft="10dp"
                     android:text="CREATE SO"
                     android:textColor="@color/white" />
             </LinearLayout>

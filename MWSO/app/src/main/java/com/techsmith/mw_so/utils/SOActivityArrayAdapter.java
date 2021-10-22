@@ -262,10 +262,10 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                 Gson gson = new Gson();
                 allocateQty = gson.fromJson(strGetTotal, AllocateQty.class);
                 if (allocateQty.statusFlag == 0) {
-                    cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
-                    volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
-                    tvSOH.setText("Rate : " + String.format("%.2f", allocateQty.data.rate));
-                    allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
+                    cashDisc.setText("Cash Disc: " + allocateQty.data.cashDiscPer + "%");
+                    volDisc.setText("Vol Disc:  " + allocateQty.data.volDiscPer + "%");
+                    tvSOH.setText("Rate: " + String.format("%.2f", allocateQty.data.rate));
+                    allocStore.setText("Allocated Warehouse: " + allocateQty.data.allocStoreCode);
                     Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
 
                     listSODetailPL.add(allocateQty.data);

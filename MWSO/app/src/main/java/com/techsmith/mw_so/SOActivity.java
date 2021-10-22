@@ -2,8 +2,11 @@ package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -156,9 +159,7 @@ public class SOActivity extends AppCompatActivity {
         }
     }
 
-    public void ClearSearch(View view) {
-        acvItemSearchSOActivity.setText("");
-    }
+
 
     private class GetItemDetailsTask extends AsyncTask<String, String, String> {
         @Override
@@ -425,7 +426,7 @@ public class SOActivity extends AppCompatActivity {
                                             listSODetailPL.size(), detailList, total);
                                     lvProductlist.setAdapter(arrayAdapter);
                                     arrayAdapter.notifyDataSetChanged();
-                                    tvAmountValue.setText(String.valueOf(total));
+                                    tvAmountValue.setText(String.format("%.2f", total));
 
                                     qtydialog.dismiss();
                                     acvItemSearchSOActivity.setText("");
@@ -537,13 +538,13 @@ public class SOActivity extends AppCompatActivity {
 
                     try {
                         caculate.setEnabled(true);
-                        cashDisc.setText("Cash Disc - " + allocateQty.data.cashDiscPer + "%");
-                        volDisc.setText("Vol Disc - " + allocateQty.data.volDiscPer + "%");
-                        tvRate.setText("Rate : " + String.format("%.2f", allocateQty.data.rate));
-                        allocStore.setText("Allocated Warehouse : " + allocateQty.data.allocStoreCode);
+                        cashDisc.setText("Cash Disc: " + allocateQty.data.cashDiscPer + "%");
+                        volDisc.setText("Vol Disc: " + allocateQty.data.volDiscPer + "%");
+                        tvRate.setText("Rate: " + String.format("%.2f", allocateQty.data.rate));
+                        allocStore.setText("Allocated Warehouse: " + allocateQty.data.allocStoreCode);
                         Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
                         tvSelectedItemName.setText("" + itemName);
-                        tvMrp.setText("MRP : " + itemMrp);
+                        tvMrp.setText("MRP: " + itemMrp);
 
                         StringBuilder builder = new StringBuilder();
                         for (String details : houseList) {
@@ -684,6 +685,67 @@ public class SOActivity extends AppCompatActivity {
 
 
         }
+    }
+
+
+    public void ClearSearch(View view) {
+        acvItemSearchSOActivity.setText("");
+    }
+
+    public void SaveSO(View view) {
+        tsMessages("Function not yet implemented...");
+    }
+
+    public void ClearList(View view) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+        alertDialogBuilder.setMessage("Do you want to delete the full list..?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                detailList.clear();
+                total=total*0.0;
+                SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
+                        listSODetailPL.size(), detailList, total);
+                lvProductlist.setAdapter(arrayAdapter);
+                arrayAdapter.notifyDataSetChanged();
+                tvAmountValue.setText("");
+
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public void Restart(View view) {
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+        alertDialogBuilder.setMessage("Do you want to start a new SO..?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
     }
 
     private void tsMessages(String msg) {
