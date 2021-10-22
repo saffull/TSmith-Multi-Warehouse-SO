@@ -55,6 +55,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
     TextView tvProductName, tvSOH, tvmrp, allocStore, cashDisc, volDisc, tvSelectedItemName, tvMrp, whSoh, offers, whText, Freeqty;
     AllocateQtyPL itemDetail;
     SharedPreferences prefs;
+    SharedPreferences.Editor editor;
     ImageButton btnDelete;
     String Url, strGetTotal, strErrorMsg, current_qty, strGetItemDetail, loginResponse;
     AllocateQty allocateQty, Allocateqty;
@@ -71,6 +72,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
         this.total = total;
 
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        editor = prefs.edit();
         loginResponse = prefs.getString("loginResponse", "");
         Gson gson = new Gson();
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
@@ -85,7 +87,6 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
         try {
-            System.out.println("item size coming is" + itemArraylist.size());
             itemDetail = itemArraylist.get(position);
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,12 +128,12 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                         public void onClick(DialogInterface dialog, int arg1) {
                             System.out.println("Clicked Position is " + position);
                             total = total - (itemArraylist.get(position).qty * itemArraylist.get(position).MRP);
-
                             itemArraylist.remove(position);
+                            ((SOActivity) context).detailList=itemArraylist;
                             SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(context,
                                     R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist, total);
                             ((SOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                            ((SOActivity) context).tvAmountValue.setText(String.valueOf(total));
+                            ((SOActivity) context).tvAmountValue.setText(String.format("%.2f", total));
                             arrayAdapter.notifyDataSetChanged();
                             if (itemArraylist.isEmpty())
                                 itemArraylist = new ArrayList<AllocateQtyPL>();
@@ -169,6 +170,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
         return convertView;
 
     }
+
 
     @Override
     public int getCount() {
@@ -579,14 +581,11 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                                         Toast.makeText(context, "Qty cannot be less than 1", Toast.LENGTH_SHORT).show();
                                         return;
                                     } else {
-                                        for (int i = 0; i < itemArraylist.size(); i++) {
-                                            System.out.println(i + "----" + itemArraylist.get(i).itemId + "-----" + itemArraylist.get(i).qty);
-                                        }
-
+                                        ((SOActivity) context).detailList=itemArraylist;
                                         SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(context,
                                                 R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist, total);
                                         ((SOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                                        ((SOActivity) context).tvAmountValue.setText(String.valueOf(total));
+                                        ((SOActivity) context).tvAmountValue.setText(String.format("%.2f", total));
                                         arrayAdapter.notifyDataSetChanged();
                                         qtydialog.dismiss();
 

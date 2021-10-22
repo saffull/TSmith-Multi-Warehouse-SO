@@ -77,7 +77,7 @@ public class SOActivity extends AppCompatActivity {
     public ListView lvProductlist;// item made public so that to access in its adapter class
     AllocateQty allocateQty;
     List<AllocateQtyPL> listSODetailPL;
-    ArrayList<AllocateQtyPL> detailList;
+   public ArrayList<AllocateQtyPL> detailList;
     HashMap<String, String> offerMap = new HashMap<>();
 
     @Override
@@ -693,6 +693,9 @@ public class SOActivity extends AppCompatActivity {
     }
 
     public void SaveSO(View view) {
+        for (int i = 0; i < detailList.size(); i++) {
+            System.out.println(detailList.get(i).itemId+"<-------------->"+detailList.get(i).qty);
+        }
         tsMessages("Function not yet implemented...");
     }
 
