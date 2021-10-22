@@ -3,6 +3,7 @@ package com.techsmith.mw_so.utils;
 public class AllocateQtyPL {
     public int customer ;
     public int itemId ;
+    public int code;
     public int allocStore ;
     public String allocStoreCode ;
     public double soh ;

@@ -34,7 +34,10 @@ import com.techsmith.mw_so.utils.AutoCompleteProductListCustomAdapter;
 import com.techsmith.mw_so.utils.ItemDetails;
 import com.techsmith.mw_so.utils.ItemList;
 import com.techsmith.mw_so.utils.SOActivityArrayAdapter;
+import com.techsmith.mw_so.utils.SOMemo;
 import com.techsmith.mw_so.utils.SOPL;
+import com.techsmith.mw_so.utils.SOSave;
+import com.techsmith.mw_so.utils.SaveItemSO;
 import com.techsmith.mw_so.utils.UserPL;
 
 import org.json.JSONObject;
@@ -53,7 +56,7 @@ public class SOActivity extends AppCompatActivity {
 
     SharedPreferences prefs;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg,
-            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal;
+            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal,itemCode;
 
     public Double itemSoh, total = 0.0;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
@@ -121,10 +124,10 @@ public class SOActivity extends AppCompatActivity {
                     if (SelectedText.length() >= 3) {
                         itemId = itemList.data.get(pos).pmid;
                         itemName = itemList.data.get(pos).product;
+                        itemCode=itemList.data.get(pos).code;
 
                         itemMrp = String.valueOf(itemList.data.get(pos).mrp);
                         itemSoh = itemList.data.get(pos).sohInPacks;
-
                         for (int i = 0; i < detailList.size(); i++) {
                             if (detailList.get(i).itemId == itemId) {
                                 Toast.makeText(SOActivity.this, "item already added..", Toast.LENGTH_LONG).show();
@@ -415,6 +418,7 @@ public class SOActivity extends AppCompatActivity {
                                 } else {
                                     allocateQty.data.productName = itemName;
                                     allocateQty.data.MRP = Double.parseDouble(itemMrp);
+                                    allocateQty.data.code=Integer.parseInt(itemCode);
                                     detailList.add(allocateQty.data);
                                     listSODetailPL.add(allocateQty.data);
                                     total = total + (allocateQty.data.qty * Double.parseDouble(itemMrp));
@@ -693,10 +697,23 @@ public class SOActivity extends AppCompatActivity {
     }
 
     public void SaveSO(View view) {
+        SaveItemSO saveItemSO=new SaveItemSO();
         for (int i = 0; i < detailList.size(); i++) {
             System.out.println(detailList.get(i).itemId+"<-------------->"+detailList.get(i).qty);
+            saveItemSO.itemId=detailList.get(i).itemId;
+            saveItemSO.itemCode=detailList.get(i).code;
+            saveItemSO.mrp=detailList.get(i).MRP;
+            saveItemSO.freeQty=(int) detailList.get(i).freeQty;
+            saveItemSO.storeId=String.valueOf(detailList.get(i).allocStore);
+            saveItemSO.value=detailList.get(i).MRP*detailList.get(i).qty;
+
+
         }
-        tsMessages("Function not yet implemented...");
+        Gson gson = new Gson();
+        String soString = gson.toJson(saveItemSO);
+        System.out.println(soString);
+
+        //tsMessages("Function not yet implemented...");
     }
 
     public void ClearList(View view) {
