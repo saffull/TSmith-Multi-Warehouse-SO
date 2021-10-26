@@ -11,6 +11,8 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_add_circle_outline_24px.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_baseline_close_24px.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_bg1.xml" value="0.2203125" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_comment_changes.xml" value="0.1125" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_comments.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_file_new.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_list_clear.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_password.xml" value="0.2203125" />
@@ -27,10 +29,12 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_phone.xml" value="0.33" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_settings.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_so.xml" value="0.18" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/add_remarks.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/autocomplete_view_row.xml" value="0.22" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/item_lv_saleorder.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/list_row.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/quantity_selection_dialogwindow.xml" value="0.23772102161100198" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/save_dialogwindow.xml" value="0.1" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/ts_message_dialouge.xml" value="0.1" />
       </map>
     </option>

@@ -3,5 +3,5 @@ package com.techsmith.mw_so.utils;
 import java.util.List;
 
 public class SaveSODetail {
-    public List<SaveItemSO> item;
+    public List<AllocateQtyPL> item;
 }

@@ -406,6 +406,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="0.2"
+                        android:onClick="ShowRemarks"
+                        android:src="@drawable/ic_comments"
                         android:background="@null" />
 
 

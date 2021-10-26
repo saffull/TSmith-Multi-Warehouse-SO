@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -38,6 +40,9 @@ import com.techsmith.mw_so.utils.SOMemo;
 import com.techsmith.mw_so.utils.SOPL;
 import com.techsmith.mw_so.utils.SOSave;
 import com.techsmith.mw_so.utils.SaveItemSO;
+import com.techsmith.mw_so.utils.SaveSODetail;
+import com.techsmith.mw_so.utils.SaveSOResponse;
+import com.techsmith.mw_so.utils.SaveSummarySO;
 import com.techsmith.mw_so.utils.UserPL;
 
 import org.json.JSONObject;
@@ -55,8 +60,8 @@ import java.util.List;
 public class SOActivity extends AppCompatActivity {
 
     SharedPreferences prefs;
-    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg,
-            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal,itemCode;
+    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO,billRemarks,
+            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", cceId = "", machineId = "";
 
     public Double itemSoh, total = 0.0;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
@@ -69,18 +74,20 @@ public class SOActivity extends AppCompatActivity {
     TextView cashDisc, volDisc, allocStore, tvRate, whText, tvSelectedItemName, tvMrp, whSoh, offers;
     public TextView tvAmountValue; // item made public so that to access in its adapter class
     SOPL soplObj;
-    Button caculate, btnAdd;
+    Button caculate, btnAdd, btnAllClear, btnSave;
     List<String> offerList, houseList, sohList;
     TextView tvCustomerName, tvDate, Freeqty;
     AutoCompleteTextView acvItemSearchSOActivity;
     ProgressDialog pDialog;
-    Dialog qtydialog;
+    ImageButton imgBtnRemarksPrescrptn;
+    Dialog qtydialog, dialog;
     UserPL userPLObj;
-    Double tsMsgDialogWindowHeight;
+    Double tsMsgDialogWindowHeight, saveDialogWindowHeight;
     public ListView lvProductlist;// item made public so that to access in its adapter class
     AllocateQty allocateQty;
     List<AllocateQtyPL> listSODetailPL;
-   public ArrayList<AllocateQtyPL> detailList;
+    public ArrayList<AllocateQtyPL> detailList;/*list made common to both main & adapter class, so that UI changes done in adapter class
+    eg: changing the qty or deleting get reflected globally*/
     HashMap<String, String> offerMap = new HashMap<>();
 
     @Override
@@ -93,6 +100,9 @@ public class SOActivity extends AppCompatActivity {
         ic_search = findViewById(R.id.imgBtnSearchItem);
         lvProductlist = findViewById(R.id.lvProductlist);
         tvAmountValue = findViewById(R.id.tvAmountValue);
+        btnAllClear = findViewById(R.id.btnAllClear);
+        imgBtnRemarksPrescrptn=findViewById(R.id.imgBtnRemarksPrescrptn);
+        btnSave = findViewById(R.id.btnSave);
         tvDate = findViewById(R.id.tvDate);
         loginResponse = prefs.getString("loginResponse", "");
         Gson gson = new Gson();
@@ -100,6 +110,7 @@ public class SOActivity extends AppCompatActivity {
         Url = prefs.getString("MultiSOURL", "");
         CustomerName = userPLObj.summary.customerName;
         CustomerId = userPLObj.summary.customerId;
+        cceId = String.valueOf(userPLObj.summary.cceId);
         listSODetailPL = new ArrayList<>();
         detailList = new ArrayList<>();
 
@@ -108,6 +119,7 @@ public class SOActivity extends AppCompatActivity {
         int screen_height = displayMetrics.heightPixels;
         int screen_width = displayMetrics.widthPixels;
         tsMsgDialogWindowHeight = Double.valueOf((screen_height * 38) / 100);
+        saveDialogWindowHeight = (double) (screen_height * 42) / 100;
 
         acvItemSearchSOActivity = findViewById(R.id.acvItemSearchSOActivity);
         tvCustomerName.setText(CustomerName);
@@ -124,7 +136,7 @@ public class SOActivity extends AppCompatActivity {
                     if (SelectedText.length() >= 3) {
                         itemId = itemList.data.get(pos).pmid;
                         itemName = itemList.data.get(pos).product;
-                        itemCode=itemList.data.get(pos).code;
+                        itemCode = itemList.data.get(pos).code;
 
                         itemMrp = String.valueOf(itemList.data.get(pos).mrp);
                         itemSoh = itemList.data.get(pos).sohInPacks;
@@ -151,6 +163,7 @@ public class SOActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     public void SearchItem(View view) {
@@ -162,6 +175,74 @@ public class SOActivity extends AppCompatActivity {
         }
     }
 
+    public void ShowRemarks(View view) {
+        try {
+            prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
+            billRemarks = prefs.getString("BillRemarksWSSO", "");
+            dialog = new Dialog(SOActivity.this);
+            dialog.setContentView(R.layout.add_remarks);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setTitle("Remarks");
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+
+            ImageButton imgBtnCloseRemarksWindow = (ImageButton) dialog.findViewById(R.id.imgBtnCloseRemarksWindow);
+            Button btnOkRemarks = (Button) dialog.findViewById(R.id.btnOkRemarks_Itemwise);
+            Button btnClearRemarks_Itemwise = (Button) dialog.findViewById(R.id.btnClearRemarks_Itemwise);
+            final EditText etAddRemarks = (EditText) dialog.findViewById(R.id.etAddRemarks_Itemwise);
+            etAddRemarks.setText(billRemarks);
+
+
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = Integer.parseInt(String.valueOf(saveDialogWindowHeight));
+            lp.gravity = Gravity.CENTER;
+            dialog.getWindow().setAttributes(lp);
+
+
+            imgBtnCloseRemarksWindow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+            btnOkRemarks.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    billRemarks = etAddRemarks.getText().toString();
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("BillRemarksWSSO", billRemarks);
+                    editor.commit();
+
+                    if (billRemarks.equalsIgnoreCase("")) {
+                        imgBtnRemarksPrescrptn.setImageResource(R.drawable.ic_comments);
+                    } else {
+                        imgBtnRemarksPrescrptn.setImageResource(R.drawable.ic_comment_changes);
+                    }
+
+                    dialog.dismiss();
+
+                }
+            });
+
+            btnClearRemarks_Itemwise.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    etAddRemarks.setText("");
+                }
+            });
+
+            dialog.show();
+
+        } catch (Exception ex) {
+            Toast.makeText(SOActivity.this, "" + ex, Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     private class GetItemDetailsTask extends AsyncTask<String, String, String> {
@@ -418,7 +499,8 @@ public class SOActivity extends AppCompatActivity {
                                 } else {
                                     allocateQty.data.productName = itemName;
                                     allocateQty.data.MRP = Double.parseDouble(itemMrp);
-                                    allocateQty.data.code=Integer.parseInt(itemCode);
+                                    allocateQty.data.code = Integer.parseInt(itemCode);
+                                    allocateQty.data.storeId = String.valueOf(allocateQty.data.allocStore);
                                     detailList.add(allocateQty.data);
                                     listSODetailPL.add(allocateQty.data);
                                     total = total + (allocateQty.data.qty * Double.parseDouble(itemMrp));
@@ -474,7 +556,7 @@ public class SOActivity extends AppCompatActivity {
                 URL url = new URL(Url + "AllocateQty");
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+                connection.setRequestMethod("POST");
                 connection.setReadTimeout(300000);
                 connection.setConnectTimeout(300000);
                 connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
@@ -697,24 +779,172 @@ public class SOActivity extends AppCompatActivity {
     }
 
     public void SaveSO(View view) {
-        SaveItemSO saveItemSO=new SaveItemSO();
-        for (int i = 0; i < detailList.size(); i++) {
-            System.out.println(detailList.get(i).itemId+"<-------------->"+detailList.get(i).qty);
-            saveItemSO.itemId=detailList.get(i).itemId;
-            saveItemSO.itemCode=detailList.get(i).code;
-            saveItemSO.mrp=detailList.get(i).MRP;
-            saveItemSO.freeQty=(int) detailList.get(i).freeQty;
-            saveItemSO.storeId=String.valueOf(detailList.get(i).allocStore);
-            saveItemSO.value=detailList.get(i).MRP*detailList.get(i).qty;
+        if (detailList.size() > 0) {
+            listSODetailPL = detailList;
+            SaveSODetail saveSODetail = new SaveSODetail();
+            saveSODetail.item = listSODetailPL;
+
+            SaveSummarySO saveSummarySO = new SaveSummarySO();
+            saveSummarySO.custId = CustomerId;
+            saveSummarySO.customer = CustomerName;
+            saveSummarySO.docSeries = "SOM";
+            saveSummarySO.docDate = "26-10-2021";
+            saveSummarySO.docComplete = 1;
+            saveSummarySO.docSeries = "";
+            saveSummarySO.remarks = "Testing DOC";
+            saveSummarySO.cceId = cceId;
+            saveSummarySO.machineId = "";
+            saveSummarySO.userId = "";
 
 
+            SOMemo soMemo = new SOMemo();
+            soMemo.detail = saveSODetail;
+            soMemo.summary = saveSummarySO;
+
+
+            SOSave soSave = new SOSave();
+            soSave.soMemo = soMemo;
+
+
+            Gson gson = new Gson();
+            soString = gson.toJson(soSave);
+            System.out.println(soString);
+            new SaveSOTask().execute();
+        } else {
+            Toast.makeText(SOActivity.this, "Add to the list", Toast.LENGTH_LONG).show();
         }
-        Gson gson = new Gson();
-        String soString = gson.toJson(saveItemSO);
-        System.out.println(soString);
+
 
         //tsMessages("Function not yet implemented...");
     }
+
+    private class SaveSOTask extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(SOActivity.this);
+            pDialog.setMessage("Saving SO...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            //https://tsmithy.in/somemouat/api/SaveSO
+            try {
+
+                URL url = new URL(Url + "SaveSO");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setDoOutput(true);
+
+                OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+                wr.write(soString);
+                wr.flush();
+
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                try {
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strSaveMiniSO = sb.toString();
+                        System.out.println("SO Saving Response is " + sb.toString());
+
+                    } else {
+                        strErrorMsg = connection.getResponseMessage();
+                        strSaveMiniSO = "httperror";
+                    }
+
+                } finally {
+                    connection.disconnect();
+                }
+
+            } catch (Exception e) {
+                Log.e("ERROR", e.getMessage(), e);
+                return null;
+            }
+            return strSaveMiniSO;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            try {
+                Gson gson = new Gson();
+
+                SaveSOResponse saveSOResponse;
+                saveSOResponse = gson.fromJson(strSaveMiniSO, SaveSOResponse.class);
+                if (saveSOResponse.statusFlag == 0) {
+                    dialog = new Dialog(SOActivity.this);
+                    dialog.setContentView(R.layout.save_dialogwindow);
+//                        dialog.setCanceledOnTouchOutside(false);
+                    dialog.setCanceledOnTouchOutside(true);
+                    dialog.setTitle("Save");
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+//                        ImageButton imgBtnCloseSaveWindow = (ImageButton) dialog.findViewById(R.id.imgBtnCloseSaveWindow);
+                    Button btnOkSavePopup = dialog.findViewById(R.id.btnOkSavePopup);
+                    TextView tvSaveStatus = dialog.findViewById(R.id.tvSaveStatus);
+
+                    WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                    lp.copyFrom(dialog.getWindow().getAttributes());
+                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                    lp.height = Integer.parseInt(String.valueOf(saveDialogWindowHeight));
+                    lp.gravity = Gravity.CENTER;
+                    dialog.getWindow().setAttributes(lp);
+
+                    btnOkSavePopup.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            disableButtons();
+                            dialog.dismiss();
+                        }
+                    });
+
+                    // tvSaveStatus.setText("Saved \n\nToken No: " + tokenNo);
+                    tvSaveStatus.setText("Saved\n\n SOMemoNo:\t" + saveSOResponse.data.get(saveSOResponse.data.size() - 1).SOMemoNo);
+                    tvSaveStatus.setMovementMethod(new ScrollingMovementMethod());
+                    dialog.show();
+
+                } else {
+                    tsMessages(saveSOResponse.errorMessage);
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void disableButtons() {
+        btnSave.setEnabled(false);
+        btnAllClear.setEnabled(false);
+    }
+
 
     public void ClearList(View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
@@ -723,7 +953,7 @@ public class SOActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
                 detailList.clear();
-                total=total*0.0;
+                total = total * 0.0;
                 SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                         listSODetailPL.size(), detailList, total);
                 lvProductlist.setAdapter(arrayAdapter);
