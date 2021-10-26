@@ -17,24 +17,23 @@
         android:background="@drawable/ic_cancel" />
 
 
-
     <EditText
         android:id="@+id/etAddRemarks_Itemwise"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/llremarksBottom"
+        android:layout_below="@+id/imgBtnCloseRemarksWindow"
         android:layout_gravity="center"
-        android:hint="Add Remarks"
-        android:textColorHint="@color/white"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/et_roundedbox_bg"
         android:backgroundTint="@color/white"
-        android:textSize="12sp"
         android:gravity="top|start"
+        android:hint="Add Remarks"
         android:inputType="textMultiLine|textCapSentences"
         android:textColor="@color/black"
-        android:layout_marginTop="20px"
-        android:layout_marginLeft="25px"
-        android:layout_below="@+id/imgBtnCloseRemarksWindow"
-        android:background="@drawable/et_roundedbox_bg"
-        android:layout_above="@+id/llremarksBottom"/>
+        android:textColorHint="@color/white"
+        android:textSize="18sp" />
 
     <LinearLayout
         android:id="@+id/llremarksBottom"

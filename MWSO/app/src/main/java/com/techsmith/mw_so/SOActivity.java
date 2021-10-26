@@ -60,7 +60,7 @@ import java.util.List;
 public class SOActivity extends AppCompatActivity {
 
     SharedPreferences prefs;
-    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO,billRemarks,
+    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks,
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", cceId = "", machineId = "";
 
     public Double itemSoh, total = 0.0;// item made public so that to access in its adapter class
@@ -74,6 +74,7 @@ public class SOActivity extends AppCompatActivity {
     TextView cashDisc, volDisc, allocStore, tvRate, whText, tvSelectedItemName, tvMrp, whSoh, offers;
     public TextView tvAmountValue; // item made public so that to access in its adapter class
     SOPL soplObj;
+    EditText etAddRemarks;
     Button caculate, btnAdd, btnAllClear, btnSave;
     List<String> offerList, houseList, sohList;
     TextView tvCustomerName, tvDate, Freeqty;
@@ -101,7 +102,7 @@ public class SOActivity extends AppCompatActivity {
         lvProductlist = findViewById(R.id.lvProductlist);
         tvAmountValue = findViewById(R.id.tvAmountValue);
         btnAllClear = findViewById(R.id.btnAllClear);
-        imgBtnRemarksPrescrptn=findViewById(R.id.imgBtnRemarksPrescrptn);
+        imgBtnRemarksPrescrptn = findViewById(R.id.imgBtnRemarksPrescrptn);
         btnSave = findViewById(R.id.btnSave);
         tvDate = findViewById(R.id.tvDate);
         loginResponse = prefs.getString("loginResponse", "");
@@ -178,7 +179,7 @@ public class SOActivity extends AppCompatActivity {
     public void ShowRemarks(View view) {
         try {
             prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
-            billRemarks = prefs.getString("BillRemarksWSSO", "");
+            billRemarks = prefs.getString("BillRemarksMWSO", "");
             dialog = new Dialog(SOActivity.this);
             dialog.setContentView(R.layout.add_remarks);
             dialog.setCanceledOnTouchOutside(false);
@@ -189,14 +190,15 @@ public class SOActivity extends AppCompatActivity {
             ImageButton imgBtnCloseRemarksWindow = (ImageButton) dialog.findViewById(R.id.imgBtnCloseRemarksWindow);
             Button btnOkRemarks = (Button) dialog.findViewById(R.id.btnOkRemarks_Itemwise);
             Button btnClearRemarks_Itemwise = (Button) dialog.findViewById(R.id.btnClearRemarks_Itemwise);
-            final EditText etAddRemarks = (EditText) dialog.findViewById(R.id.etAddRemarks_Itemwise);
+            etAddRemarks = (EditText) dialog.findViewById(R.id.etAddRemarks_Itemwise);
             etAddRemarks.setText(billRemarks);
 
 
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(dialog.getWindow().getAttributes());
             lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = Integer.parseInt(String.valueOf(saveDialogWindowHeight));
+            //lp.height = Integer.parseInt(String.valueOf(saveDialogWindowHeight));
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             lp.gravity = Gravity.CENTER;
             dialog.getWindow().setAttributes(lp);
 
@@ -215,7 +217,7 @@ public class SOActivity extends AppCompatActivity {
                     billRemarks = etAddRemarks.getText().toString();
 
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString("BillRemarksWSSO", billRemarks);
+                    editor.putString("BillRemarksMWSO", billRemarks);
                     editor.commit();
 
                     if (billRemarks.equalsIgnoreCase("")) {
@@ -240,7 +242,7 @@ public class SOActivity extends AppCompatActivity {
             dialog.show();
 
         } catch (Exception ex) {
-            Toast.makeText(SOActivity.this, "" + ex, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SOActivity.this, "--->" + ex, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -779,39 +781,43 @@ public class SOActivity extends AppCompatActivity {
     }
 
     public void SaveSO(View view) {
-        if (detailList.size() > 0) {
-            listSODetailPL = detailList;
-            SaveSODetail saveSODetail = new SaveSODetail();
-            saveSODetail.item = listSODetailPL;
+        try {
+            if (detailList.size() > 0) {
+                listSODetailPL = detailList;
+                SaveSODetail saveSODetail = new SaveSODetail();
+                saveSODetail.item = listSODetailPL;
 
-            SaveSummarySO saveSummarySO = new SaveSummarySO();
-            saveSummarySO.custId = CustomerId;
-            saveSummarySO.customer = CustomerName;
-            saveSummarySO.docSeries = "SOM";
-            saveSummarySO.docDate = "26-10-2021";
-            saveSummarySO.docComplete = 1;
-            saveSummarySO.docSeries = "";
-            saveSummarySO.remarks = "Testing DOC";
-            saveSummarySO.cceId = cceId;
-            saveSummarySO.machineId = "";
-            saveSummarySO.userId = "";
-
-
-            SOMemo soMemo = new SOMemo();
-            soMemo.detail = saveSODetail;
-            soMemo.summary = saveSummarySO;
+                SaveSummarySO saveSummarySO = new SaveSummarySO();
+                saveSummarySO.custId = CustomerId;
+                saveSummarySO.customer = CustomerName;
+                saveSummarySO.docSeries = "SOM";
+                saveSummarySO.docDate = "26-10-2021";
+                saveSummarySO.docComplete = 1;
+                saveSummarySO.docSeries = "";
+                saveSummarySO.remarks = etAddRemarks.getText().toString();
+                saveSummarySO.cceId = cceId;
+                saveSummarySO.machineId = "";
+                saveSummarySO.userId = "";
 
 
-            SOSave soSave = new SOSave();
-            soSave.soMemo = soMemo;
+                SOMemo soMemo = new SOMemo();
+                soMemo.detail = saveSODetail;
+                soMemo.summary = saveSummarySO;
 
 
-            Gson gson = new Gson();
-            soString = gson.toJson(soSave);
-            System.out.println(soString);
-            new SaveSOTask().execute();
-        } else {
-            Toast.makeText(SOActivity.this, "Add to the list", Toast.LENGTH_LONG).show();
+                SOSave soSave = new SOSave();
+                soSave.soMemo = soMemo;
+
+
+                Gson gson = new Gson();
+                soString = gson.toJson(soSave);
+                System.out.println(soString);
+                new SaveSOTask().execute();
+            } else {
+                Toast.makeText(SOActivity.this, "Add to the list", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
@@ -912,7 +918,7 @@ public class SOActivity extends AppCompatActivity {
                     WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                     lp.copyFrom(dialog.getWindow().getAttributes());
                     lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                    lp.height = Integer.parseInt(String.valueOf(saveDialogWindowHeight));
+                    lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
                     lp.gravity = Gravity.CENTER;
                     dialog.getWindow().setAttributes(lp);
 
@@ -943,6 +949,8 @@ public class SOActivity extends AppCompatActivity {
     private void disableButtons() {
         btnSave.setEnabled(false);
         btnAllClear.setEnabled(false);
+        acvItemSearchSOActivity.setEnabled(false);
+        ic_search.setEnabled(false);
     }
 
 
@@ -980,6 +988,10 @@ public class SOActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("BillRemarksMWSO", "");
+                editor.commit();
+                editor.apply();
                 Intent intent = getIntent();
                 finish();
                 startActivity(intent);
