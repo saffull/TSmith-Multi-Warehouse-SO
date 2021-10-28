@@ -66,7 +66,7 @@ public class SOActivity extends AppCompatActivity {
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", cceId = "", machineId = "";
 
-    public Double itemSoh, total = 0.0;// item made public so that to access in its adapter class
+    public Double itemSoh, total = 0.0,totalSOH;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
     Boolean isRepeat = false;
     EditText etQty;
@@ -405,6 +405,12 @@ public class SOActivity extends AppCompatActivity {
                         public void afterTextChanged(Editable s) {
                             System.out.println(s.toString());
                             btnAdd.setEnabled(false);
+                            if (Double.parseDouble(s.toString())>totalSOH){
+                               Toast.makeText(SOActivity.this,"Max units exceeded...",Toast.LENGTH_LONG).show();
+                                caculate.setEnabled(false);
+                            }else{
+                                caculate.setEnabled(true);
+                            }
                         }
                     });
 
@@ -635,6 +641,7 @@ public class SOActivity extends AppCompatActivity {
                         Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
                         tvSelectedItemName.setText("" + itemName);
                         tvMrp.setText("MRP: " + itemMrp);
+                        totalSOH=allocateQty.data.soh;
 
                         StringBuilder builder = new StringBuilder();
                         for (String details : houseList) {
