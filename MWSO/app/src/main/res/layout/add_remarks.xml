@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dialogwindow_bg"
+    android:orientation="vertical"
     android:paddingLeft="20dp"
     android:paddingRight="20dp">
 
@@ -12,7 +12,7 @@
         android:id="@+id/imgBtnCloseRemarksWindow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="31.33dp"
+        android:layout_marginStart="31.33dp"
         android:layout_marginTop="39.33dp"
         android:background="@drawable/ic_cancel" />
 
@@ -20,12 +20,14 @@
     <EditText
         android:id="@+id/etAddRemarks_Itemwise"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/llremarksBottom"
         android:layout_below="@+id/imgBtnCloseRemarksWindow"
         android:layout_gravity="center"
-        android:layout_marginLeft="25dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/et_roundedbox_bg"
         android:backgroundTint="@color/white"
         android:gravity="top|start"
@@ -39,24 +41,24 @@
         android:id="@+id/llremarksBottom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnClearRemarks_Itemwise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CLEAR" />
+            android:text="@string/clear" />
 
         <Button
             android:id="@+id/btnOkRemarks_Itemwise"
             android:layout_width="wrap_content"
-            android:layout_marginStart="10dp"
             android:layout_height="wrap_content"
-            android:text="OK" />
+            android:layout_marginStart="10dp"
+            android:text="@string/ok" />
 
 
     </LinearLayout>
@@ -72,15 +74,6 @@
     <!--android:layout_centerHorizontal="true"/>-->
 
 </RelativeLayout>
-
-
-
-
-
-
-
-
-
 
 
     <!--<?xml version="1.0" encoding="utf-8"?>-->
@@ -100,7 +93,6 @@
     <!--android:layout_marginTop="39.33px"-->
     <!--android:background="@drawable/ic_baseline_close_24px"-->
     <!--android:id="@+id/imgBtnCloseRemarksWindow" />-->
-
 
 
     <!--<EditText-->

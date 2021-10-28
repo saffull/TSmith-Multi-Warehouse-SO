@@ -3,8 +3,10 @@ package com.techsmith.mw_so;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -77,6 +79,12 @@ public class MainActivity extends AppCompatActivity {
         Url = prefs.getString("MultiSOURL", "");
         etUsername.setText(prefs.getString("username", ""));
         etPassword.setText(prefs.getString("password", ""));
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        System.exit(0);
     }
 
     public void Login(View view) {
@@ -197,12 +205,12 @@ public class MainActivity extends AppCompatActivity {
                         prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("loginResponse", strCheckLogin);
+                        editor.putString("BillRemarksMWSO", "");
                         editor.apply();
-                        editor.commit();
                         startActivity(new Intent(MainActivity.this, CustomerInformation.class));
 
                     } else {
-                        tsMessages(""+userPLObj.errorMessage);
+                        tsMessages("" + userPLObj.errorMessage);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -211,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void tsMessages(String msg) {
 
         try {

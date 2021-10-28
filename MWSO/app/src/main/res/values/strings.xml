@@ -2,4 +2,6 @@
     <string name="app_name">MW-SO</string>
     <string name="powered_by_techsmith_software_pvt_ltd">Powered By Techsmith Software Pvt Ltd</string>
     <string name="calculate">Calculate</string>
+    <string name="clear">CLEAR</string>
+    <string name="ok">OK</string>
 </resources>

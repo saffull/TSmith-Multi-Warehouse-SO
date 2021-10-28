@@ -90,7 +90,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
             itemDetail = itemArraylist.get(position);
         } catch (Exception e) {
             e.printStackTrace();
-            itemArraylist.remove(itemArraylist.size());
+            itemArraylist.remove(itemArraylist.size()-1);
             itemDetail = itemArraylist.get(position);
         }
 

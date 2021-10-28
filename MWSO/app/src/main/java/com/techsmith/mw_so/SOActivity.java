@@ -53,14 +53,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class SOActivity extends AppCompatActivity {
 
     SharedPreferences prefs;
-    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks,
+    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", cceId = "", machineId = "";
 
     public Double itemSoh, total = 0.0;// item made public so that to access in its adapter class
@@ -187,10 +190,10 @@ public class SOActivity extends AppCompatActivity {
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
 
-            ImageButton imgBtnCloseRemarksWindow = (ImageButton) dialog.findViewById(R.id.imgBtnCloseRemarksWindow);
-            Button btnOkRemarks = (Button) dialog.findViewById(R.id.btnOkRemarks_Itemwise);
-            Button btnClearRemarks_Itemwise = (Button) dialog.findViewById(R.id.btnClearRemarks_Itemwise);
-            etAddRemarks = (EditText) dialog.findViewById(R.id.etAddRemarks_Itemwise);
+            ImageButton imgBtnCloseRemarksWindow = dialog.findViewById(R.id.imgBtnCloseRemarksWindow);
+            Button btnOkRemarks = dialog.findViewById(R.id.btnOkRemarks_Itemwise);
+            Button btnClearRemarks_Itemwise = dialog.findViewById(R.id.btnClearRemarks_Itemwise);
+            etAddRemarks = dialog.findViewById(R.id.etAddRemarks_Itemwise);
             etAddRemarks.setText(billRemarks);
 
 
@@ -509,7 +512,6 @@ public class SOActivity extends AppCompatActivity {
 
                                     String[] from = {"SlNo,ItemName", "BatchCode", "ExpiryDate", "MRP", "BillingRate", "TaxPer", "TaxAmount", "TotalDisc", "LineTotalAmount"};
                                     int[] to = {R.id.itemcode, R.id.name, R.id.batchcode, R.id.batchbarcode, R.id.location, R.id.uperpack, R.id.expiry, R.id.sysstock, R.id.currentsoh};
-
                                     SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                                             listSODetailPL.size(), detailList, total);
                                     lvProductlist.setAdapter(arrayAdapter);
@@ -780,41 +782,94 @@ public class SOActivity extends AppCompatActivity {
         acvItemSearchSOActivity.setText("");
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+        alertDialogBuilder.setMessage("Do you want to logout..!!");
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                finish();
+                startActivity(new Intent(SOActivity.this, MainActivity.class));
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
+    }
+
     public void SaveSO(View view) {
         try {
             if (detailList.size() > 0) {
-                listSODetailPL = detailList;
-                SaveSODetail saveSODetail = new SaveSODetail();
-                saveSODetail.item = listSODetailPL;
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+                alertDialogBuilder.setMessage(" Do you want to continue saving?");
+                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        listSODetailPL = detailList;
+                        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                        SaveSODetail saveSODetail = new SaveSODetail();
+                        saveSODetail.item = listSODetailPL;
 
-                SaveSummarySO saveSummarySO = new SaveSummarySO();
-                saveSummarySO.custId = CustomerId;
-                saveSummarySO.customer = CustomerName;
-                saveSummarySO.docSeries = "SOM";
-                saveSummarySO.docDate = "26-10-2021";
-                saveSummarySO.docComplete = 1;
-                saveSummarySO.docSeries = "";
-                saveSummarySO.remarks = etAddRemarks.getText().toString();
-                saveSummarySO.cceId = cceId;
-                saveSummarySO.machineId = "";
-                saveSummarySO.userId = "";
-
-
-                SOMemo soMemo = new SOMemo();
-                soMemo.detail = saveSODetail;
-                soMemo.summary = saveSummarySO;
-
-
-                SOSave soSave = new SOSave();
-                soSave.soMemo = soMemo;
+                        SaveSummarySO saveSummarySO = new SaveSummarySO();
+                        saveSummarySO.custId = CustomerId;
+                        saveSummarySO.customer = CustomerName;
+                        saveSummarySO.docSeries = "SOM";
+                        saveSummarySO.docDate = date;
+                        saveSummarySO.docComplete = 1;
+                        saveSummarySO.docSeries = "";
+                        saveSummarySO.remarks = billRemarks;
+                        saveSummarySO.cceId = cceId;
+                        saveSummarySO.machineId = "";
+                        saveSummarySO.userId = "";
 
 
-                Gson gson = new Gson();
-                soString = gson.toJson(soSave);
-                System.out.println(soString);
-                new SaveSOTask().execute();
+                        SOMemo soMemo = new SOMemo();
+                        soMemo.detail = saveSODetail;
+                        soMemo.summary = saveSummarySO;
+
+
+                        SOSave soSave = new SOSave();
+                        soSave.soMemo = soMemo;
+
+
+                        Gson gson = new Gson();
+                        soString = gson.toJson(soSave);
+                        System.out.println(soString);
+                        new SaveSOTask().execute();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.show();
+
             } else {
-                Toast.makeText(SOActivity.this, "Add to the list", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+                alertDialogBuilder.setMessage("No SO to save.....!!");
+                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setCanceledOnTouchOutside(true);
+                alertDialog.show();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -955,30 +1010,49 @@ public class SOActivity extends AppCompatActivity {
 
 
     public void ClearList(View view) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
-        alertDialogBuilder.setMessage("Do you want to delete the full list..?");
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int arg1) {
-                detailList.clear();
-                total = total * 0.0;
-                SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
-                        listSODetailPL.size(), detailList, total);
-                lvProductlist.setAdapter(arrayAdapter);
-                arrayAdapter.notifyDataSetChanged();
-                tvAmountValue.setText("");
+        if (detailList.size() > 0) {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+            alertDialogBuilder.setMessage("Do you want to delete the full list..?");
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int arg1) {
+                    detailList.clear();
+                    total = total * 0.0;
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("BillRemarksMWSO", "");
+                    editor.commit();
+                    SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
+                            listSODetailPL.size(), detailList, total);
+                    lvProductlist.setAdapter(arrayAdapter);
+                    arrayAdapter.notifyDataSetChanged();
+                    tvAmountValue.setText("");
 
-            }
-        });
-        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
 
-            }
-        });
+                }
+            });
 
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+        } else {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+            alertDialogBuilder.setMessage("Nothing to clear..?");
+            alertDialogBuilder.setPositiveButton("cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int arg1) {
+                    dialog.cancel();
+                }
+            });
+
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
     }
 
     public void Restart(View view) {
@@ -990,7 +1064,6 @@ public class SOActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int arg1) {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("BillRemarksMWSO", "");
-                editor.commit();
                 editor.apply();
                 Intent intent = getIntent();
                 finish();
@@ -1001,11 +1074,11 @@ public class SOActivity extends AppCompatActivity {
         alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-
             }
         });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
 
     }
