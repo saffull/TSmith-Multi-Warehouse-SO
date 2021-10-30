@@ -39,10 +39,11 @@ import java.net.URL;
 public class CustomerInformation extends AppCompatActivity {
     SharedPreferences prefs;
     AutoCompleteTextView acvCustomerName;
-    ImageButton imgBtnCustSearchbyName;
+    ImageButton imgBtnCustSearchbyName, imgBtnSearchbyHUID;
     EditText etCustomerId, etCustomerAdrs, etCustomerMobile, etCustomerGSTNo, etReceivables;
     Button btnCreateSO;
-    String loginResponse, Url, strCustomer, strErrorMsg, selectedCustomerId, strReceivables;
+    String loginResponse, Url, strCustomer, strErrorMsg, strReceivables, selectedCustomerName;
+    int customerId, selectedCustomerId;
     ProgressDialog pDialog;
     CustomerList customerList;
     Double tsMsgDialogWindowHeight;
@@ -63,6 +64,7 @@ public class CustomerInformation extends AppCompatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(CustomerInformation.this);
         acvCustomerName = findViewById(R.id.acvCustomerName);
         imgBtnCustSearchbyName = findViewById(R.id.imgBtnCustSearchbyName);
+        imgBtnSearchbyHUID = findViewById(R.id.imgBtnSearchbyHUID);
         etCustomerId = findViewById(R.id.etCustomerId);
         etCustomerAdrs = findViewById(R.id.etCustomerAdrs);
         etCustomerMobile = findViewById(R.id.etCustomerMobile);
@@ -75,10 +77,14 @@ public class CustomerInformation extends AppCompatActivity {
             Gson gson = new Gson();
             userPLObj = gson.fromJson(loginResponse, UserPL.class);
             acvCustomerName.setText(userPLObj.summary.customerName);
-            etCustomerId.setText(String.valueOf(userPLObj.summary.customerId));
             etCustomerAdrs.setText(userPLObj.summary.customerAddress);
             etCustomerGSTNo.setText(userPLObj.summary.customerGSTIN);
             etCustomerMobile.setText(userPLObj.summary.customerPhoneNo);
+
+            if (userPLObj.summary.customerId != 0)
+                etCustomerId.setText(String.valueOf(userPLObj.summary.customerId));
+            else
+                etCustomerId.setText("");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,6 +103,12 @@ public class CustomerInformation extends AppCompatActivity {
                 }
             }
         });
+        imgBtnSearchbyHUID.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tsMessages("Function Not yet Implemented..");
+            }
+        });
         acvCustomerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -105,7 +117,8 @@ public class CustomerInformation extends AppCompatActivity {
 
 
                 String selectedCustomer = (String) parent.getItemAtPosition(pos);
-                selectedCustomerId = String.valueOf(customerList.data.get(pos).acid);
+                selectedCustomerId = customerList.data.get(pos).acid;
+                selectedCustomerName = customerList.data.get(pos).customer;
                 etCustomerGSTNo.setText(customerList.data.get(pos).gstin);
                 etCustomerId.setText(String.valueOf(customerList.data.get(pos).acid));
                 etCustomerAdrs.setText(customerList.data.get(pos).customerAddress);
@@ -114,16 +127,17 @@ public class CustomerInformation extends AppCompatActivity {
 
                 prefs = PreferenceManager.getDefaultSharedPreferences(CustomerInformation.this);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt("CustomerId", Integer.parseInt(selectedCustomerId));
-                editor.putString("CustomerName", userPLObj.summary.customerName);
-                editor.commit();
+                editor.putInt("CustomerId", customerList.data.get(pos).acid);
+                editor.putString("CustomerName", selectedCustomerName);
                 editor.apply();
+                LockButtons();
 
 
             }
         });
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -133,7 +147,7 @@ public class CustomerInformation extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
                 finish();
-                startActivity(new Intent(CustomerInformation.this,MainActivity.class));
+                startActivity(new Intent(CustomerInformation.this, MainActivity.class));
             }
         });
         alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -150,6 +164,9 @@ public class CustomerInformation extends AppCompatActivity {
 
     public void ClearAll(View view) {
         acvCustomerName.setText("");
+        acvCustomerName.setEnabled(true);
+        imgBtnCustSearchbyName.setEnabled(true);
+        acvCustomerName.setAdapter(null);
         etCustomerId.setText("");
         etCustomerMobile.setText("");
         etCustomerAdrs.setText("");
@@ -162,7 +179,15 @@ public class CustomerInformation extends AppCompatActivity {
     }
 
     public void GetReceivables(View view) {
-        if (userPLObj.summary.customerId != 0) {
+        customerId = userPLObj.summary.customerId;
+        if (customerId != 0) {
+            new GetReceivablesTask().execute();
+        } else {
+            customerId = selectedCustomerId;
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("selectedCustomerName", selectedCustomerName);
+            editor.putInt("selectedCustomerId", selectedCustomerId);
+            editor.apply();
             new GetReceivablesTask().execute();
         }
     }
@@ -181,7 +206,7 @@ public class CustomerInformation extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             //https://tsmithy.in/somemouat/api/GetReceivables?CustId=382
             try {
-                URL url = new URL(Url + "GetReceivables?CustId=" + userPLObj.summary.customerId);
+                URL url = new URL(Url + "GetReceivables?CustId=" + customerId);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(300000);
@@ -191,7 +216,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -286,7 +311,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -407,4 +432,15 @@ public class CustomerInformation extends AppCompatActivity {
         }
 
     }
+
+    private void LockButtons() {
+        imgBtnCustSearchbyName.setEnabled(false);
+        acvCustomerName.setEnabled(false);
+        imgBtnSearchbyHUID.setEnabled(false);
+        etCustomerAdrs.setEnabled(false);
+        etCustomerMobile.setEnabled(false);
+        etCustomerGSTNo.setEnabled(false);
+
+    }
+
 }

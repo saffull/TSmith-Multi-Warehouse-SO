@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences prefs;
     ProgressDialog pDialog;
     Double tsMsgDialogWindowHeight;
-    String username, password, Url, strUserPLJson, strCheckLogin, strErrorMsg;
+    String username, password, Url, MultiSOStoredDevId, strCheckLogin, strErrorMsg;
     String[] permissions = {Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,};
 
@@ -128,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
 
             System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
             try {
-                // URL url = new URL(Url + "LoginVer2?Name="+username+"&pwd="+password);
-                URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
+                //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
+                URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name="+username+"&secret=1047109119116122626466");
                 System.out.println(Url + "LoginVer2?Name=" + username + "&pwd=" + password);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
@@ -140,7 +140,8 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                //connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 

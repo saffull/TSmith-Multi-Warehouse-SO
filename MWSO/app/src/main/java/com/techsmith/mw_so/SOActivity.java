@@ -39,7 +39,6 @@ import com.techsmith.mw_so.utils.SOActivityArrayAdapter;
 import com.techsmith.mw_so.utils.SOMemo;
 import com.techsmith.mw_so.utils.SOPL;
 import com.techsmith.mw_so.utils.SOSave;
-import com.techsmith.mw_so.utils.SaveItemSO;
 import com.techsmith.mw_so.utils.SaveSODetail;
 import com.techsmith.mw_so.utils.SaveSOResponse;
 import com.techsmith.mw_so.utils.SaveSummarySO;
@@ -64,9 +63,10 @@ public class SOActivity extends AppCompatActivity {
 
     SharedPreferences prefs;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
-            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", cceId = "", machineId = "";
+            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "",
+            cceId = "", machineId = "";
 
-    public Double itemSoh, total = 0.0,totalSOH;// item made public so that to access in its adapter class
+    public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
     Boolean isRepeat = false;
     EditText etQty;
@@ -112,8 +112,16 @@ public class SOActivity extends AppCompatActivity {
         Gson gson = new Gson();
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
         Url = prefs.getString("MultiSOURL", "");
-        CustomerName = userPLObj.summary.customerName;
-        CustomerId = userPLObj.summary.customerId;
+        try {
+        if (userPLObj.summary.customerName==null){
+            CustomerName = prefs.getString("selectedCustomerName", "");
+            CustomerId = prefs.getInt("selectedCustomerId", 0);
+        }else{
+            CustomerName = userPLObj.summary.customerName;
+             CustomerId = userPLObj.summary.customerId;
+        }
+
+
         cceId = String.valueOf(userPLObj.summary.cceId);
         listSODetailPL = new ArrayList<>();
         detailList = new ArrayList<>();
@@ -126,8 +134,13 @@ public class SOActivity extends AppCompatActivity {
         saveDialogWindowHeight = (double) (screen_height * 42) / 100;
 
         acvItemSearchSOActivity = findViewById(R.id.acvItemSearchSOActivity);
-        tvCustomerName.setText(CustomerName);
-        tvDate.setText(String.valueOf(CustomerId));
+
+
+            tvCustomerName.setText(CustomerName);
+            tvDate.setText(String.valueOf(CustomerId));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         acvItemSearchSOActivity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -237,7 +250,6 @@ public class SOActivity extends AppCompatActivity {
             btnClearRemarks_Itemwise.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
                     etAddRemarks.setText("");
                 }
             });
@@ -405,10 +417,10 @@ public class SOActivity extends AppCompatActivity {
                         public void afterTextChanged(Editable s) {
                             System.out.println(s.toString());
                             btnAdd.setEnabled(false);
-                            if (Double.parseDouble(s.toString())>totalSOH){
-                               Toast.makeText(SOActivity.this,"Max units exceeded...",Toast.LENGTH_LONG).show();
+                            if (Double.parseDouble(s.toString()) > totalSOH) {
+                                Toast.makeText(SOActivity.this, "Max units exceeded...", Toast.LENGTH_LONG).show();
                                 caculate.setEnabled(false);
-                            }else{
+                            } else {
                                 caculate.setEnabled(true);
                             }
                         }
@@ -641,7 +653,7 @@ public class SOActivity extends AppCompatActivity {
                         Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
                         tvSelectedItemName.setText("" + itemName);
                         tvMrp.setText("MRP: " + itemMrp);
-                        totalSOH=allocateQty.data.soh;
+                        totalSOH = allocateQty.data.soh;
 
                         StringBuilder builder = new StringBuilder();
                         for (String details : houseList) {
@@ -792,23 +804,24 @@ public class SOActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
-        alertDialogBuilder.setMessage("Do you want to logout..!!");
-        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setMessage("Do you want to logout or change Customer..!!");
+        alertDialogBuilder.setPositiveButton("Logout", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
                 finish();
                 startActivity(new Intent(SOActivity.this, MainActivity.class));
             }
         });
-        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton("Change Customer", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+
+                finish();
+                startActivity(new Intent(SOActivity.this, CustomerInformation.class));
             }
         });
 
         AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
     }
 
@@ -816,7 +829,7 @@ public class SOActivity extends AppCompatActivity {
         try {
             if (detailList.size() > 0) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
-                alertDialogBuilder.setMessage(" Do you want to continue saving?");
+                alertDialogBuilder.setMessage("Do you want to continue saving?");
                 alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
@@ -995,6 +1008,7 @@ public class SOActivity extends AppCompatActivity {
                     // tvSaveStatus.setText("Saved \n\nToken No: " + tokenNo);
                     tvSaveStatus.setText("Saved\n\n SOMemoNo:\t" + saveSOResponse.data.get(saveSOResponse.data.size() - 1).SOMemoNo);
                     tvSaveStatus.setMovementMethod(new ScrollingMovementMethod());
+                    dialog.setCanceledOnTouchOutside(false);
                     dialog.show();
 
                 } else {
@@ -1027,13 +1041,12 @@ public class SOActivity extends AppCompatActivity {
                     total = total * 0.0;
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString("BillRemarksMWSO", "");
-                    editor.commit();
+                    editor.apply();
                     SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                             listSODetailPL.size(), detailList, total);
                     lvProductlist.setAdapter(arrayAdapter);
                     arrayAdapter.notifyDataSetChanged();
                     tvAmountValue.setText("");
-
                 }
             });
             alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
