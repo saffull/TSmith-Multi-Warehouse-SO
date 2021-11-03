@@ -36,7 +36,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import io.github.muddz.styleabletoast.StyleableToast;
 
 public class CustomerInformation extends AppCompatActivity {
     SharedPreferences prefs;
@@ -186,8 +185,7 @@ public class CustomerInformation extends AppCompatActivity {
             finish();
             startActivity(new Intent(CustomerInformation.this, SOActivity.class));
         } else {
-            StyleableToast.makeText(CustomerInformation.this, "Hello World!", Toast.LENGTH_LONG, R.style.mytoast).show();
-
+            Toast.makeText(CustomerInformation.this, "Select a Customer", Toast.LENGTH_SHORT).show();
 
         }
     }
