@@ -19,8 +19,7 @@
             android:background="@color/activity_bg_color"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:padding="5dp">
 
             <ImageButton
                 android:id="@+id/imageButton"
@@ -28,8 +27,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
                 android:background="@null"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_person" />
+                android:onClick="GoBack"
+                app:srcCompat="@drawable/ic_back_arrow" />
 
             <TextView
                 android:id="@+id/tvCustomerName"
@@ -369,28 +368,35 @@
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvNoOfPrescrptnsAdded"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:textColor="@color/black"
-            android:visibility="invisible" />
-
         <LinearLayout
             android:id="@+id/llSOBottombar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/activity_bg_color"
             android:orientation="horizontal"
-            android:padding="15dp">
+            android:padding="10dp">
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.7"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
                 android:orientation="vertical"
-                android:padding="20px">
+                android:padding="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/etReceivables"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:fontFamily="@font/fabrica"
+                        android:gravity="center" />
+                </LinearLayout>
                 <!--android:background="#00FFFF"-->
 
                 <LinearLayout
@@ -398,6 +404,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <!--android:background="#FF0000"-->
 
                     <ImageButton

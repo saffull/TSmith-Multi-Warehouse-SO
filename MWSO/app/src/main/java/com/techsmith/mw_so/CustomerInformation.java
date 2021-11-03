@@ -36,13 +36,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import io.github.muddz.styleabletoast.StyleableToast;
+
 public class CustomerInformation extends AppCompatActivity {
     SharedPreferences prefs;
     AutoCompleteTextView acvCustomerName;
     ImageButton imgBtnCustSearchbyName, imgBtnSearchbyHUID;
     EditText etCustomerId, etCustomerAdrs, etCustomerMobile, etCustomerGSTNo, etReceivables;
     Button btnCreateSO;
-    String loginResponse, Url, strCustomer, strErrorMsg, strReceivables, selectedCustomerName;
+    String loginResponse, Url, strCustomer, strErrorMsg, strReceivables, selectedCustomerName, multiSOStoredDevId;
     int customerId, selectedCustomerId;
     ProgressDialog pDialog;
     CustomerList customerList;
@@ -73,6 +75,9 @@ public class CustomerInformation extends AppCompatActivity {
         etReceivables = findViewById(R.id.etReceivables);
         loginResponse = prefs.getString("loginResponse", "");
         Url = prefs.getString("MultiSOURL", "");
+        multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
+        btnCreateSO.setEnabled(false);
+        btnCreateSO.setAlpha((float) 0.6);
         try {
             Gson gson = new Gson();
             userPLObj = gson.fromJson(loginResponse, UserPL.class);
@@ -124,7 +129,8 @@ public class CustomerInformation extends AppCompatActivity {
                 etCustomerAdrs.setText(customerList.data.get(pos).customerAddress);
                 etCustomerMobile.setText(customerList.data.get(pos).customerPhoneNo);
 
-
+                btnCreateSO.setEnabled(true);
+                btnCreateSO.setAlpha(1);
                 prefs = PreferenceManager.getDefaultSharedPreferences(CustomerInformation.this);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt("CustomerId", customerList.data.get(pos).acid);
@@ -163,6 +169,8 @@ public class CustomerInformation extends AppCompatActivity {
     }
 
     public void ClearAll(View view) {
+        btnCreateSO.setEnabled(false);
+        btnCreateSO.setAlpha((float) 0.6);
         acvCustomerName.setText("");
         acvCustomerName.setEnabled(true);
         imgBtnCustSearchbyName.setEnabled(true);
@@ -174,21 +182,30 @@ public class CustomerInformation extends AppCompatActivity {
     }
 
     public void CreateSO(View view) {
-        finish();
-        startActivity(new Intent(CustomerInformation.this, SOActivity.class));
+        if (!acvCustomerName.getText().toString().isEmpty()) {
+            finish();
+            startActivity(new Intent(CustomerInformation.this, SOActivity.class));
+        } else {
+            StyleableToast.makeText(CustomerInformation.this, "Hello World!", Toast.LENGTH_LONG, R.style.mytoast).show();
+
+
+        }
     }
 
     public void GetReceivables(View view) {
+        System.out.println("Customer ID is " + customerId);
         customerId = userPLObj.summary.customerId;
         if (customerId != 0) {
             new GetReceivablesTask().execute();
-        } else {
+        } else if (selectedCustomerId != 0) {
             customerId = selectedCustomerId;
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("selectedCustomerName", selectedCustomerName);
             editor.putInt("selectedCustomerId", selectedCustomerId);
             editor.apply();
             new GetReceivablesTask().execute();
+        } else {
+            Toast.makeText(CustomerInformation.this, "No Customer Specified..!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -216,7 +233,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "saffull@gmail.com");
+                connection.setRequestProperty("machineid", multiSOStoredDevId);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -311,7 +328,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "saffull@gmail.com");
+                connection.setRequestProperty("machineid", multiSOStoredDevId);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -440,6 +457,7 @@ public class CustomerInformation extends AppCompatActivity {
         etCustomerAdrs.setEnabled(false);
         etCustomerMobile.setEnabled(false);
         etCustomerGSTNo.setEnabled(false);
+        etCustomerId.setEnabled(false);
 
     }
 

@@ -4,4 +4,7 @@
     <string name="calculate">Calculate</string>
     <string name="clear">CLEAR</string>
     <string name="ok">OK</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="customer_information">Customer Information</string>
+    <string name="customer_address">Customer Address</string>
 </resources>

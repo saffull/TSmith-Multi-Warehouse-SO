@@ -57,7 +57,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
     ImageButton btnDelete;
-    String Url, strGetTotal, strErrorMsg, current_qty, strGetItemDetail, loginResponse;
+    String Url, strGetTotal, strErrorMsg, current_qty, strGetItemDetail, loginResponse,multiSOStoredDevId,CustomerName;
     AllocateQty allocateQty, Allocateqty;
     List<String> houseList, sohList, offerList;
     UserPL userPLObj;
@@ -74,11 +74,21 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         editor = prefs.edit();
         loginResponse = prefs.getString("loginResponse", "");
-        Gson gson = new Gson();
-        userPLObj = gson.fromJson(loginResponse, UserPL.class);
+        try {
+            Gson gson = new Gson();
+            userPLObj = gson.fromJson(loginResponse, UserPL.class);
 
-        Url = prefs.getString("MultiSOURL", "");
-        CustomerId = userPLObj.summary.customerId;
+            Url = prefs.getString("MultiSOURL", "");
+            multiSOStoredDevId=prefs.getString("MultiSOStoredDevId","");
+
+            if (userPLObj.summary.customerName == null) {
+                CustomerName = prefs.getString("selectedCustomerName", "");
+                CustomerId = prefs.getInt("selectedCustomerId", 0);
+            } else {
+                CustomerName = userPLObj.summary.customerName;
+                CustomerId = userPLObj.summary.customerId;
+            }
+        }catch (Exception e){e.printStackTrace();}
 
     }
 
@@ -208,7 +218,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid",multiSOStoredDevId);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setDoOutput(true);
                 OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
@@ -336,7 +346,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
 
                 //https://tsmithy.in/somemouat/api/GetSOHAndSchemes?ItemId=14290&CustId=382
                 URL url = new URL(Url + "GetSOHAndSchemes?ItemId=" + itemDetail.itemId + "&CustId=" + CustomerId);
-
+                System.out.println(Url + "GetSOHAndSchemes?ItemId=" + itemDetail.itemId + "&CustId=" + CustomerId);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(300000);
@@ -346,7 +356,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid",multiSOStoredDevId);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -370,6 +380,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                         reader.close();
                         String str = "";
                         strGetItemDetail = sb.toString();
+                        System.out.println("Adapter Response is "+sb.toString());
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -653,7 +664,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid",multiSOStoredDevId);
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setDoOutput(true);
                 OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());

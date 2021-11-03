@@ -53,12 +53,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/toolbar1"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
             android:layout_marginTop="80dp"
             android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:padding="16dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -128,10 +126,10 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/button_selector"
                 android:clickable="true"
-                android:onClick="Login"
                 android:elevation="10dp"
                 android:focusable="true"
                 android:fontFamily="@font/fabrica"
+                android:onClick="Login"
                 android:text="Login"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
@@ -143,7 +141,7 @@
                 android:layout_gravity="right"
                 android:layout_margin="10dp"
                 android:fontFamily="@font/fabrica"
-                android:text="Forgot Password"
+                android:text="@string/forgot_password"
                 android:textColor="@color/violet1" />
 
             <TextView
