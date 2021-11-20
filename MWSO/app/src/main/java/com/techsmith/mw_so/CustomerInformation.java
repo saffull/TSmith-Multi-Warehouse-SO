@@ -74,9 +74,15 @@ public class CustomerInformation extends AppCompatActivity {
         etReceivables = findViewById(R.id.etReceivables);
         loginResponse = prefs.getString("loginResponse", "");
         Url = prefs.getString("MultiSOURL", "");
-        multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
-        btnCreateSO.setEnabled(false);
-        btnCreateSO.setAlpha((float) 0.6);
+       // multiSOStoredDevId = prefs.getString(""salam_ka@yahoo.com"", "");
+       /* if (acvCustomerName.getText().toString().isEmpty()){
+            btnCreateSO.setEnabled(false);
+            btnCreateSO.setAlpha((float) 0.6);
+        }
+        else{
+            btnCreateSO.setEnabled(true);
+        }*/
+
         try {
             Gson gson = new Gson();
             userPLObj = gson.fromJson(loginResponse, UserPL.class);
@@ -231,7 +237,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -326,7 +332,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 

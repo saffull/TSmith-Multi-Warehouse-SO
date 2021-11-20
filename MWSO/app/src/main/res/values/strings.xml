@@ -7,4 +7,7 @@
     <string name="forgot_password">Forgot Password</string>
     <string name="customer_information">Customer Information</string>
     <string name="customer_address">Customer Address</string>
+    <string name="delivery_amp_collection">Collections</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

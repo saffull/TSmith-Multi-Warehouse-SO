@@ -16,11 +16,20 @@
         android:theme="@style/Theme.MWSO"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Collections"
+            android:exported="true" />
+        <activity
+            android:name=".Category"
+            android:exported="true" />
+        <activity
             android:name=".CustomerInformation"
+            android:configChanges="orientation|screenSize"
             android:exported="true" />
         <activity
             android:name=".SOActivity"
-            android:exported="true" />
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".Settings"
             android:exported="true" />

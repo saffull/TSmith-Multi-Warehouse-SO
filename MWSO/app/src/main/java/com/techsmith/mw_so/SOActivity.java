@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -17,6 +18,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -67,7 +69,6 @@ public class SOActivity extends AppCompatActivity {
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "",
             cceId = "", multiSOStoredDevId = "";
-
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
     Boolean isRepeat = false;
@@ -101,6 +102,20 @@ public class SOActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_so);
         getSupportActionBar().hide();
+
+        //Determine screen size
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            Toast.makeText(this, "Large screen", Toast.LENGTH_LONG).show();
+        }
+        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
+            Toast.makeText(this, "Normal sized screen", Toast.LENGTH_LONG).show();
+        }
+        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) {
+            Toast.makeText(this, "Small sized screen", Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(this, "Screen size is neither large, normal or small", Toast.LENGTH_LONG).show();
+        }
         prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
         tvCustomerName = findViewById(R.id.tvCustomerName);
         ic_search = findViewById(R.id.imgBtnSearchItem);
@@ -148,7 +163,22 @@ public class SOActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
+        acvItemSearchSOActivity.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    filter = acvItemSearchSOActivity.getText().toString();
+                    if (filter.length() >= 3) {
+                        new GetItemsTask().execute();
+                    } else {
+                        Toast.makeText(SOActivity.this, "Add atleast 3 characters", Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
         acvItemSearchSOActivity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, final int pos, long arg3) {
@@ -299,7 +329,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -416,7 +446,7 @@ public class SOActivity extends AppCompatActivity {
                     etQty.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                            System.out.println(s.toString());
                         }
 
                         @Override
@@ -459,7 +489,6 @@ public class SOActivity extends AppCompatActivity {
                                 Toast.makeText(SOActivity.this, "Add atleast 1", Toast.LENGTH_LONG).show();
                             else
                                 new AllocateQtyTask().execute();
-
                         }
                     });
                     imgBtnCloseQtySelection.setOnClickListener(new View.OnClickListener() {
@@ -597,7 +626,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setDoOutput(true);
                 OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
@@ -723,7 +752,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -811,6 +840,8 @@ public class SOActivity extends AppCompatActivity {
     public void ClearSearch(View view) {
         acvItemSearchSOActivity.setText("");
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -933,7 +964,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setReadTimeout(300000);
                 connection.setConnectTimeout(300000);
@@ -1052,7 +1083,7 @@ public class SOActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString("BillRemarksMWSO", "");
                     editor.apply();
-                     arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
+                    arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                             listSODetailPL.size(), detailList, total);
                     lvProductlist.setAdapter(arrayAdapter);
                     arrayAdapter.notifyDataSetChanged();
@@ -1172,7 +1203,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 

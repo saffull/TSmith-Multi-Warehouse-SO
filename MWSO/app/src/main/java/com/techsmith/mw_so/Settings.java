@@ -52,8 +52,8 @@ public class Settings extends AppCompatActivity {
         URL = etUrlValue.getText().toString().trim();
         SharedPreferences.Editor editor = prefs.edit();
         //editor.putString("MultiSOStoredDevId", myuniqueID);
-        editor.putString("MultiSOStoredDevId", "saffull@gmail.com");
-        //editor.putString("MultiSOStoredDevId", "salam_ka@yahoo.com");
+        //editor.putString("MultiSOStoredDevId", "saffull@gmail.com");
+        editor.putString("MultiSOStoredDevId", "salam_ka@yahoo.com");
         editor.putString("MultiSOURL", URL);
         editor.apply();
         finish();

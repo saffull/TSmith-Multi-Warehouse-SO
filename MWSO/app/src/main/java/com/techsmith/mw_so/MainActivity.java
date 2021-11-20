@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", multiSOStoredDevId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("loginResponse", strCheckLogin);
                         editor.putString("BillRemarksMWSO", "");
                         editor.apply();
-                        startActivity(new Intent(MainActivity.this, CustomerInformation.class));
+                        startActivity(new Intent(MainActivity.this, Category.class));
 
                     } else {
                         tsMessages("" + userPLObj.errorMessage);
