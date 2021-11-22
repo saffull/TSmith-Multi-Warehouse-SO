@@ -7,6 +7,7 @@
     <EditText
         android:id="@+id/etUserInput"
         android:hint="Enter the Amount"
+        android:inputType="number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
