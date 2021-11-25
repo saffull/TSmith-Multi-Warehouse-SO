@@ -4,10 +4,26 @@
     android:orientation="vertical"
     android:layout_height="match_parent">
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:id="@+id/etUserInput"
+            android:ems="10"
+            android:inputType="number"
+            android:layout_margin="5dp"
+            android:layout_height="wrap_content"
+            android:hint="Please enter the amount" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <EditText
-        android:id="@+id/etUserInput"
+
         android:hint="Enter the Amount"
         android:inputType="number"
+        android:ems="10"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 

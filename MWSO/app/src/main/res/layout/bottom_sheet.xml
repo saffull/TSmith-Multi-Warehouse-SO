@@ -14,8 +14,8 @@
         android:id="@+id/llAddRx"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/activity_bg_color"
         android:layout_gravity="center"
+        android:background="@color/activity_bg_color"
         android:orientation="vertical">
 
 
@@ -39,14 +39,15 @@
                 android:text=""
                 android:textOff=""
                 android:textOn="" />
+
             <TextView
                 android:id="@+id/tvAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:fontFamily="@font/ralewaybold"
-                android:text="Total MRP:₹ "
                 android:layout_toRightOf="@+id/toggleButton"
+                android:fontFamily="@font/ralewaybold"
+                android:text="Total Amount:₹ "
                 android:textStyle="bold" />
             <!--   android:text="Approx.Amount:₹ "-->
             <TextView
@@ -57,7 +58,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_toRightOf="@+id/tvAmount"
                 android:background="#4A7BCB"
-                android:fontFamily="@font/ralewaybold"
+                android:fontFamily="@font/fabrica"
                 android:inputType="numberDecimal"
                 android:padding="15dp"
                 android:text=""
@@ -68,37 +69,25 @@
 
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/widget377"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="0dp"
-        android:weightSum="3"
         android:background="@color/activity_bg_color"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:weightSum="3">
 
-        <Button
-            android:id="@+id/btnCOL_Save"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:layout_gravity="left"
-            android:layout_marginLeft="3dp"
-            android:background="@color/activity_bg_color"
-            android:fontFamily="@font/fabrica"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:text="Save"
-            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/btnCOL_Reset"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_weight="1"
             android:layout_gravity="left"
             android:layout_marginLeft="3dp"
+            android:layout_weight="1"
             android:background="@color/activity_bg_color"
             android:fontFamily="@font/fabrica"
             android:paddingLeft="3dp"
@@ -110,9 +99,9 @@
             android:id="@+id/btnCOL_Remarks"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_weight="1"
             android:layout_gravity="left"
             android:layout_marginLeft="3dp"
+            android:layout_weight="1"
             android:background="@color/activity_bg_color"
             android:fontFamily="@font/fabrica"
             android:paddingLeft="3dp"
@@ -120,6 +109,18 @@
             android:text="Remarks"
             android:textColor="@color/white" />
 
-
+        <Button
+            android:id="@+id/btnCOL_Save"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:background="@color/activity_bg_color"
+            android:fontFamily="@font/fabrica"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="Save"
+            android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

@@ -58,16 +58,29 @@
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:orientation="horizontal"
                     android:layout_weight="1">
 
                     <Spinner
                         android:id="@+id/storeSelect"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_marginRight="15dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content" />
-                </RelativeLayout>
+                    <ImageButton
+                        android:id="@+id/imgBtnSearchbyHUID"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="resetSpinner"
+                        android:layout_marginLeft="15dp"
+                        android:layout_alignRight="@+id/storeSelect"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:src="@drawable/ic_reset" />
+                </LinearLayout>
 
                 <!--<RelativeLayout
                     android:layout_width="match_parent"
@@ -98,7 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="80dp"
                 android:layout_marginBottom="5dp"
                 android:background="#000000" />
 
@@ -165,7 +178,8 @@
                         android:layout_height="40dp"
                         android:layout_gravity="left"
                         android:layout_marginLeft="3dp"
-                        android:background="@color/activity_bg_color"
+                        android:enabled="false"
+                        android:background="@color/green"
                         android:fontFamily="@font/fabrica"
                         android:onClick="AutoFillAmount"
                         android:paddingLeft="5dp"
@@ -201,22 +215,15 @@
                 android:layout_marginRight="5dp"
                 android:background="@color/activity_bg_color"
                 android:orientation="horizontal"
-                android:weightSum="4">
+                android:weightSum="5">
 
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.4"
+                    android:layout_weight="1.2"
                     android:fontFamily="@font/fabrica"
-                    android:text="#"
-                    android:textColor="@color/black" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/fabrica"
+                    android:gravity="left"
                     android:text="Bill No"
                     android:textColor="@color/black" />
 
@@ -225,7 +232,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/fabrica"
-                    android:gravity="center"
+                    android:gravity="right"
                     android:text="Due"
                     android:textColor="@color/black" />
 
@@ -241,7 +248,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.6"
+                    android:layout_weight="0.8"
                     android:fontFamily="@font/fabrica"
                     android:gravity="center"
                     android:text="Select"
@@ -252,7 +259,7 @@
             <ListView
                 android:id="@+id/lvCollectionlist"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="480dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginBottom="5dp"
