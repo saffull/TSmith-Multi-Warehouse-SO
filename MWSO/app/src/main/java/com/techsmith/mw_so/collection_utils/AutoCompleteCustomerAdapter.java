@@ -1,4 +1,4 @@
-package com.techsmith.mw_so.utils;
+package com.techsmith.mw_so.collection_utils;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,27 +6,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.techsmith.mw_so.CustomerInformation;
+
+import com.techsmith.mw_so.Collections;
 import com.techsmith.mw_so.R;
+import com.techsmith.mw_so.utils.KArrayAdapter;
 
-
-public class AutocompleteCustomArrayAdapter  extends KArrayAdapter<String>{
-
-
+public class AutoCompleteCustomerAdapter  extends KArrayAdapter<String> {
     Context mContext;
     int layoutResourceId;
     public String[]  items;
 
-
-    public AutocompleteCustomArrayAdapter(Context mContext, int layoutResourceId, String[] objects) {
-
-        super(mContext, layoutResourceId, objects);
-
+    public AutoCompleteCustomerAdapter(Context context, int layoutResourceId, String[] objects) {
+        super(context, layoutResourceId, objects);
         this.layoutResourceId = layoutResourceId;
-        this.mContext = mContext;
+        this.mContext = context;
         this.items = objects;
     }
-
+    @Override
+    public int getCount() {
+        return items.length;
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -34,19 +33,14 @@ public class AutocompleteCustomArrayAdapter  extends KArrayAdapter<String>{
 
             if(convertView == null) {
                 // inflate the layout
-                LayoutInflater inflater = ((CustomerInformation) mContext).getLayoutInflater();
+                LayoutInflater inflater = ((Collections) mContext).getLayoutInflater();
                 convertView = inflater.inflate(layoutResourceId, parent, false);
             }
-
-            // object item based on the position
             String objectItem = items[position];
 
-            // get the TextView and then set the text (item name) and tag (item ID) values
             TextView textViewItem = convertView.findViewById(R.id.textViewItem);
             textViewItem.setText(objectItem);
 
-            // in case you want to add some style, you can do something like:
-//            textViewItem.setBackgroundColor(Color.CYAN);
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -57,10 +51,4 @@ public class AutocompleteCustomArrayAdapter  extends KArrayAdapter<String>{
         return convertView;
 
     }
-
-    @Override
-    public int getCount() {
-        return items.length;
-    }
-
 }

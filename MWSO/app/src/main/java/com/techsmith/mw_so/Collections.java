@@ -2,7 +2,11 @@ package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -14,37 +18,41 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.techsmith.mw_so.collection_utils.AutoCompleteCustomerAdapter;
+import com.techsmith.mw_so.collection_utils.CSpinner;
 import com.techsmith.mw_so.collection_utils.Collection;
 import com.techsmith.mw_so.collection_utils.CollectionPL;
 import com.techsmith.mw_so.collection_utils.FillAmount;
 import com.techsmith.mw_so.collection_utils.SOAutoFillAdapter;
 import com.techsmith.mw_so.collection_utils.SOCollectionAdapter;
 import com.techsmith.mw_so.utils.AppConfigSettings;
-import com.techsmith.mw_so.utils.AutocompleteCustomArrayAdapter;
 import com.techsmith.mw_so.utils.CustomerList;
 import com.techsmith.mw_so.utils.UserPL;
 
@@ -54,33 +62,40 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class Collections extends AppCompatActivity {
-    EditText cashAmount;
-    TextInputEditText userInput;
+    public EditText cashAmount, userInput, tvAmountValue, editText1;
     RadioButton cash, cheque;
     Gson gson;
-    Double TempAutoFillAmount, total = 0.0;
+    Double TempAutoFillAmount, total = 0.0, tvTotal = 0.0;
     Collection collection;
-    private Spinner storeSelect;
+    private CSpinner storeSelect;
+    CustomerList customerList;
+    AutoCompleteTextView acvItemSearchSOActivity;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet, ll;
     private ToggleButton tbUpDown;
     private Button save, reset, remarks, autoFill;
-    public TextView tvAmountValue;
+    public TextView tvDueValue;
     SharedPreferences prefs;
     public ListView lvCollectionlist;
     ProgressDialog pDialog;
+    ImageButton imgBtnCustSearchbyName;
     SOCollectionAdapter arrayAdapter;
     AutoCompleteTextView acvCustomerName;
-    String StoreId, etCustomerId, Url, multiSOStoredDevId, loginResponse, strErrorMsg, strCollections, strCustomer;
+    private RecyclerView recyclerView;
+    String StoreId, etCustomerId, Url, Cname = "", multiSOStoredDevId, loginResponse, strErrorMsg, strCollections, strCustomer;
     UserPL userPLObj;
-    public String[] stores, amt;
-    int i = 0, edPos, autoCount = 0;
+    SwitchCompat switchCompat;
+    public String[] stores, amt, vTmp;
+    int i = 0, edPos, autoCount = 0, dueTotal = 0;
     HashMap<String, String> storeMap;
     List<CollectionPL> listCollectionPL;
+    Boolean autoFlag = false;
     public ArrayList<CollectionPL> detailList;
 
     @Override
@@ -95,16 +110,17 @@ public class Collections extends AppCompatActivity {
         setContentView(R.layout.activity_collections);
         getSupportActionBar().hide();
         prefs = PreferenceManager.getDefaultSharedPreferences(Collections.this);
-        cashAmount = findViewById(R.id.cashAmount);
         acvCustomerName = findViewById(R.id.acvCustomerName);
+        lvCollectionlist = findViewById(R.id.lvCollectionlist);
         cash = findViewById(R.id.radioCOLCash);
         cheque = findViewById(R.id.radioCOLCheque);
         storeSelect = findViewById(R.id.storeSelect);
         ll = findViewById(R.id.paymentDetails);
         autoFill = findViewById(R.id.btnCOL_AutoFill);
+        imgBtnCustSearchbyName = findViewById(R.id.imgBtnCustSearchbyName);
         listCollectionPL = new ArrayList<>();
         detailList = new ArrayList<>();
-        lvCollectionlist = findViewById(R.id.lvCollectionlist);
+
         loginResponse = prefs.getString("loginResponse", "");
         gson = new Gson();
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
@@ -125,6 +141,26 @@ public class Collections extends AppCompatActivity {
             }
         });
 
+        imgBtnCustSearchbyName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (acvCustomerName.getText().toString().equalsIgnoreCase("") || acvCustomerName.getText().toString().length() < 3) {
+
+                    Toast.makeText(Collections.this, "Please input minimum 3 characters", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    new GetCustomerListTask().execute();
+                }
+            }
+        });
+        acvCustomerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                storeSelect.setEnabled(true);
+            }
+        });
+
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(View view, int newState) {
@@ -141,6 +177,43 @@ public class Collections extends AppCompatActivity {
             }
         });
 
+        tvAmountValue.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    Double temp;
+                    if (s.toString().length() > 0) {
+
+                        temp = dueTotal - Double.parseDouble(s.toString());
+                        final Handler handler = new Handler(Looper.getMainLooper());
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (temp < 0)
+                                    tvDueValue.setText("0");
+                                else
+                                    tvDueValue.setText(String.valueOf(temp));
+                            }
+                        }, 500);
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+
         try {
             gson = new Gson();
             if (userPLObj.detail.size() > 0)
@@ -148,12 +221,18 @@ public class Collections extends AppCompatActivity {
             else
                 stores = new String[5000];
             userPLObj = gson.fromJson(loginResponse, UserPL.class);
+
             acvCustomerName.setText(userPLObj.summary.customerName);
             stores[0] = "Select Store";
             for (int i = 0; i < userPLObj.detail.size(); i++) {
                 stores[i + 1] = userPLObj.detail.get(i).storeName;
                 storeMap.put(userPLObj.detail.get(i).storeName, String.valueOf(userPLObj.detail.get(i).storeId));
             }
+            if (acvCustomerName.getText().toString().isEmpty())
+                storeSelect.setEnabled(false);
+            else
+                storeSelect.setEnabled(true);
+
             ArrayAdapter ad
                     = new ArrayAdapter(
                     this,
@@ -168,21 +247,24 @@ public class Collections extends AppCompatActivity {
             storeSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    System.out.println("Stores position is " + stores[position] + storeMap.get(stores[position]));
+
                     edPos = position;
                     StoreId = storeMap.get(stores[position]);
+
                     if (StoreId != null && position > 0) {
                         autoFill.setEnabled(true);
+                        tvAmountValue.setText("");
                         new TakeCollectionTask().execute();
                     } else if (position == 0) {
                         autoFill.setEnabled(false);
+                        tvAmountValue.setText("");
                         lvCollectionlist.setAdapter(null);
                     }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    System.out.println("Nothing selected");
+
 
                 }
             });
@@ -196,14 +278,57 @@ public class Collections extends AppCompatActivity {
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("custom-message"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mTotalReceiver, new IntentFilter("custom-total"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mTotalReceiver,
+                new IntentFilter("custom-total"));
 
-        // new TakeCollectionTask().execute();
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Collections.this, "Functionality Not Implemented..", Toast.LENGTH_SHORT).show();
+                Double tempTotal = 0.0;
+                // Toast.makeText(Collections.this, "Functionality Not Implemented..", Toast.LENGTH_SHORT).show();
+                tvTotal = Double.parseDouble(tvAmountValue.getText().toString());
+                try {
+
+                    for (int i = 0; i < detailList.size(); i++) {
+                        View view1 = lvCollectionlist.getChildAt(i);
+                        editText1 = view1.findViewById(R.id.pay);
+
+                        String string = editText1.getText().toString();
+                        if (!string.equals("")) {
+                            tempTotal += Double.parseDouble(string);
+                        } else {
+                        }
+
+                    }
+
+                   /*
+                    for (int i = 0; i < detailList.size(); i++) {
+                        if (!detailList.get(i).ReceivedAmt.isEmpty())
+                            builder.append("Amount Recieved For Bill No: " + detailList.get(i).DocNo + " is " + detailList.get(i).ReceivedAmt + "\n");
+                        else
+                            System.out.println("Empty Amount Recieved..");
+
+                        builder.append("\nReceived total amount is " + tvTotal + "\n");
+
+                    }*/
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                tsMessages("Recieved amount is " + tvTotal);
+
+
+               /* if (tempTotal != tvTotal) {
+                    Double temp = tempTotal - tvTotal;
+                    if (temp > 0)
+                        tsMessages("Total amount & Filled amount not  balanced..\n Difference  amount " + String.valueOf(temp));
+                    else if (temp < 0)
+                        tsMessages("Total amount & Filled amount not  balanced..\n Difference amount " + String.valueOf(temp * -1));
+                    else
+                        tsMessages("Recieved amount is " + tvTotal);
+                }*/
             }
         });
         reset.setOnClickListener(new View.OnClickListener() {
@@ -229,8 +354,15 @@ public class Collections extends AppCompatActivity {
             try {
                 String command = intent.getStringExtra("command");
                 if (command.equalsIgnoreCase("ok")) {
+                    Double tp = 0.0;
+                    for (String s : vTmp) {
 
-                    calculateTotal();
+                        tp = tp + Double.parseDouble(s);
+                    }
+                    tvAmountValue.setText(String.valueOf(tp));
+                    //calculateTotal();
+                } else {
+                    // calculateElse();
                 }
 
             } catch (Exception e) {
@@ -242,6 +374,7 @@ public class Collections extends AppCompatActivity {
 
     };
 
+
     private void init() {
         this.linearLayoutBSheet = findViewById(R.id.bottomSheet);
         this.bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBSheet);
@@ -250,6 +383,7 @@ public class Collections extends AppCompatActivity {
         this.reset = findViewById(R.id.btnCOL_Reset);
         this.remarks = findViewById(R.id.btnCOL_Remarks);
         this.tvAmountValue = findViewById(R.id.tvAmountValue);
+        this.tvDueValue = findViewById(R.id.tvDueValue);
     }
 
 
@@ -288,7 +422,8 @@ public class Collections extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        cheque.setChecked(false);
+                        dialog.cancel();
 
                     }
                 })
@@ -296,6 +431,7 @@ public class Collections extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
+                                cheque.setChecked(false);
                             }
                         });
 
@@ -337,12 +473,14 @@ public class Collections extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public void resetSpinner(View view) {
+    public void ClearSearch(View view) {
+        acvCustomerName.setText("");
+        acvCustomerName.setAdapter(null);
         storeSelect.setSelection(0);
-        total=0.0;
+        total = 0.0;
+        storeSelect.setEnabled(false);
         tvAmountValue.setText("");
-        autoCount=0;
-
+        autoCount = 0;
     }
 
 
@@ -369,7 +507,7 @@ public class Collections extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -424,12 +562,37 @@ public class Collections extends AppCompatActivity {
                     FillAmount fillAmount = gson.fromJson(strCollections, FillAmount.class);
                     if (fillAmount.statusFlag == 0) {
                         autoCount++;
+                        vTmp = new String[0];
                         detailList = new ArrayList<>();
                         detailList = (ArrayList<CollectionPL>) fillAmount.data;
                         lvCollectionlist.setAdapter(null);
-                        SOAutoFillAdapter arrayFillAdapter = new SOAutoFillAdapter(Collections.this, R.layout.list_row, detailList);
+                        autoFlag = true;
+
+                        SOAutoFillAdapter arrayFillAdapter = new SOAutoFillAdapter(Collections.this, R.layout.list_row, detailList, autoFlag);
                         lvCollectionlist.setAdapter(arrayFillAdapter);
                         arrayFillAdapter.notifyDataSetChanged();
+
+
+                        autoFill.setEnabled(false);
+
+                       /*   for (int i=0;i<detailList.size();i++){
+                            dueTotal += collection.data.get(i).Balance;
+                            tvAmountValue.setText(String.valueOf(dueTotal));
+                        }*/
+                        Double temp = Double.parseDouble(String.valueOf(dueTotal)) - Double.parseDouble(String.valueOf(TempAutoFillAmount));
+                       /* if (temp < 0)
+                            tvDueValue.setText("0");
+                        else*/
+                        //tvDueValue.setText(String.valueOf(temp));
+
+                        final Handler handler = new Handler(Looper.getMainLooper());
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                tvAmountValue.setText(String.valueOf(TempAutoFillAmount));
+                            }
+                        }, 1000);
+
                     } else {
                         lvCollectionlist.setAdapter(null);
                         tsMessages(collection.errorMessage);
@@ -442,6 +605,7 @@ public class Collections extends AppCompatActivity {
             }
         }
     }
+
 
     private class TakeCollectionTask extends AsyncTask<String, String, String> {
         @Override
@@ -466,7 +630,7 @@ public class Collections extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -523,16 +687,20 @@ public class Collections extends AppCompatActivity {
                     collection = om.readValue(strCollections, Collection.class);*/
                     if (collection.statusFlag == 0) {
                         listCollectionPL = collection.data;
+                        detailList = new ArrayList<>();
                         detailList = (ArrayList<CollectionPL>) collection.data;
                         amt = new String[detailList.size()];
+                        dueTotal = 0;
+                        autoFlag = false;
+                        vTmp = new String[detailList.size()];
                         for (int i = 0; i < detailList.size(); i++) {
-                            amt[i] = "0";
-                        }
+                            vTmp[i] = "0";
 
+                        }
+                        System.out.println(Arrays.toString(vTmp));
                         for (i = 0; i < collection.data.size(); i++) {
-                            System.out.println(collection.data.get(i).Balance);
-                            // detailList.add(collection.data.get(i));
-                            //System.out.println(listCollectionPL.get(i).docDate);
+                            dueTotal += collection.data.get(i).Balance;
+                            tvDueValue.setText(String.valueOf(dueTotal));
 
                         }
                         arrayAdapter = new SOCollectionAdapter(Collections.this, R.layout.list_row, detailList);
@@ -614,7 +782,7 @@ public class Collections extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
@@ -673,7 +841,7 @@ public class Collections extends AppCompatActivity {
             } else {
 
                 Gson gson = new Gson();
-                CustomerList customerList = gson.fromJson(strCustomer, CustomerList.class);
+                customerList = gson.fromJson(strCustomer, CustomerList.class);
 
                 if (customerList.statusFlag == 0) {
 
@@ -682,19 +850,20 @@ public class Collections extends AppCompatActivity {
 
                         for (int i = 0; i < customerList.data.size(); i++) {
                             arrCust[i] = customerList.data.get(i).customer;
-                            System.out.println(arrCust[i]);
+
                         }
 
 
-                        AutocompleteCustomArrayAdapter myAdapter = new AutocompleteCustomArrayAdapter(Collections.this, R.layout.autocomplete_view_row, arrCust);
+                        AutoCompleteCustomerAdapter myAdapter = new AutoCompleteCustomerAdapter(Collections.this, R.layout.autocomplete_view_row, arrCust);
                         acvCustomerName.setAdapter(myAdapter);
                         acvCustomerName.showDropDown();
+                        storeSelect.setEnabled(true);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                 } else {
-                    //tsMessages(customerList.errorMessage);
+                    tsMessages(customerList.errorMessage);
                 }
             }
 
@@ -705,14 +874,22 @@ public class Collections extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                double qty = intent.getDoubleExtra("sum", 0.0);
-                System.out.println("Sum Recieved is " + qty);
-                if (qty > 0)
-                    total = total + qty;
-                else
-                    total = total - (-1 * qty);
-                tvAmountValue.setText(String.valueOf(total));
-                //calculateTotal();
+                int pos = intent.getIntExtra("pos", -1);
+
+
+                //arrayAdapter = new SOCollectionAdapter(context, R.layout.list_row, detailList);
+                // lvCollectionlist.setAdapter(arrayAdapter);
+                //arrayAdapter.notifyDataSetChanged();
+
+                    lvCollectionlist.setSelection(pos);
+
+                Double tp = 0.0;
+                for (String s : vTmp) {
+
+                    tp = tp + Double.parseDouble(s);
+                }
+                tvAmountValue.setText(String.valueOf(tp));
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -723,16 +900,40 @@ public class Collections extends AppCompatActivity {
 
     };
 
-    private void calculateTotal() {
+
+    public void calculateTotal() {
         tvAmountValue.setText("");
         total = 0.0;
         for (int i = 0; i < detailList.size(); i++) {
             View view = lvCollectionlist.getChildAt(i);
             EditText editText = view.findViewById(R.id.pay);
+            CheckBox select = view.findViewById(R.id.select);
+
             String string = editText.getText().toString();
-            if (!string.equals(""))
+            if (!string.equals("")) {
                 total += Double.parseDouble(string);
+            } else
+                select.setChecked(false);
+
+            if (detailList.get(i).select.toString().equalsIgnoreCase("true"))
+                editText.setEnabled(false);
+            else
+                editText.setEnabled(true);
+
             tvAmountValue.setText(String.valueOf(total));
         }
+
+
     }
+
+    private void calculateElse() {
+
+        Double tp = 0.0;
+        for (int i = 0; i < detailList.size(); i++) {
+            tp = tp + Double.parseDouble(detailList.get(i).ReceivedAmt);
+        }
+        tvAmountValue.setText(String.valueOf(tp));
+
+    }
+
 }

@@ -13,6 +13,8 @@
         android:weightSum="5">
 
 
+
+
         <TextView
             android:id="@+id/billno"
             android:layout_width="0dp"
@@ -31,41 +33,42 @@
             android:layout_weight="0.8"
             android:fontFamily="@font/fabrica"
             android:gravity="right"
+            android:textSize="14sp"
             android:text="Due"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textColor="@color/black" />
 
         <EditText
             android:id="@+id/pay"
+            android:textSize="14sp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.7"
+            android:layout_weight="1"
+            android:editable="false"
             android:fontFamily="@font/fabrica"
             android:gravity="center"
-            android:inputType="number"
-            android:textColor="@color/green"
-            android:textSize="14sp" />
+            android:inputType="none"
+            android:textColor="@color/green" />
 
         <CheckBox
             android:id="@+id/select"
             android:layout_width="0dp"
+            android:textSize="14sp"
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
             android:fontFamily="@font/fabrica"
             android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textColor="@color/black" />
 
-        <Button
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/btnOK"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_gravity="end"
-            android:visibility="invisible"
+            android:visibility="gone"
+            android:textSize="14sp"
             android:layout_marginStart="15dp"
             android:layout_weight="1"
-            android:gravity="center"
             android:text="ok"
-            android:textSize="14sp" />
+            android:gravity="center" />
     </LinearLayout>
 </LinearLayout>

@@ -18,4 +18,6 @@ public class CollectionPL {
     public String ReceivedAmt;
     public Boolean select=false;
 
+
+
 }

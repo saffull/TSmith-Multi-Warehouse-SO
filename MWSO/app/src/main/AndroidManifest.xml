@@ -17,6 +17,7 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".Collections"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Category"

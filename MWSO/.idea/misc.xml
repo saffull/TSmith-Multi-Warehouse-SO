@@ -28,12 +28,13 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_settings.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_so.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/layout_border.xml" value="0.2203125" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/mybutton.xml" value="0.16197916666666667" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/qty_addbtn_bg.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/rounded_button.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/tb_up_down.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/whiteline.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_category.xml" value="0.20416666666666666" />
-        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_collections.xml" value="0.20416666666666666" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_collections.xml" value="0.22" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_customer_information.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_listview.xml" value="0.1" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_main.xml" value="0.19010416666666666" />
@@ -46,6 +47,7 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/autofill_dialog.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/bottom_sheet.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/cheque_dialog.xml" value="0.25" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/collection_autofill_layout.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/collection_row.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/collection_row_layout.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/fragment_bottom_sheet.xml" value="0.20416666666666666" />
