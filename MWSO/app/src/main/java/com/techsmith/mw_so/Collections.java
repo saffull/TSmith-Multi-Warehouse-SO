@@ -24,6 +24,7 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,14 +53,19 @@ import com.techsmith.mw_so.collection_utils.CollectionPL;
 import com.techsmith.mw_so.collection_utils.FillAmount;
 import com.techsmith.mw_so.collection_utils.SOAutoFillAdapter;
 import com.techsmith.mw_so.collection_utils.SOCollectionAdapter;
+import com.techsmith.mw_so.collection_utils.SaveCollectionSO;
+import com.techsmith.mw_so.collection_utils.SaveResponse;
+import com.techsmith.mw_so.get_utils.GetCollection;
 import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.CustomerList;
 import com.techsmith.mw_so.utils.UserPL;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,13 +79,14 @@ public class Collections extends AppCompatActivity {
     Gson gson;
     Double TempAutoFillAmount, total = 0.0, tvTotal = 0.0;
     Collection collection;
+    SharedPreferences.Editor editor;
     private CSpinner storeSelect;
     CustomerList customerList;
     AutoCompleteTextView acvItemSearchSOActivity;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet, ll;
     private ToggleButton tbUpDown;
-    private Button save, reset, remarks, autoFill;
+    private Button save, reset, remarks, autoFill, last;
     public TextView tvDueValue;
     SharedPreferences prefs;
     public ListView lvCollectionlist;
@@ -87,13 +94,12 @@ public class Collections extends AppCompatActivity {
     ImageButton imgBtnCustSearchbyName;
     SOCollectionAdapter arrayAdapter;
     AutoCompleteTextView acvCustomerName;
-    private RecyclerView recyclerView;
-    String StoreId, etCustomerId, Url, Cname = "", multiSOStoredDevId, loginResponse, strErrorMsg, strCollections, strCustomer;
+    String StoreId, etCustomerId, Url, userRemarks = "", multiSOStoredDevId, loginResponse,
+            strErrorMsg, strCollections, strCustomer, strfromweb, strstocktake, strerrormsg, pMode = "";
     UserPL userPLObj;
-    SwitchCompat switchCompat;
     public String[] stores, amt, vTmp;
     int i = 0, edPos, autoCount = 0, dueTotal = 0;
-    HashMap<String, String> storeMap;
+    HashMap<String, String> storeMap, custMap;
     List<CollectionPL> listCollectionPL;
     Boolean autoFlag = false;
     public ArrayList<CollectionPL> detailList;
@@ -120,6 +126,7 @@ public class Collections extends AppCompatActivity {
         imgBtnCustSearchbyName = findViewById(R.id.imgBtnCustSearchbyName);
         listCollectionPL = new ArrayList<>();
         detailList = new ArrayList<>();
+        //recycler_view=findViewById(R.id.recycler_view);
 
         loginResponse = prefs.getString("loginResponse", "");
         gson = new Gson();
@@ -160,6 +167,25 @@ public class Collections extends AppCompatActivity {
                 storeSelect.setEnabled(true);
             }
         });
+        acvCustomerName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().length() == 0) {
+                    acvCustomerName.setAdapter(null);
+                    storeSelect.setEnabled(false);
+                }
+            }
+        });
 
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -177,42 +203,6 @@ public class Collections extends AppCompatActivity {
             }
         });
 
-        tvAmountValue.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                try {
-                    Double temp;
-                    if (s.toString().length() > 0) {
-
-                        temp = dueTotal - Double.parseDouble(s.toString());
-                        final Handler handler = new Handler(Looper.getMainLooper());
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (temp < 0)
-                                    tvDueValue.setText("0");
-                                else
-                                    tvDueValue.setText(String.valueOf(temp));
-                            }
-                        }, 500);
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });
 
         try {
             gson = new Gson();
@@ -285,64 +275,96 @@ public class Collections extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Double tempTotal = 0.0;
-                // Toast.makeText(Collections.this, "Functionality Not Implemented..", Toast.LENGTH_SHORT).show();
-                tvTotal = Double.parseDouble(tvAmountValue.getText().toString());
-                try {
 
-                    for (int i = 0; i < detailList.size(); i++) {
-                        View view1 = lvCollectionlist.getChildAt(i);
-                        editText1 = view1.findViewById(R.id.pay);
+                if (!pMode.isEmpty()) {
+                    //tsMessages("Recieved amount is " + tvTotal);
+                    // String strstock=gson.toJson()
+                    String temp = acvCustomerName.getText().toString();
+                    SaveCollectionSO saveCollectionSO = new SaveCollectionSO();
+                    saveCollectionSO.acid = custMap.get(temp);
+                    saveCollectionSO.partyName = temp;
+                    saveCollectionSO.paymentMode = pMode;
+                    saveCollectionSO.storeId = StoreId;
+                    saveCollectionSO.data = detailList;
+                    strstocktake = gson.toJson(saveCollectionSO);
+                    System.out.println("Writing data is " + strstocktake);
 
-                        String string = editText1.getText().toString();
-                        if (!string.equals("")) {
-                            tempTotal += Double.parseDouble(string);
-                        } else {
-                        }
-
-                    }
-
-                   /*
-                    for (int i = 0; i < detailList.size(); i++) {
-                        if (!detailList.get(i).ReceivedAmt.isEmpty())
-                            builder.append("Amount Recieved For Bill No: " + detailList.get(i).DocNo + " is " + detailList.get(i).ReceivedAmt + "\n");
-                        else
-                            System.out.println("Empty Amount Recieved..");
-
-                        builder.append("\nReceived total amount is " + tvTotal + "\n");
-
-                    }*/
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    new SaveCollection().execute();
+                } else {
+                    Toast.makeText(Collections.this, "Select a payment Mode", Toast.LENGTH_LONG).show();
                 }
-                tsMessages("Recieved amount is " + tvTotal);
 
-
-               /* if (tempTotal != tvTotal) {
-                    Double temp = tempTotal - tvTotal;
-                    if (temp > 0)
-                        tsMessages("Total amount & Filled amount not  balanced..\n Difference  amount " + String.valueOf(temp));
-                    else if (temp < 0)
-                        tsMessages("Total amount & Filled amount not  balanced..\n Difference amount " + String.valueOf(temp * -1));
-                    else
-                        tsMessages("Recieved amount is " + tvTotal);
-                }*/
+            }
+        });
+        last.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new TakeLastCollectionTask().execute();
             }
         });
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
+
+                android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(Collections.this);
+                alertDialogBuilder.setMessage("This will reset everything.. do you want to continue..?");
+                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        Intent intent = getIntent();
+                        finish();
+                        startActivity(intent);
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                    }
+                });
+
+                android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setCanceledOnTouchOutside(true);
+                alertDialog.show();
+
             }
         });
         remarks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(Collections.this, "Functionality Not Implemented..", Toast.LENGTH_SHORT).show();
+                LayoutInflater li = LayoutInflater.from(Collections.this);
+                View promptsView = li.inflate(R.layout.remarks_dialog, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Collections.this);
+                alertDialogBuilder.setView(promptsView);
+                userInput = promptsView.findViewById(R.id.etUserRemarks);
+
+                userRemarks = prefs.getString("remarks", "");
+                userInput.setText(userRemarks);
+
+                // set dialog message
+                alertDialogBuilder
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                userRemarks = userInput.getText().toString().trim();
+                                prefs = PreferenceManager.getDefaultSharedPreferences(Collections.this);
+                                editor = prefs.edit();
+                                editor.putString("remarks", userRemarks);
+                                editor.commit();
+                            }
+                        })
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.show();
+
+
             }
         });
 
@@ -384,6 +406,7 @@ public class Collections extends AppCompatActivity {
         this.remarks = findViewById(R.id.btnCOL_Remarks);
         this.tvAmountValue = findViewById(R.id.tvAmountValue);
         this.tvDueValue = findViewById(R.id.tvDueValue);
+        this.last = findViewById(R.id.btnCOL_Last);
     }
 
 
@@ -393,17 +416,15 @@ public class Collections extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.radioCOLCash:
                 if (checked) {
-                    if (autoCount > 0)
-                        cashAmount.setVisibility(View.GONE);
-                    else
-                        cashAmount.setVisibility(View.VISIBLE);
+                    pMode = "cash";
                 }
                 break;
 
             case R.id.radioCOLCheque:
                 if (checked)
-                    cashAmount.setVisibility(View.GONE);
+                    pMode = "cheque";
                 callDialog();
+
 
                 break;
             default:
@@ -422,7 +443,6 @@ public class Collections extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        cheque.setChecked(false);
                         dialog.cancel();
 
                     }
@@ -431,7 +451,7 @@ public class Collections extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
-                                cheque.setChecked(false);
+
                             }
                         });
 
@@ -456,7 +476,7 @@ public class Collections extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         TempAutoFillAmount = 0.0;
                         TempAutoFillAmount = Double.parseDouble(userInput.getText().toString());
-                        new AutoFillTask().execute();
+                        callDialouge();
                     }
                 })
                 .setNegativeButton("Cancel",
@@ -470,6 +490,26 @@ public class Collections extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
 
         // show it
+        alertDialog.show();
+    }
+
+    private void callDialouge() {
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(Collections.this);
+        alertDialogBuilder.setMessage("Do you want to continue..?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                new AutoFillTask().execute();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+
+            }
+        });
+
+        android.app.AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
@@ -574,16 +614,6 @@ public class Collections extends AppCompatActivity {
 
 
                         autoFill.setEnabled(false);
-
-                       /*   for (int i=0;i<detailList.size();i++){
-                            dueTotal += collection.data.get(i).Balance;
-                            tvAmountValue.setText(String.valueOf(dueTotal));
-                        }*/
-                        Double temp = Double.parseDouble(String.valueOf(dueTotal)) - Double.parseDouble(String.valueOf(TempAutoFillAmount));
-                       /* if (temp < 0)
-                            tvDueValue.setText("0");
-                        else*/
-                        //tvDueValue.setText(String.valueOf(temp));
 
                         final Handler handler = new Handler(Looper.getMainLooper());
                         handler.postDelayed(new Runnable() {
@@ -846,10 +876,12 @@ public class Collections extends AppCompatActivity {
                 if (customerList.statusFlag == 0) {
 
                     try {
+                        custMap = new HashMap<>();
                         String[] arrCust = new String[customerList.data.size()];
 
                         for (int i = 0; i < customerList.data.size(); i++) {
                             arrCust[i] = customerList.data.get(i).customer;
+                            custMap.put(customerList.data.get(i).customer, String.valueOf(customerList.data.get(i).acid));
 
                         }
 
@@ -881,7 +913,7 @@ public class Collections extends AppCompatActivity {
                 // lvCollectionlist.setAdapter(arrayAdapter);
                 //arrayAdapter.notifyDataSetChanged();
 
-                    lvCollectionlist.setSelection(pos);
+                lvCollectionlist.setSelection(pos);
 
                 Double tp = 0.0;
                 for (String s : vTmp) {
@@ -900,40 +932,168 @@ public class Collections extends AppCompatActivity {
 
     };
 
+    private class SaveCollection extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(Collections.this);
+            pDialog.setMessage("Saving SO...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
 
-    public void calculateTotal() {
-        tvAmountValue.setText("");
-        total = 0.0;
-        for (int i = 0; i < detailList.size(); i++) {
-            View view = lvCollectionlist.getChildAt(i);
-            EditText editText = view.findViewById(R.id.pay);
-            CheckBox select = view.findViewById(R.id.select);
+        @Override
+        protected String doInBackground(String... strings) {
 
-            String string = editText.getText().toString();
-            if (!string.equals("")) {
-                total += Double.parseDouble(string);
-            } else
-                select.setChecked(false);
+            try {
 
-            if (detailList.get(i).select.toString().equalsIgnoreCase("true"))
-                editText.setEnabled(false);
-            else
-                editText.setEnabled(true);
+                URL url = new URL("https://tsmithy.in/dummy/api/PostDummy");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(30000);
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("authkey", "D39C1EB0-DC32-4CF2-817B-EE748A8E4A30");
+                connection.setRequestProperty("docid", "12");
+                connection.setRequestProperty("module", "Ts-MWSO");
+                connection.connect();
 
-            tvAmountValue.setText(String.valueOf(total));
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(strstocktake);
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strfromweb = sb.toString();
+                        System.out.println("Save Document Response is " + strfromweb);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strfromweb = "httperror";
+                }
+            } catch (Exception e) {
+                Log.e("ERROR", e.getMessage(), e);
+                return null;
+            }
+
+
+            return strfromweb;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            SaveResponse saveResponse = gson.fromJson(s, SaveResponse.class);
+            if (saveResponse.errorStatus == 0) {
+                editor = prefs.edit();
+                editor.putString("rcptno", String.valueOf(saveResponse.rcptNo));
+                editor.commit();
+                tsMessages("SO Saved..\n Recipet No is:\t" + saveResponse.rcptNo);
+                last.setEnabled(true);
+
+            } else {
+                Toast.makeText(Collections.this, "Failed to save due to" + saveResponse.statusMessage, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class TakeLastCollectionTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(Collections.this);
+            pDialog.setMessage("Loading Last Saved SO...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                String rcpt = prefs.getString("rcptno", "");
+
+                URL url = new URL("https://tsmithy.in/dummy/api/GetDummy?Module=Ts-MWSO&DocId=&RcptNo=" + rcpt);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(30000);
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("authkey", "D39C1EB0-DC32-4CF2-817B-EE748A8E4A30");
+                connection.setRequestProperty("docid", "13");
+                connection.setRequestProperty("module", "Ts-MWSO");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strfromweb = sb.toString();
+                        System.out.println("Get Document Response is " + strfromweb);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strfromweb = "httperror";
+                }
+            } catch (Exception e) {
+                Log.e("ERROR", e.getMessage(), e);
+                return null;
+            }
+
+
+            return strfromweb;
         }
 
 
-    }
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            GetCollection saveResponse = gson.fromJson(s, GetCollection.class);
+            if (saveResponse.errorStatus == 0) {
 
-    private void calculateElse() {
+                tsMessages(saveResponse.data.partyName);
+            }
 
-        Double tp = 0.0;
-        for (int i = 0; i < detailList.size(); i++) {
-            tp = tp + Double.parseDouble(detailList.get(i).ReceivedAmt);
         }
-        tvAmountValue.setText(String.valueOf(tp));
-
     }
+
 
 }

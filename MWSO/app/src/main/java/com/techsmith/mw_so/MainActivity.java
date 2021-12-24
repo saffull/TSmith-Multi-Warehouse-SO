@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
                 connection.setRequestProperty("machineid", "saffull@gmail.com");
+                // connection.setRequestProperty("machineid","salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 

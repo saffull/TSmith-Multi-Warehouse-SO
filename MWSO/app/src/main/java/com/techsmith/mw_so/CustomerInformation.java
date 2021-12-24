@@ -153,12 +153,12 @@ public class CustomerInformation extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CustomerInformation.this);
-        alertDialogBuilder.setMessage("Do you want to logout..!!");
+        alertDialogBuilder.setMessage("Do you want to exit.!!");
         alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
                 finish();
-                startActivity(new Intent(CustomerInformation.this, MainActivity.class));
+                startActivity(new Intent(CustomerInformation.this, Category.class));
             }
         });
         alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

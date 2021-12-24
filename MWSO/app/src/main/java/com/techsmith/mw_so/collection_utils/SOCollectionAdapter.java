@@ -78,6 +78,9 @@ public class SOCollectionAdapter extends ArrayAdapter {
             select = convertView.findViewById(R.id.select);
             btnOk = convertView.findViewById(R.id.btnOK);
 
+            btnOk.setTag(R.id.key_col_edt_ramt, pay);
+            select.setTag(R.id.key_col_edt_ramt, pay);
+
             due.setText(String.valueOf(collectionPL.Balance));
             billno.setText(collectionPL.DocNo);
             pay.setText(collectionPL.ReceivedAmt);
@@ -93,14 +96,19 @@ public class SOCollectionAdapter extends ArrayAdapter {
                     @Override
                     public void onClick(View v) {
                         Button btnClicked = (Button) v;
+                        EditText edtCurrentRAmt = (EditText) (btnClicked.getTag(R.id.key_col_edt_ramt));
+                        if (edtCurrentRAmt.getText().toString().trim().length() > 0) {
+                            System.out.println("data there");
+                        }
+                        edtCurrentRAmt.setText(String.valueOf(itemArraylist.get(edPos).Balance));
 
-                        itemArraylist.get(edPos).ReceivedAmt = String.valueOf(itemArraylist.get(edPos).Balance);
-                        itemArraylist.get(edPos).select = true;
+                        //itemArraylist.get(edPos).ReceivedAmt = String.valueOf(itemArraylist.get(edPos).Balance);
+                        //itemArraylist.get(edPos).select = true;
 
-                        Intent intent = new Intent("custom-message");
-                        System.out.println("sended value is " + edPos);
-                        intent.putExtra("pos", edPos);
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        //Intent intent = new Intent("custom-message");
+                        //System.out.println("sended value is " + edPos);
+                        // intent.putExtra("pos", edPos);
+                        //LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     }
                 });
                 pay.addTextChangedListener(new TextWatcher() {
@@ -123,13 +131,13 @@ public class SOCollectionAdapter extends ArrayAdapter {
                         //((Collections) context).detailList = itemArraylist;
 
                         if (s.toString().length() == 0) {
-                            ((Collections) context). vTmp[edPos] ="0";
+                            ((Collections) context).vTmp[edPos] = "0";
                             //vTmp[edPos] = "";
                             //((Collections) context).vTmp = vTmp;
                             //((Collections) context).detailList = itemArraylist;
 
                         } else {
-                            ((Collections) context). vTmp[edPos] =s.toString();
+                            ((Collections) context).vTmp[edPos] = s.toString();
                             // vTmp[edPos] = "";
                             //vTmp[edPos] = s.toString();
                             //((Collections) context).vTmp = vTmp;
@@ -147,10 +155,17 @@ public class SOCollectionAdapter extends ArrayAdapter {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (buttonView.isChecked()) {
                             try {
+                                CheckBox btnClicked = (CheckBox) buttonView;
+                                EditText edtCurrentRAmt = (EditText) (btnClicked.getTag(R.id.key_col_edt_ramt));
+                                if (edtCurrentRAmt.getText().toString().trim().length() > 0) {
+                                    System.out.println("data there");
+                                }
+                                edtCurrentRAmt.setText(String.valueOf(itemArraylist.get(edPos).Balance));
+                                edtCurrentRAmt.setEnabled(false);
                                 itemArraylist.get(edPos).ReceivedAmt = String.valueOf(itemArraylist.get(edPos).Balance);
                                 itemArraylist.get(edPos).select = true;
 
-                                ((Collections) context). vTmp[edPos] = String.valueOf(itemArraylist.get(edPos).Balance);
+                                ((Collections) context).vTmp[edPos] = String.valueOf(itemArraylist.get(edPos).Balance);
                                 // edt.get(edPos).setText(String.valueOf(itemArraylist.get(edPos).Balance));
                                 //System.out.println("Pushed amount is " + Arrays.toString(vTmp));
                                 //edt.get(edPos).setEnabled(false);
@@ -163,9 +178,15 @@ public class SOCollectionAdapter extends ArrayAdapter {
 
                         } else {
                             try {
+                                CheckBox btnClicked = (CheckBox) buttonView;
+                                EditText edtCurrentRAmt = (EditText) (btnClicked.getTag(R.id.key_col_edt_ramt));
+                                if (edtCurrentRAmt.getText().toString().trim().length() > 0) {
+                                    edtCurrentRAmt.setText("");
+                                    edtCurrentRAmt.setEnabled(true);
+                                }
                                 itemArraylist.get(edPos).ReceivedAmt = "";
                                 itemArraylist.get(edPos).select = false;
-                                ((Collections) context). vTmp[edPos] ="0";
+                                ((Collections) context).vTmp[edPos] = "0";
                                 // ((Collections) context).vTmp = vTmp;
                                 // edt.get(edPos).setText("");
                                 // edt.get(edPos).setEnabled(true);
@@ -175,7 +196,7 @@ public class SOCollectionAdapter extends ArrayAdapter {
                             }
                         }
 
-                        try {
+                      /*  try {
                             ((Collections) context).detailList = itemArraylist;
                             arrayAdapter = new SOCollectionAdapter(context, R.layout.list_row, itemArraylist);
                             ((Collections) context).lvCollectionlist.setAdapter(arrayAdapter);
@@ -188,7 +209,7 @@ public class SOCollectionAdapter extends ArrayAdapter {
                             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }
+                        }*/
 
 
                     }

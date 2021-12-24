@@ -51,15 +51,15 @@
                 android:text="Total "
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/tvDue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/toggleButton"
-                android:layout_marginLeft="5dp"
                 android:fontFamily="@font/ralewaybold"
-                android:text="Due :₹ "
+                android:text="Tota Due :₹ "
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -67,7 +67,7 @@
                 android:id="@+id/tvDueValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_toRightOf="@+id/tvDue"
                 android:background="#4A7BCB"
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="1dp"
                 android:layout_toRightOf="@+id/tvDueValue"
                 android:fontFamily="@font/ralewaybold"
                 android:text="Received:₹ "
@@ -94,11 +94,11 @@
                 android:id="@+id/tvAmountValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_toRightOf="@+id/tvAmount"
                 android:background="#4A7BCB"
                 android:editable="false"
+                android:singleLine="true"
                 android:fontFamily="@font/fabrica"
                 android:inputType="none"
                 android:padding="15dp"
@@ -163,6 +163,20 @@
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
             android:text="Save"
+            android:textColor="@color/white" />
+        <Button
+            android:id="@+id/btnCOL_Last"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:enabled="false"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:background="@color/activity_bg_color"
+            android:fontFamily="@font/fabrica"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="Last"
             android:textColor="@color/white" />
     </LinearLayout>
 </LinearLayout>

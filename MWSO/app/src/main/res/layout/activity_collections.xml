@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Collections">
-
 
         <LinearLayout
             android:id="@+id/llx"
@@ -22,7 +22,6 @@
                 android:layout_marginRight="5dp"
                 android:orientation="vertical"
                 android:weightSum="2">
-
 
 
                 <RelativeLayout
@@ -222,7 +221,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
+                    android:layout_weight="1.9"
                     android:fontFamily="@font/fabrica"
                     android:gravity="left"
                     android:text="Bill No"
@@ -231,7 +230,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="0.8"
                     android:fontFamily="@font/fabrica"
                     android:gravity="right"
                     android:text="Due"
@@ -240,7 +239,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.5"
+                    android:layout_weight="1.3"
                     android:fontFamily="@font/fabrica"
                     android:gravity="center"
                     android:text="Pay"
@@ -249,7 +248,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="0.8"
                     android:fontFamily="@font/fabrica"
                     android:gravity="center"
                     android:text="Select"
@@ -265,6 +264,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_height="410dp"
                 android:layout_weight="1" />-->
+
 
             <ListView
                 android:id="@+id/lvCollectionlist"

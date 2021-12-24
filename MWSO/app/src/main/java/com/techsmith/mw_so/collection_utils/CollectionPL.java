@@ -17,6 +17,7 @@ public class CollectionPL {
     public int Lineid;
     public String ReceivedAmt;
     public Boolean select=false;
+    public String remarks;
 
 
 
