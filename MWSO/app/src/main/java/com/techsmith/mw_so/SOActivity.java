@@ -596,6 +596,7 @@ public class SOActivity extends AppCompatActivity {
         }
     }
 
+
     private class AllocateQtyTask extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
@@ -851,7 +852,7 @@ public class SOActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
                 finish();
-                startActivity(new Intent(SOActivity.this, MainActivity.class));
+                startActivity(new Intent(SOActivity.this, Category.class));
             }
         });
         alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

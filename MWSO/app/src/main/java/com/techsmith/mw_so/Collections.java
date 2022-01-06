@@ -2,11 +2,7 @@ package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -22,7 +18,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -33,7 +28,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -46,6 +40,7 @@ import android.widget.ToggleButton;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
+import com.techsmith.mw_so.collection_utils.AutoCollectionPL;
 import com.techsmith.mw_so.collection_utils.AutoCompleteCustomerAdapter;
 import com.techsmith.mw_so.collection_utils.CSpinner;
 import com.techsmith.mw_so.collection_utils.Collection;
@@ -53,6 +48,7 @@ import com.techsmith.mw_so.collection_utils.CollectionPL;
 import com.techsmith.mw_so.collection_utils.FillAmount;
 import com.techsmith.mw_so.collection_utils.SOAutoFillAdapter;
 import com.techsmith.mw_so.collection_utils.SOCollectionAdapter;
+import com.techsmith.mw_so.collection_utils.SaveCollectionAutoSO;
 import com.techsmith.mw_so.collection_utils.SaveCollectionSO;
 import com.techsmith.mw_so.collection_utils.SaveResponse;
 import com.techsmith.mw_so.get_utils.GetCollection;
@@ -65,13 +61,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class Collections extends AppCompatActivity {
     public EditText cashAmount, userInput, tvAmountValue, editText1;
@@ -103,6 +97,7 @@ public class Collections extends AppCompatActivity {
     List<CollectionPL> listCollectionPL;
     Boolean autoFlag = false;
     public ArrayList<CollectionPL> detailList;
+    public ArrayList<AutoCollectionPL> autodetailList;
 
     @Override
     public void onBackPressed() {
@@ -277,19 +272,59 @@ public class Collections extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (!pMode.isEmpty()) {
-                    //tsMessages("Recieved amount is " + tvTotal);
-                    // String strstock=gson.toJson()
-                    String temp = acvCustomerName.getText().toString();
                     SaveCollectionSO saveCollectionSO = new SaveCollectionSO();
-                    saveCollectionSO.acid = custMap.get(temp);
-                    saveCollectionSO.partyName = temp;
-                    saveCollectionSO.paymentMode = pMode;
-                    saveCollectionSO.storeId = StoreId;
-                    saveCollectionSO.data = detailList;
-                    strstocktake = gson.toJson(saveCollectionSO);
-                    System.out.println("Writing data is " + strstocktake);
+                    SaveCollectionAutoSO sso = new SaveCollectionAutoSO();
+                    String temp = acvCustomerName.getText().toString();
+                    if (!autoFlag) {
+                        if (!pMode.equalsIgnoreCase("cheque")) {
+                            saveCollectionSO.acid = custMap.get(temp);
+                            saveCollectionSO.partyName = temp;
+                            saveCollectionSO.paymentMode = pMode;
+                            saveCollectionSO.storeId = StoreId;
+                            saveCollectionSO.data = detailList;
+                            saveCollectionSO.total = tvAmountValue.getText().toString();
+                        } else {
+                            saveCollectionSO.acid = custMap.get(temp);
+                            saveCollectionSO.partyName = temp;
+                            saveCollectionSO.storeId = StoreId;
+                            saveCollectionSO.data = detailList;
+                            saveCollectionSO.total = tvAmountValue.getText().toString();
+                            saveCollectionSO.paymentMode = pMode;
+                            saveCollectionSO.docBank = "Yes Bank";
+                            saveCollectionSO.docDate = "12-09-2021";
+                            saveCollectionSO.docType = "";
+                            saveCollectionSO.depositBank = "";
+                        }
 
-                    new SaveCollection().execute();
+                        strstocktake = gson.toJson(saveCollectionSO);
+                        System.out.println("Writing data is " + strstocktake);
+                    } else {
+                        if (!pMode.equalsIgnoreCase("cheque")) {
+                            sso.acid = custMap.get(temp);
+                            sso.partyName = temp;
+                            sso.paymentMode = pMode;
+                            sso.storeId = StoreId;
+                            sso.data = autodetailList;
+                            sso.total = tvAmountValue.getText().toString();
+                        } else {
+                            sso.acid = custMap.get(temp);
+                            sso.partyName = temp;
+                            sso.storeId = StoreId;
+                            sso.data = autodetailList;
+                            sso.total = tvAmountValue.getText().toString();
+                            sso.paymentMode = pMode;
+                            sso.docBank = "Yes Bank";
+                            sso.docDate = "12-09-2021";
+                            sso.docType = "";
+                            sso.depositBank = "";
+                        }
+
+                        strstocktake = gson.toJson(sso);
+                        System.out.println("Writing data in auto Fill adapter is  " + strstocktake);
+                    }
+
+
+                    //new SaveCollection().execute();
                 } else {
                     Toast.makeText(Collections.this, "Select a payment Mode", Toast.LENGTH_LONG).show();
                 }
@@ -603,12 +638,12 @@ public class Collections extends AppCompatActivity {
                     if (fillAmount.statusFlag == 0) {
                         autoCount++;
                         vTmp = new String[0];
-                        detailList = new ArrayList<>();
-                        detailList = (ArrayList<CollectionPL>) fillAmount.data;
+                        autodetailList = new ArrayList<>();
+                        autodetailList = (ArrayList<AutoCollectionPL>) fillAmount.data;
                         lvCollectionlist.setAdapter(null);
                         autoFlag = true;
 
-                        SOAutoFillAdapter arrayFillAdapter = new SOAutoFillAdapter(Collections.this, R.layout.list_row, detailList, autoFlag);
+                        SOAutoFillAdapter arrayFillAdapter = new SOAutoFillAdapter(Collections.this, R.layout.list_row, autodetailList, autoFlag);
                         lvCollectionlist.setAdapter(arrayFillAdapter);
                         arrayFillAdapter.notifyDataSetChanged();
 

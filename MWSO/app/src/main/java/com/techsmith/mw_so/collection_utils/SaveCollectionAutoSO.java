@@ -1,9 +1,8 @@
 package com.techsmith.mw_so.collection_utils;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class SaveCollectionSO {
+public class SaveCollectionAutoSO {
     public String partyName;
     public String acid;
     public String docBank;
@@ -13,6 +12,6 @@ public class SaveCollectionSO {
     public String docType;
     public String storeId;
     public String paymentMode;
-    public ArrayList<CollectionPL> data;
+    public ArrayList<AutoCollectionPL> data;
     public String total;
 }

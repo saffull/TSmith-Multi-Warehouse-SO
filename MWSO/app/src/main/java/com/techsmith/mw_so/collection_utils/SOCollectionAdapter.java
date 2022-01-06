@@ -85,10 +85,6 @@ public class SOCollectionAdapter extends ArrayAdapter {
             billno.setText(collectionPL.DocNo);
             pay.setText(collectionPL.ReceivedAmt);
 
-            if (collectionPL.select)
-                select.setChecked(true);
-            else
-                select.setChecked(false);
 //1635951471998
             try {
 
@@ -163,7 +159,7 @@ public class SOCollectionAdapter extends ArrayAdapter {
                                 edtCurrentRAmt.setText(String.valueOf(itemArraylist.get(edPos).Balance));
                                 edtCurrentRAmt.setEnabled(false);
                                 itemArraylist.get(edPos).ReceivedAmt = String.valueOf(itemArraylist.get(edPos).Balance);
-                                itemArraylist.get(edPos).select = true;
+
 
                                 ((Collections) context).vTmp[edPos] = String.valueOf(itemArraylist.get(edPos).Balance);
                                 // edt.get(edPos).setText(String.valueOf(itemArraylist.get(edPos).Balance));
@@ -185,7 +181,6 @@ public class SOCollectionAdapter extends ArrayAdapter {
                                     edtCurrentRAmt.setEnabled(true);
                                 }
                                 itemArraylist.get(edPos).ReceivedAmt = "";
-                                itemArraylist.get(edPos).select = false;
                                 ((Collections) context).vTmp[edPos] = "0";
                                 // ((Collections) context).vTmp = vTmp;
                                 // edt.get(edPos).setText("");

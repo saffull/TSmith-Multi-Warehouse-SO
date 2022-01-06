@@ -98,10 +98,10 @@
                 android:layout_toRightOf="@+id/tvAmount"
                 android:background="#4A7BCB"
                 android:editable="false"
-                android:singleLine="true"
                 android:fontFamily="@font/fabrica"
                 android:inputType="none"
                 android:padding="15dp"
+                android:singleLine="true"
                 android:text=""
                 android:textColor="@color/white"
                 android:textSize="12sp" />

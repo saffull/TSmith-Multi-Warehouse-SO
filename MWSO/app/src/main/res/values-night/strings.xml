@@ -7,4 +7,6 @@
     <string name="customer_information">Customer Information</string>
     <string name="customer_address">Customer Address</string>
     <string name="delivery_amp_collection">Collections</string>
+    <string name="delivery">Delivery</string>
+    <string name="delivery_date">Delivery Date</string>
 </resources>

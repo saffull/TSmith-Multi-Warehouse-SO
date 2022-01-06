@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     Double tsMsgDialogWindowHeight;
     String username, password, Url, multiSOStoredDevId, strCheckLogin, strErrorMsg;
     String[] permissions = {Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,};
+            Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

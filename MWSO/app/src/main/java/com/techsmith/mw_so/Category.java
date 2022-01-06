@@ -24,4 +24,9 @@ public class Category extends AppCompatActivity {
         finish();
         startActivity(new Intent(Category.this, Collections.class));
     }
+
+    public void gotoCollectionPage(View view) {
+        finish();
+        startActivity(new Intent(Category.this, Delivery.class));
+    }
 }

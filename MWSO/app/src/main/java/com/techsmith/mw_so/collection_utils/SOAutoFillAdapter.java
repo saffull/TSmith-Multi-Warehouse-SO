@@ -24,15 +24,15 @@ import com.techsmith.mw_so.R;
 import java.util.ArrayList;
 
 public class SOAutoFillAdapter extends ArrayAdapter {
-    ArrayList<CollectionPL> itemArraylist;
+    ArrayList<AutoCollectionPL> itemArraylist;
     Context context;
     TextView due, billno;
     EditText pay;
     CheckBox select;
-    CollectionPL collectionPL;
+    AutoCollectionPL collectionPL;
     Button btnOk;
     Boolean autoFlag=false;
-    public SOAutoFillAdapter(@NonNull Context context, int resource, ArrayList<CollectionPL> detailList,Boolean autoFlag) {
+    public SOAutoFillAdapter(@NonNull Context context, int resource, ArrayList<AutoCollectionPL> detailList,Boolean autoFlag) {
         super(context, resource);
         this.context = context;
         this.itemArraylist = detailList;

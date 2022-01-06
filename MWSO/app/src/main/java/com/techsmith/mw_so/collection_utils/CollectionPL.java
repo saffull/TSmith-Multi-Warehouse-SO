@@ -8,7 +8,6 @@ public class CollectionPL {
     public int BillAmount;
     public  String docNo;
     public int Balance;
-    public int balance;
     public int OverDuedays;
     public String DueDate;
     public String Terms;
@@ -16,9 +15,6 @@ public class CollectionPL {
     public double amountCollected;
     public int Lineid;
     public String ReceivedAmt;
-    public Boolean select=false;
     public String remarks;
-
-
 
 }
