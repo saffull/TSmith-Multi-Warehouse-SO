@@ -109,7 +109,7 @@ public class Collections extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collections);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         prefs = PreferenceManager.getDefaultSharedPreferences(Collections.this);
         acvCustomerName = findViewById(R.id.acvCustomerName);
         lvCollectionlist = findViewById(R.id.lvCollectionlist);

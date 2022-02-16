@@ -16,8 +16,13 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MWSO"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true" >
+
+        </activity>
         <activity
             android:name=".Delivery"
             android:exported="true" />

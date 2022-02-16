@@ -123,42 +123,42 @@
         android:weightSum="3">
 
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnCOL_Reset"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_gravity="left"
             android:layout_marginLeft="3dp"
             android:layout_weight="1"
-            android:background="@color/activity_bg_color"
+            android:background="@drawable/corners_round_btn"
             android:fontFamily="@font/fabrica"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
             android:text="Reset"
             android:textColor="@color/white" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnCOL_Remarks"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_gravity="left"
             android:layout_marginLeft="3dp"
             android:layout_weight="1"
-            android:background="@color/activity_bg_color"
+            android:background="@drawable/corners_round_btn"
             android:fontFamily="@font/fabrica"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
             android:text="Remarks"
             android:textColor="@color/white" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnCOL_Save"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_gravity="left"
             android:layout_marginLeft="3dp"
             android:layout_weight="1"
-            android:background="@color/activity_bg_color"
+            android:background="@drawable/corners_round_btn"
             android:fontFamily="@font/fabrica"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
@@ -170,9 +170,10 @@
             android:layout_height="40dp"
             android:layout_gravity="left"
             android:enabled="false"
+            android:visibility="gone"
             android:layout_marginLeft="3dp"
             android:layout_weight="1"
-            android:background="@color/activity_bg_color"
+            android:background="@drawable/corners_round_btn"
             android:fontFamily="@font/fabrica"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"

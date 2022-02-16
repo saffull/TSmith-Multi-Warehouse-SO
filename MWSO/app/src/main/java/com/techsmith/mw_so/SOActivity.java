@@ -101,7 +101,7 @@ public class SOActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_so);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         //Determine screen size
         if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) {
