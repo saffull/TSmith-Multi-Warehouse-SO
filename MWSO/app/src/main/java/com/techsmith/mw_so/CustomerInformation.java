@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.techsmith.mw_so.collection_utils.Receivable;
 import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.AutocompleteCustomArrayAdapter;
 import com.techsmith.mw_so.utils.CustomerList;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 
 public class CustomerInformation extends AppCompatActivity {
@@ -43,13 +45,15 @@ public class CustomerInformation extends AppCompatActivity {
     ImageButton imgBtnCustSearchbyName, imgBtnSearchbyHUID;
     EditText etCustomerId, etCustomerAdrs, etCustomerMobile, etCustomerGSTNo, etReceivables;
     Button btnCreateSO;
-    String loginResponse, Url, strCustomer, strErrorMsg, strReceivables, selectedCustomerName, multiSOStoredDevId;
+    String loginResponse, Url, strCustomer, strErrorMsg, strReceivables, strReceivableDetails, uniqueID,
+            selectedCustomerName, multiSOStoredDevId;
     int customerId, selectedCustomerId;
     ProgressDialog pDialog;
     CustomerList customerList;
     Double tsMsgDialogWindowHeight;
     CustomerReceivables customerReceivables;
     UserPL userPLObj;
+    Receivable receivable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,12 @@ public class CustomerInformation extends AppCompatActivity {
         etReceivables = findViewById(R.id.etReceivables);
         loginResponse = prefs.getString("loginResponse", "");
         Url = prefs.getString("MultiSOURL", "");
-       // multiSOStoredDevId = prefs.getString(""salam_ka@yahoo.com"", "");
+        uniqueID = UUID.randomUUID().toString();
+        System.out.println("GUID is " + uniqueID.toUpperCase());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("guid", uniqueID);
+        editor.apply();
+        // multiSOStoredDevId = prefs.getString(""salam_ka@yahoo.com"", "");
        /* if (acvCustomerName.getText().toString().isEmpty()){
             btnCreateSO.setEnabled(false);
             btnCreateSO.setAlpha((float) 0.6);
@@ -213,6 +222,102 @@ public class CustomerInformation extends AppCompatActivity {
         }
     }
 
+    public void ReceivableDetails(View view) {
+        new GetReceivableDetailsTask().execute();
+    }
+
+    private class GetReceivableDetailsTask extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            pDialog = new ProgressDialog(CustomerInformation.this);
+            pDialog.setMessage("Loading Details..");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                URL url = new URL(Url + "GetReceivableDetails?CustId=382");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", prefs.getString("guid", ""));
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                String responseMsg = connection.getResponseMessage();
+
+                try {
+
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        String str = "";
+                        strReceivableDetails = sb.toString();
+                        System.out.println("Response of Customer Recievable Details  is--->" + strReceivables);
+                    } else {
+//                        strErrorMsg = connection.getResponseMessage();
+                        strErrorMsg = responseMsg;
+                        strReceivableDetails = "httperror";
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return strReceivableDetails;
+        }
+
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            //strReceivableDetails
+            if (strReceivableDetails == null || strReceivableDetails.isEmpty()) {
+                Toast.makeText(CustomerInformation.this, "No result from web", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    Gson gson = new Gson();
+                    receivable = gson.fromJson(strReceivableDetails, Receivable.class);
+                    for (int i = 0; i < receivable.data.size(); i++) {
+                        System.out.println(receivable.data.get(i).billAmount);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
     private class GetReceivablesTask extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
@@ -237,6 +342,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", prefs.getString("guid", ""));
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
@@ -332,6 +438,7 @@ public class CustomerInformation extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", prefs.getString("guid", ""));
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();

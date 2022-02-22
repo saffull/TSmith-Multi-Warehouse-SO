@@ -162,6 +162,7 @@ public class Delivery extends AppCompatActivity {
                     gson = new Gson();
                     deliverySO = new DeliverySO();
                     deliverySO.date = currentTime.toString();
+                    deliverySO.customer = custSelect.getSelectedItem().toString();
 
 
                     for (int i = 0; i < recycler_view.getChildCount(); i++) {

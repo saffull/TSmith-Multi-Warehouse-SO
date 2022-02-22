@@ -61,6 +61,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class SOActivity extends AppCompatActivity {
 
@@ -68,7 +69,7 @@ public class SOActivity extends AppCompatActivity {
     SOActivityArrayAdapter arrayAdapter;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "",
-            cceId = "", multiSOStoredDevId = "";
+            cceId = "", multiSOStoredDevId = "", uniqueId;
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
     Boolean isRepeat = false;
@@ -106,14 +107,11 @@ public class SOActivity extends AppCompatActivity {
         //Determine screen size
         if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) {
             Toast.makeText(this, "Large screen", Toast.LENGTH_LONG).show();
-        }
-        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
+        } else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
             Toast.makeText(this, "Normal sized screen", Toast.LENGTH_LONG).show();
-        }
-        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) {
+        } else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) {
             Toast.makeText(this, "Small sized screen", Toast.LENGTH_LONG).show();
-        }
-        else {
+        } else {
             Toast.makeText(this, "Screen size is neither large, normal or small", Toast.LENGTH_LONG).show();
         }
         prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
@@ -131,6 +129,8 @@ public class SOActivity extends AppCompatActivity {
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
         Url = prefs.getString("MultiSOURL", "");
         multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
+        uniqueId = prefs.getString("guid", "");
+        System.out.println("Unique Id is " + uniqueId);
         try {
             if (userPLObj.summary.customerName == null) {
                 CustomerName = prefs.getString("selectedCustomerName", "");
@@ -329,6 +329,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", uniqueId);
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
@@ -615,7 +616,7 @@ public class SOActivity extends AppCompatActivity {
                 appUserPlJsnStr.put("itemid", itemId);
                 appUserPlJsnStr.put("customer", CustomerId);
 
-                //https://tsmithy.in/somemouat/api/AllocateQty
+                //https://tsmithy.in1/somemouat/api/AllocateQty
                 URL url = new URL(Url + "AllocateQty");
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -627,6 +628,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", uniqueId);
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setDoOutput(true);
@@ -753,13 +755,14 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", uniqueId);
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
                 int responsecode = connection.getResponseCode();
                 String responseMsg = connection.getResponseMessage();
-
+                System.out.println("Response code is " + responsecode);
 
                 try {
 
@@ -843,7 +846,6 @@ public class SOActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
@@ -889,6 +891,7 @@ public class SOActivity extends AppCompatActivity {
                         saveSummarySO.docSeries = "";
                         saveSummarySO.remarks = billRemarks;
                         saveSummarySO.cceId = cceId;
+                        saveSummarySO.docGuid=uniqueId;
                         saveSummarySO.machineId = "";
                         saveSummarySO.userId = "";
 
@@ -955,7 +958,7 @@ public class SOActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             //https://tsmithy.in/somemouat/api/SaveSO
             try {
-
+                System.out.println("GUID coming here is"+uniqueId);
                 URL url = new URL(Url + "SaveSO");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -965,6 +968,9 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("noofitems", String.valueOf(detailList.size()));
+                connection.setRequestProperty("guid", uniqueId);
+                connection.setRequestProperty("custid", String.valueOf(CustomerId));
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setReadTimeout(300000);
@@ -1124,12 +1130,19 @@ public class SOActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int arg1) {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("BillRemarksMWSO", "");
-                editor.apply();
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
+                try {
+                    String uniqueID = UUID.randomUUID().toString();
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("BillRemarksMWSO", "");
+                    editor.putString("guid", "");
+                    editor.putString("guid", uniqueID);
+                    editor.apply();
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -1204,6 +1217,7 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", uniqueId);
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();

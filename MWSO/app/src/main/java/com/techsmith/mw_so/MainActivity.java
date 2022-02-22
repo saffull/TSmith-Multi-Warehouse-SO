@@ -36,6 +36,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     TextInputEditText etUsername, etPassword;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         int screen_height = displayMetrics.heightPixels;
         int screen_width = displayMetrics.widthPixels;
         tsMsgDialogWindowHeight = Double.valueOf((screen_height * 38) / 100);
+
 
         Dexter.withContext(this)
                 .withPermissions(
@@ -142,8 +144,9 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
                 connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("machineid", "saffull@gmail.com");
-                // connection.setRequestProperty("machineid","salam_ka@yahoo.com");
+                //connection.setRequestProperty("machineid", "saffull@gmail.com");
+                //connection.setRequestProperty("machineid","salam_ka@yahoo.com");
+                connection.setRequestProperty("machineid",username.trim());
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 

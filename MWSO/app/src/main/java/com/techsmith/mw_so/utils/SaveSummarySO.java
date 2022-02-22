@@ -11,4 +11,5 @@ public class SaveSummarySO {
     public String machineId;
     public String cceId;
     public String userId;
+    public String docGuid;
 }
