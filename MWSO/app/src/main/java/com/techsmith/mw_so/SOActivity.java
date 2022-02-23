@@ -818,10 +818,14 @@ public class SOActivity extends AppCompatActivity {
                     itemList = gson.fromJson(strGetItems, ItemList.class);
                     if (itemList.statusFlag == 0) {
                         String[] arrProducts = new String[itemList.data.size()];
+                        String[] arrMrp=new String[itemList.data.size()];
+                        String[] arrSoh=new String[itemList.data.size()];
                         for (int i = 0; i < itemList.data.size(); i++) {
                             arrProducts[i] = itemList.data.get(i).product;
+                            arrMrp[i]=String.valueOf(itemList.data.get(i).mrp);
+                            arrSoh[i]=String.valueOf(itemList.data.get(i).sohInPacks);
                         }
-                        AutoCompleteProductListCustomAdapter myAdapter = new AutoCompleteProductListCustomAdapter(SOActivity.this, R.layout.autocomplete_view_row, arrProducts);
+                        AutoCompleteProductListCustomAdapter myAdapter = new AutoCompleteProductListCustomAdapter(SOActivity.this, R.layout.autocomplete_view_row, arrProducts,arrMrp,arrSoh);
                         acvItemSearchSOActivity.setAdapter(myAdapter);
                         acvItemSearchSOActivity.showDropDown();
                     } else {

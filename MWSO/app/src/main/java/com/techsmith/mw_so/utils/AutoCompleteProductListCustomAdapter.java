@@ -16,14 +16,18 @@ public class AutoCompleteProductListCustomAdapter extends KArrayAdapter<String> 
     int layoutResourceId;
     //    MyObject data[] = null;
     public String[] items;
+    public String[] Mrp;
+    public String[] Soh;
 
-    public AutoCompleteProductListCustomAdapter(Context mContext, int layoutResourceId, String[] objects) {
+    public AutoCompleteProductListCustomAdapter(Context mContext, int layoutResourceId, String[] objects, String[] mrp, String[] soh) {
 
         super(mContext, layoutResourceId, objects);
 
         this.layoutResourceId = layoutResourceId;
         this.mContext = mContext;
         this.items = objects;
+        this.Mrp = mrp;
+        this.Soh = soh;
     }
 
     @Override
@@ -49,7 +53,17 @@ public class AutoCompleteProductListCustomAdapter extends KArrayAdapter<String> 
 
             // get the TextView and then set the text (item name) and tag (item ID) values
             TextView textViewItem = convertView.findViewById(R.id.textViewItem);
-            textViewItem.setText(objectItem);
+            TextView txtMrp = convertView.findViewById(R.id.txtmrp);
+            TextView txtSoh = convertView.findViewById(R.id.txtsoh);
+
+            try {
+                textViewItem.setText(objectItem);
+                txtMrp.setText("MRP: "+Mrp[position]);
+                txtSoh.setText("SOH: "+Soh[position]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
             // in case you want to add some style, you can do something like:
 //            textViewItem.setBackgroundColor(Color.CYAN);

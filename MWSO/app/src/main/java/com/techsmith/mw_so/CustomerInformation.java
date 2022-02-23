@@ -1,6 +1,9 @@
 package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -24,7 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.techsmith.mw_so.collection_utils.Receivable;
+import com.techsmith.mw_so.receivable_utils.AdapterRe;
+import com.techsmith.mw_so.receivable_utils.Receivable;
 import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.AutocompleteCustomArrayAdapter;
 import com.techsmith.mw_so.utils.CustomerList;
@@ -36,6 +41,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -54,6 +61,10 @@ public class CustomerInformation extends AppCompatActivity {
     CustomerReceivables customerReceivables;
     UserPL userPLObj;
     Receivable receivable;
+    List<String> docId, billAmount, balancelist;
+    RecyclerView recyclerView;
+    Dialog dialog;
+    AdapterRe adapterRe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -223,7 +234,10 @@ public class CustomerInformation extends AppCompatActivity {
     }
 
     public void ReceivableDetails(View view) {
-        new GetReceivableDetailsTask().execute();
+        if (!etReceivables.getText().toString().isEmpty())
+            new GetReceivableDetailsTask().execute();
+        else
+            Toast.makeText(CustomerInformation.this, "Click Receivable Button", Toast.LENGTH_SHORT).show();
     }
 
     private class GetReceivableDetailsTask extends AsyncTask<String, String, String> {
@@ -274,7 +288,7 @@ public class CustomerInformation extends AppCompatActivity {
                         reader.close();
                         String str = "";
                         strReceivableDetails = sb.toString();
-                        System.out.println("Response of Customer Recievable Details  is--->" + strReceivables);
+                        System.out.println("Response of Customer Recievable Details  is--->" + strReceivableDetails);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -304,11 +318,61 @@ public class CustomerInformation extends AppCompatActivity {
                 Toast.makeText(CustomerInformation.this, "No result from web", Toast.LENGTH_SHORT).show();
             } else {
                 try {
+                    docId = new ArrayList();
+                    billAmount = new ArrayList();
+                    balancelist = new ArrayList();
                     Gson gson = new Gson();
                     receivable = gson.fromJson(strReceivableDetails, Receivable.class);
                     for (int i = 0; i < receivable.data.size(); i++) {
-                        System.out.println(receivable.data.get(i).billAmount);
+                        billAmount.add(String.valueOf(receivable.data.get(i).billAmount));
+                        balancelist.add(String.valueOf(receivable.data.get(i).balance));
+                        //if (receivable.data.get(i).docNo.length() < 16)
+                            docId.add(receivable.data.get(i).docNo);
+                        /*else
+                            docId.add(receivable.data.get(i).docNo.substring(0, 15));*/
                     }
+
+                    dialog = new Dialog(CustomerInformation.this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setCancelable(false);
+                    dialog.setContentView(R.layout.dialog_recycler);
+                    WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                    lp.copyFrom(dialog.getWindow().getAttributes());
+                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                    lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+                    lp.gravity = Gravity.CENTER;
+                    dialog.getWindow().setAttributes(lp);
+
+
+                    Button btndialog = (Button) dialog.findViewById(R.id.btndialog);
+                    TextView dialog_cust = dialog.findViewById(R.id.dialog_cust);
+                    TextView total = dialog.findViewById(R.id.total);
+                    total.setText("Total: " + etReceivables.getText().toString().trim());
+                    dialog_cust.setText(receivable.data.get(0).customer);
+                    btndialog.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            dialog.dismiss();
+                        }
+                    });
+
+                    recyclerView = dialog.findViewById(R.id.recycler);
+                    adapterRe = new AdapterRe(CustomerInformation.this, docId, billAmount, balancelist);
+                    recyclerView.setAdapter(adapterRe);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+                    recyclerView.addItemDecoration(new DividerItemDecoration(CustomerInformation.this, LinearLayoutManager.VERTICAL));
+
+
+                    recyclerView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            System.out.println("Id is " + v.getId());
+                        }
+                    });
+
+                    dialog.show();
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
