@@ -151,6 +151,14 @@ public class Delivery extends AppCompatActivity {
 
             }
         });
+        btnsendotp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              startActivity(new Intent(Delivery.this, BleActivity.class));
+               // startActivity(new Intent(Delivery.this, BluetoothActivity.class));
+
+            }
+        });
         btnsave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
