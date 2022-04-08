@@ -68,10 +68,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Collections extends AppCompatActivity {
-    public EditText cashAmount, userInput, tvAmountValue, editText1;
+    public EditText userInput, tvAmountValue;
     RadioButton cash, cheque;
     Gson gson;
-    Double TempAutoFillAmount, total = 0.0, tvTotal = 0.0;
+    Double TempAutoFillAmount, total = 0.0;
     Collection collection;
     SharedPreferences.Editor editor;
     private CSpinner storeSelect;
@@ -584,7 +584,7 @@ public class Collections extends AppCompatActivity {
                 connection.setRequestProperty("remarks", "");
                 connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.connect();
+                connection.connect(); 
 
                 int responsecode = connection.getResponseCode();
                 String responseMsg = connection.getResponseMessage();

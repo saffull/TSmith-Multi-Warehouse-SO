@@ -47,6 +47,7 @@ public class BluetoothActivity extends AppCompatActivity {
         findViewById(R.id.btn_print_layout).setOnClickListener(v -> printView());
         findViewById(R.id.btn_print_receipt).setOnClickListener(v -> printQrReceipt());
         findViewById(R.id.btn_print_receipt2).setOnClickListener(v -> printQrReceipt2());
+        findViewById(R.id.printtsmith).setOnClickListener(v -> printOurReceipt());
     }
 
     private void showPrinterList() {
@@ -133,41 +134,41 @@ public class BluetoothActivity extends AppCompatActivity {
         Printama.with(this).connect(printama -> {
             printama.setSmallText();
             printama.printText("small___________\n");
-            printama.printTextln("Techsmith Software Private Limit");
+            printama.printTextln("Techsmith Software Private Limited");
 
             printama.setNormalText();
             printama.printText("normal__________\n");
-            printama.printTextln("Techsmith Software Private Limit");
+            printama.printTextln("Techsmith Software Private Limited");
 
             printama.printTextNormal("bold____________\n");
-            printama.printTextlnBold("Techsmith Software Private Limit");
+            printama.printTextlnBold("Techsmith Software Private Limited");
 
             printama.setNormalText();
             printama.printTextNormal("tall____________\n");
-            printama.printTextlnTall("Techsmith Software Private Limit");
+            printama.printTextlnTall("Techsmith Software Private Limited");
 
             printama.printTextNormal("tall bold_______\n");
-            printama.printTextlnTallBold("Techsmith Software Private Limit");
+            printama.printTextlnTallBold("Techsmith Software Private Limited");
 
             printama.printTextNormal("wide____________\n");
-            printama.printTextlnWide("Techsmith Software Private Limit");
+            printama.printTextlnWide("Techsmith Software Private Limited");
 
             printama.printTextNormal("wide bold_______\n");
-            printama.printTextlnWideBold("Techsmith Software Private Limit");
+            printama.printTextlnWideBold("Techsmith Software Private Limited");
 
             printama.printTextNormal("wide tall_______\n");
-            printama.printTextlnWideTall("Techsmith Software Private Limit");
+            printama.printTextlnWideTall("Techsmith Software Private Limited");
 
             printama.printTextNormal("wide tall bold__\n");
-            printama.printTextlnWideTallBold("Techsmith Software Private Limit");
+            printama.printTextlnWideTallBold("Techsmith Software Private Limited");
 
             printama.printTextNormal("underline_______\n");
             printama.setUnderline();
-            printama.printTextln("Techsmith Software Private Limit");
+            printama.printTextln("Techsmith Software Private Limited");
 
             printama.printTextNormal("delete line_____\n");
             printama.setDeleteLine();
-            printama.printTextln("Techsmith Software Private Limit");
+            printama.printTextln("Techsmith Software Private Limited");
 
             printama.setNormalText();
             printama.feedPaper();
@@ -282,6 +283,43 @@ public class BluetoothActivity extends AppCompatActivity {
 
             printama.close();
         }, this::showToast);
+    }
+
+    private void printOurReceipt() {
+        String address = "http://www.tsmith.co.in";
+        Printama.with(this).connect(printama -> {
+            printama.printTextln("Techsmith Software Pvt Limited", Printama.CENTER);
+            printama.setNormalText();
+            printama.printDashedLine();
+            printama.addNewLine();
+
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix bitMatrix;
+            try {
+                bitMatrix = writer.encode(address, BarcodeFormat.QR_CODE, 100, 100);
+                int width = bitMatrix.getWidth();
+                int height = bitMatrix.getHeight();
+                Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        int color = Color.WHITE;
+                        if (bitMatrix.get(x, y)) color = Color.BLACK;
+                        bitmap.setPixel(x, y, color);
+                    }
+                }
+                if (bitmap != null) {
+                    printama.printImage(bitmap);
+                }
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+            printama.addNewLine();
+            printama.feedPaper();
+            printama.close();
+
+
+        }, this::showToast);
+
     }
 
     private void printQrReceipt2() {

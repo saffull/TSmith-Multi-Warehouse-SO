@@ -304,5 +304,15 @@
             android:textSize="12sp" />
 
     </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="printOurReceipt"
+        android:id="@+id/printtsmith"
+        android:backgroundTint="@color/colorAccent"
+        android:text="Print Techsmith Recipet"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        android:textSize="12sp" />
 
 </LinearLayout>

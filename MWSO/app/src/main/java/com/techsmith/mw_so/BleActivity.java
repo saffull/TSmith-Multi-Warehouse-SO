@@ -1,7 +1,10 @@
 package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -9,6 +12,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +27,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.anggastudio.printama.Printama;
 import com.google.gson.Gson;
+
 import com.techsmith.mw_so.collection_utils.CSpinner;
 import com.techsmith.mw_so.utils.LineResponse;
 import com.techsmith.mw_so.utils.UnicodeFormatter;
@@ -93,6 +99,7 @@ public class BleActivity extends AppCompatActivity {
         Button openButton = findViewById(R.id.open);
         Button sendButton = findViewById(R.id.send);
         Button closeButton = findViewById(R.id.close);
+
         myLabel = findViewById(R.id.label);
         myTextbox = findViewById(R.id.entry);
         status = findViewById(R.id.status);
@@ -119,7 +126,7 @@ public class BleActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     sendData();
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -336,21 +343,15 @@ public class BleActivity extends AppCompatActivity {
                     String he = "<font size='big'>ORDER N°045</font>\n";
                     he = he + "********************************\n\n";
                     // String BILL = print_message;
-                    //String BILL = "Techsmith Software Private Limi"; // 32 including space
-                    String BILL = "4B 4B 6B 6B \n 6D 6D 6D 6B \n 6D 6D 6B " +
-                            "6B\n  4D 4D 4B 4B\n 5B 6B  6B 6D\n  6D 6B" +
-                            "5D 5D\n  5B 5B  4D 4D\n  4D 4B\n ";
-                   /* BILL = BILL
-                            + "================================\n";*/
-                    String tes="abdcd ryme\n\n" +
-                            "4B 4B 6B 6B \n 6D 6D 6B 5D\n 5D 5B 5B 4D\n 4B 4D 5B 4B \n" +
-                            "4B 4B 4B 5B\n 6B 6B 6D 6D\n 6B 5D 5D 5B\n 5B 4D 4D 4B";
+                    String BILL = "Techsmith Software Private Limited \n"; // 32 including space
+
                     String time = formattedDate + "\n\n";
 
                     os.write(blank.getBytes());
-                    os.write(bb3);
+                    os.write(cc);
                     os.write(BILL.getBytes());//writing the data to the bluetooth output stream
                     os.write(blank.getBytes());
+                   // os.write(print_message.getBytes());
                     os.write(time.getBytes());
                     // os.write(he.getBytes());
                     os.write(0x0D);
@@ -425,7 +426,7 @@ public class BleActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             try {
                 /*&LineBreak=%23*/
-                URL url = new URL("https://tsmithy.in/dummy/api/PrintTextA?CharactersInARow=15&NoOf'Lines=15");
+                URL url = new URL("https://tsmithy.in/dummy/api/PrintTextA?CharactersInARow=13&NoOfLines=5&LineBreak=%23");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(15000);
