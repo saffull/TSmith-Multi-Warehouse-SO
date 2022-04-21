@@ -83,7 +83,7 @@ public class SOActivity extends AppCompatActivity {
     SOPL soplObj;
     EditText etAddRemarks;
     Button caculate, btnAdd, btnAllClear, btnSave;
-    List<String> offerList, houseList, sohList;
+    List<String> offerList, houseList, sohList, printStoreId, printSbNumber;
     TextView tvCustomerName, tvDate, Freeqty, etReceivables;
     AutoCompleteTextView acvItemSearchSOActivity;
     ProgressDialog pDialog;
@@ -818,14 +818,14 @@ public class SOActivity extends AppCompatActivity {
                     itemList = gson.fromJson(strGetItems, ItemList.class);
                     if (itemList.statusFlag == 0) {
                         String[] arrProducts = new String[itemList.data.size()];
-                        String[] arrMrp=new String[itemList.data.size()];
-                        String[] arrSoh=new String[itemList.data.size()];
+                        String[] arrMrp = new String[itemList.data.size()];
+                        String[] arrSoh = new String[itemList.data.size()];
                         for (int i = 0; i < itemList.data.size(); i++) {
                             arrProducts[i] = itemList.data.get(i).product;
-                            arrMrp[i]=String.valueOf(itemList.data.get(i).mrp);
-                            arrSoh[i]=String.valueOf(itemList.data.get(i).sohInPacks);
+                            arrMrp[i] = String.valueOf(itemList.data.get(i).mrp);
+                            arrSoh[i] = String.valueOf(itemList.data.get(i).sohInPacks);
                         }
-                        AutoCompleteProductListCustomAdapter myAdapter = new AutoCompleteProductListCustomAdapter(SOActivity.this, R.layout.autocomplete_view_row, arrProducts,arrMrp,arrSoh);
+                        AutoCompleteProductListCustomAdapter myAdapter = new AutoCompleteProductListCustomAdapter(SOActivity.this, R.layout.autocomplete_view_row, arrProducts, arrMrp, arrSoh);
                         acvItemSearchSOActivity.setAdapter(myAdapter);
                         acvItemSearchSOActivity.showDropDown();
                     } else {
@@ -895,7 +895,7 @@ public class SOActivity extends AppCompatActivity {
                         saveSummarySO.docSeries = "";
                         saveSummarySO.remarks = billRemarks;
                         saveSummarySO.cceId = cceId;
-                        saveSummarySO.docGuid=uniqueId;
+                        saveSummarySO.docGuid = uniqueId;
                         saveSummarySO.machineId = "";
                         saveSummarySO.userId = "";
 
@@ -962,7 +962,7 @@ public class SOActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             //https://tsmithy.in/somemouat/api/SaveSO
             try {
-                System.out.println("GUID coming here is"+uniqueId);
+                System.out.println("GUID coming here is" + uniqueId);
                 URL url = new URL(Url + "SaveSO");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -1026,6 +1026,8 @@ public class SOActivity extends AppCompatActivity {
             if (pDialog.isShowing())
                 pDialog.dismiss();
             try {
+                printStoreId = new ArrayList<>();
+                printSbNumber = new ArrayList<>();
                 Gson gson = new Gson();
 
                 SaveSOResponse saveSOResponse;
@@ -1054,11 +1056,38 @@ public class SOActivity extends AppCompatActivity {
                         public void onClick(View view) {
                             disableButtons();
                             dialog.dismiss();
+                            startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
                         }
                     });
 
                     // tvSaveStatus.setText("Saved \n\nToken No: " + tokenNo);
                     tvSaveStatus.setText("Saved\n\n SOMemoNo:\t" + saveSOResponse.data.get(saveSOResponse.data.size() - 1).SOMemoNo);
+                    //printSbNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number;
+                    //printStoreId = saveSOResponse.data.get(saveSOResponse.data.size() - 1).storeId;
+                    if (saveSOResponse.data.size() > 1) {
+                        for (int i = 0; i < saveSOResponse.data.size(); i++) {
+                            printSbNumber.add(saveSOResponse.data.get(i).SB_Number);
+                            printStoreId.add(saveSOResponse.data.get(i).storeId);
+                        }
+                        System.out.println("First List is " + printSbNumber + "\n" + printStoreId);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("printStoreId", printStoreId.toString());
+                        editor.putString("printSbNumber", printSbNumber.toString());
+                        editor.putInt("sizeCount", saveSOResponse.data.size());
+                        editor.apply();
+
+                    } else if (saveSOResponse.data.size() == 1) {
+                        String printSBNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number;
+                        String printStoreID = saveSOResponse.data.get(saveSOResponse.data.size() - 1).storeId;
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("printStoreID", printStoreID);
+                        editor.putString("printSBNumber", printSBNumber);
+                        editor.putInt("sizeCount", saveSOResponse.data.size());
+                        editor.apply();
+                    }
+
+
+                    System.out.println("size count is " + saveSOResponse.data.size());
                     tvSaveStatus.setMovementMethod(new ScrollingMovementMethod());
                     dialog.setCanceledOnTouchOutside(false);
                     dialog.show();

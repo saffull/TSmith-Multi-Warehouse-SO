@@ -76,7 +76,6 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone"
             app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="25dp"
             app:cardElevation="0dp"
@@ -103,12 +102,25 @@
         android:layout_marginBottom="5dp"
         android:gravity="center"
         android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_print_text_last"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorAccent"
+            android:gravity="center"
+            android:visibility="invisible"
+            android:text="Print Last Bill"
+            android:textAllCaps="false"
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn_print_text_left"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:visibility="gone"
             android:backgroundTint="@color/colorAccent"
             android:gravity="start|center"
             android:text="Print Text Left"
@@ -124,6 +136,7 @@
             android:backgroundTint="@color/colorAccent"
             android:text="Print Text Center"
             android:textAllCaps="false"
+            android:visibility="gone"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
 
@@ -136,6 +149,7 @@
             android:gravity="end|center"
             android:text="Print Text Right"
             android:textAllCaps="false"
+            android:visibility="gone"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
 
@@ -147,6 +161,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:visibility="gone"
         android:backgroundTint="@color/colorAccent"
         android:text="Print Many Text Style"
         android:textAllCaps="false"
@@ -156,6 +171,7 @@
     <Button
         android:id="@+id/btn_print_text_justify"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
@@ -169,6 +185,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:visibility="gone"
         android:layout_marginBottom="5dp"
         android:gravity="center"
         android:orientation="horizontal">
@@ -178,6 +195,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:visibility="gone"
             android:backgroundTint="@color/colorAccent"
             android:gravity="start|center"
             android:text="Print Image Left"
@@ -188,6 +206,7 @@
         <Button
             android:id="@+id/btn_print_image_center"
             android:layout_width="0dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@color/colorAccent"
@@ -201,6 +220,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:visibility="gone"
             android:backgroundTint="@color/colorAccent"
             android:gravity="end|center"
             android:text="Print Image Right"
@@ -215,6 +235,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:visibility="gone"
         android:layout_marginBottom="5dp"
         android:backgroundTint="@color/colorAccent"
         android:text="Print Image Full Width"
@@ -229,6 +250,7 @@
         android:backgroundTint="@color/colorAccent"
         android:text="Print Image Original Width"
         android:textAllCaps="false"
+        android:visibility="gone"
         android:textColor="@color/colorWhite"
         android:textSize="12sp" />
 
@@ -247,6 +269,7 @@
             android:backgroundTint="@color/colorAccent"
             android:text="Print Image Background"
             android:textAllCaps="false"
+            android:visibility="gone"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
 
@@ -254,6 +277,7 @@
             android:id="@+id/btn_print_image_photo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_weight="1"
             android:backgroundTint="@color/colorAccent"
             android:text="Print Image Photo"
@@ -268,6 +292,7 @@
             android:layout_weight="1"
             android:backgroundTint="@color/colorAccent"
             android:text="Print This Layout"
+            android:visibility="gone"
             android:textAllCaps="false"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
@@ -289,6 +314,7 @@
             android:backgroundTint="@color/colorAccent"
             android:text="Print Receipt QR1"
             android:textAllCaps="false"
+            android:visibility="gone"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
 
@@ -300,17 +326,31 @@
             android:backgroundTint="@color/colorAccent"
             android:text="Print Receipt QR2"
             android:textAllCaps="false"
+            android:visibility="gone"
             android:textColor="@color/colorWhite"
             android:textSize="12sp" />
 
     </LinearLayout>
+    <TextView
+        android:id="@+id/MessageDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_gravity="center"
+        android:fontFamily="@font/fabrica"
+        android:scrollbars = "vertical"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Print Preview"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
     <Button
+        android:id="@+id/printtsmith"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="printOurReceipt"
-        android:id="@+id/printtsmith"
         android:backgroundTint="@color/colorAccent"
-        android:text="Print Techsmith Recipet"
+        android:onClick="SampReceipt"
+        android:text="Print  Receipt"
         android:textAllCaps="false"
         android:textColor="@color/colorWhite"
         android:textSize="12sp" />

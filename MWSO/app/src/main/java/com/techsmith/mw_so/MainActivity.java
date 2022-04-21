@@ -45,13 +45,13 @@ public class MainActivity extends AppCompatActivity {
     Double tsMsgDialogWindowHeight;
     String username, password, Url, multiSOStoredDevId, strCheckLogin, strErrorMsg;
     String[] permissions = {Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+            Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       // getSupportActionBar().hide();
+        // getSupportActionBar().hide();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screen_height = displayMetrics.heightPixels;
@@ -77,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
+        String string = "5, 15",string1="5002/22/WS-16, APPL/22/WS-27";
+        String[] parts = string.split(",");
+        String [] parts1=string1.split(",");
+      //  System.out.println(parts.length+"--<>"+parts[0]+"\n"+parts[1].trim());
+        for (int i = 0; i < parts.length; i++) {
+            System.out.println(parts[i].trim()+"\n"+parts1[i].trim());
+
+        }
 
         Url = prefs.getString("MultiSOURL", "");
         multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
@@ -146,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestProperty("remarks", "");
                 //connection.setRequestProperty("machineid", "saffull@gmail.com");
                 //connection.setRequestProperty("machineid","salam_ka@yahoo.com");
-                connection.setRequestProperty("machineid",username.trim());
+                connection.setRequestProperty("machineid", username.trim());
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.connect();
 
