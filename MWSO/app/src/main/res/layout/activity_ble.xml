@@ -23,10 +23,10 @@
     <com.techsmith.mw_so.collection_utils.CSpinner
         android:id="@+id/storeSelect"
         android:layout_width="match_parent"
-        android:layout_margin="10dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/entry"
-        android:layout_height="wrap_content" />
+        android:layout_margin="10dp"
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/status"
@@ -41,9 +41,9 @@
         android:textColor="@color/black" />
 
     <LinearLayout
-        android:layout_width="match_parent"
         android:id="@+id/ll"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/status">
 
         <Button
@@ -67,5 +67,19 @@
             android:layout_margin="5dp"
             android:text="Close" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/MessageDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_below="@+id/ll"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/fabrica"
+        android:gravity="center"
+        android:scrollbars="vertical"
+        android:text="Print Preview"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
 
 </RelativeLayout>

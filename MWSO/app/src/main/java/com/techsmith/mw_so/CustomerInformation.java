@@ -387,7 +387,7 @@ public class CustomerInformation extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(CustomerInformation.this);
-            pDialog.setMessage("Loading...");
+            pDialog.setMessage("Loading Receivables...");
             pDialog.setCancelable(false);
             pDialog.show();
         }

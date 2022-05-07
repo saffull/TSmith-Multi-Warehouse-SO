@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,21 +18,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.anggastudio.printama.Printama;
 import com.google.gson.Gson;
 
 import com.techsmith.mw_so.collection_utils.CSpinner;
 import com.techsmith.mw_so.utils.LineResponse;
+import com.techsmith.mw_so.utils.PrintResponse;
 import com.techsmith.mw_so.utils.UnicodeFormatter;
 
 import java.io.BufferedReader;
@@ -75,10 +82,18 @@ public class BleActivity extends AppCompatActivity {
     volatile boolean stopWorker;
     /* Get time and date */
 
-
-    SharedPreferences prefs;
-    List<String> printList;
     private CSpinner storeSelect;
+    ProgressDialog pDialog;
+    String strCheckLogin, strErrorMsg, printData = "", printStoreId = "",
+            printSbNumber = "", s1 = "", s2 = "", printSBNumber, printStoreID;
+    PrintResponse printResponse;
+    TextView MessageDisplay;
+    SharedPreferences prefs;
+    List<String> printList, sbList, idList;
+    String[] sbNumber, storeId;
+    ArrayList<String> list1, list2;
+    ImageView imageView;
+    int sizeCount = 0, reCount = 0;
 
     @Override
     public void onBackPressed() {
@@ -95,6 +110,19 @@ public class BleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ble);
         prefs = PreferenceManager.getDefaultSharedPreferences(BleActivity.this);
+        MessageDisplay = findViewById(R.id.MessageDisplay);
+
+        printList = new ArrayList<>();
+        sbList = new ArrayList<>();
+        idList = new ArrayList<>();
+        sizeCount = prefs.getInt("sizeCount", 0);
+        printStoreID = prefs.getString("printStoreID", "");
+        printSBNumber = prefs.getString("printSBNumber", "");
+
+
+        printStoreId = prefs.getString("printStoreId", "").replace("[", "").replace("]", "");
+        printSbNumber = prefs.getString("printSbNumber", "").replace("[", "").replace("]", "");
+
 
         Button openButton = findViewById(R.id.open);
         Button sendButton = findViewById(R.id.send);
@@ -106,7 +134,34 @@ public class BleActivity extends AppCompatActivity {
         storeSelect = findViewById(R.id.storeSelect);
         printer = prefs.getString("printer", "UTP-1004003").trim().replace("[", "").replace("]", "");
         printList = new ArrayList<String>(Arrays.asList(printer.split(",")));
+        try {
+            sbNumber = printSbNumber.split(",");
+            storeId = printStoreId.split(",");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (sizeCount == 1) {
+            try {
+                s1 = printStoreID;
+                s2 = printSBNumber;
+                new TakeBillSingle().execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (sizeCount > 1) {
+            if (!printSbNumber.isEmpty() && !printStoreId.isEmpty()) {
+                try {
+                    new TakeBill().execute();
+                    findViewById(R.id.printtsmith).setEnabled(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
+            } else {
+                Toast.makeText(BleActivity.this, "SbNumber or StoreID is Empty", Toast.LENGTH_LONG).show();
+            }
+
+        }
 
         new takeDocument().execute();
 
@@ -343,7 +398,7 @@ public class BleActivity extends AppCompatActivity {
                     String he = "<font size='big'>ORDER N°045</font>\n";
                     he = he + "********************************\n\n";
                     // String BILL = print_message;
-                    String BILL = "Techsmith Software Private Limited \n"; // 32 including space
+                    String BILL = MessageDisplay.getText().toString(); // 32 including space
 
                     String time = formattedDate + "\n\n";
 
@@ -488,6 +543,275 @@ public class BleActivity extends AppCompatActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+
+        }
+    }
+    private class TakeBill extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(BleActivity.this);
+            pDialog.setMessage("Loading..Please wait.!!");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            strCheckLogin = "";
+
+            //  System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
+            try {
+                //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
+                //URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=15&SBillNo=APPL/22/WS-13");
+                URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=" + storeId[reCount].trim() + "&SBillNo=" + sbNumber[reCount].trim());
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setRequestProperty("authkey", "MGG427A3-F9F6-N7DA-T698-SOF60CE0MEMO");
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                //connection.setRequestProperty("machineid", "saffull@gmail.com");
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                String responseMsg = connection.getResponseMessage();
+                System.out.println("Response message is " + responsecode);
+
+
+                try {
+
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        String str = "";
+                        strCheckLogin = sb.toString();
+                        System.out.println("Response of Print Bill--->" + strCheckLogin);
+                    } else {
+//                        strErrorMsg = connection.getResponseMessage();
+                        strErrorMsg = responseMsg;
+                        strCheckLogin = "httperror";
+                    }
+
+//                    {"Id":9,"Username":"500_9","Name":"500 User 9","Password":"","Email":"pavithrapurushan06@gmail.com","Phone":"","Active":0,"StoreId":50,"StoreCode":"500","StoreName":"SEPL-PHARMA WAREHOUSE","DeviceId":"","PasswordOtp":"","ErrorStatus":0,"Message":"Success"}
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return strCheckLogin;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            printData = s;
+
+
+            if (strCheckLogin.equals("") || strCheckLogin == null) {
+                Toast.makeText(BleActivity.this, "No result", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    Gson gson = new Gson();
+                    printResponse = gson.fromJson(printData, PrintResponse.class);
+                    String test = printResponse.data.replace("\r", "\n");
+                    System.out.println("Print data is " + test);
+                    printList.add(test);
+                    System.out.println("Print List is " + printList);
+                    MessageDisplay.setText(printList.toString().replace(",", "\n").
+                            replace("[", "").replace("]", ""));
+                    MessageDisplay.setMovementMethod(new ScrollingMovementMethod());
+                    // tsMessages(test);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            CheckCount();
+                        }
+                    }, 2000);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+    private void CheckCount() {
+        reCount++;
+        if (reCount != sizeCount) {
+            try {
+                new TakeBill().execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+        }
+    }
+
+    private void tsMessages(String msg) {
+
+        try {
+            final Dialog dialog = new Dialog(BleActivity.this);
+            dialog.setContentView(R.layout.ts_message_dialouge);
+//            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCanceledOnTouchOutside(true);
+//            dialog.setTitle("Save");
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+            ImageButton imgBtnCloseSaveWindow = dialog.findViewById(R.id.imgBtnClosetsMsgWindow);
+            TextView tvMsgTodisplay = dialog.findViewById(R.id.tvTsMessageDisplay);
+
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = Gravity.CENTER;
+            dialog.getWindow().setAttributes(lp);
+
+            imgBtnCloseSaveWindow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+            tvMsgTodisplay.setText(msg);
+            dialog.show();
+        } catch (Exception ex) {
+            Toast.makeText(this, "" + ex, Toast.LENGTH_SHORT).show();
+        }
+
+    }
+    private class TakeBillSingle extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(BleActivity.this);
+            pDialog.setMessage("Loading..Please wait.!!");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            strCheckLogin = "";
+
+            //  System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
+            try {
+                //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
+                //URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=15&SBillNo=APPL/22/WS-13");
+                URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=" + s1 + "&SBillNo=" + s2);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setRequestProperty("authkey", "MGG427A3-F9F6-N7DA-T698-SOF60CE0MEMO");
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                //connection.setRequestProperty("machineid", "saffull@gmail.com");
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                String responseMsg = connection.getResponseMessage();
+                System.out.println("Response message is " + responsecode);
+
+
+                try {
+
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        String str = "";
+                        strCheckLogin = sb.toString();
+                        System.out.println("Response of Print Bill--->" + strCheckLogin);
+                    } else {
+//                        strErrorMsg = connection.getResponseMessage();
+                        strErrorMsg = responseMsg;
+                        strCheckLogin = "httperror";
+                    }
+
+//                    {"Id":9,"Username":"500_9","Name":"500 User 9","Password":"","Email":"pavithrapurushan06@gmail.com","Phone":"","Active":0,"StoreId":50,"StoreCode":"500","StoreName":"SEPL-PHARMA WAREHOUSE","DeviceId":"","PasswordOtp":"","ErrorStatus":0,"Message":"Success"}
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return strCheckLogin;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            printData = s;
+
+
+            if (strCheckLogin.equals("") || strCheckLogin == null) {
+                Toast.makeText(BleActivity.this, "No result", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    Gson gson = new Gson();
+                    printResponse = gson.fromJson(printData, PrintResponse.class);
+                    String test = printResponse.data.replace("\r", "\n");
+                    System.out.println("Print data is " + test);
+                    printList.add(test);
+                    System.out.println("Print List is " + printList);
+                    MessageDisplay.setText(printList.toString().replace(",", "\n").
+                            replace("[", "").replace("]", ""));
+                    MessageDisplay.setMovementMethod(new ScrollingMovementMethod());
+                    // tsMessages(test);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
         }
