@@ -17,7 +17,8 @@ public class Category extends AppCompatActivity {
 
     public void gotoSalesOrder(View view) {
         finish();
-        startActivity(new Intent(Category.this, CustomerInformation.class));
+        //startActivity(new Intent(Category.this, CustomerInformation.class));
+        startActivity(new Intent(Category.this, SoMenu.class));
     }
 
     public void gotoDeliveryPage(View view) {

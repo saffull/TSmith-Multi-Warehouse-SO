@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,6 +33,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.anggastudio.printama.Printama;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
@@ -38,6 +44,7 @@ import com.techsmith.mw_so.utils.AutoCompleteProductListCustomAdapter;
 import com.techsmith.mw_so.utils.CustomerReceivables;
 import com.techsmith.mw_so.utils.ItemDetails;
 import com.techsmith.mw_so.utils.ItemList;
+import com.techsmith.mw_so.utils.PrintResponse;
 import com.techsmith.mw_so.utils.SOActivityArrayAdapter;
 import com.techsmith.mw_so.utils.SOMemo;
 import com.techsmith.mw_so.utils.SOPL;
@@ -68,7 +75,7 @@ public class SOActivity extends AppCompatActivity {
     SharedPreferences prefs;
     SOActivityArrayAdapter arrayAdapter;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
-            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "",
+            strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", strCheckLogin, printData, s1 = "", s2 = "",
             cceId = "", multiSOStoredDevId = "", uniqueId;
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
@@ -98,6 +105,17 @@ public class SOActivity extends AppCompatActivity {
     eg: changing the qty or deleting get reflected globally*/
     HashMap<String, String> offerMap = new HashMap<>();
 
+    FloatingActionButton mAddAlarmFab, mAddPersonFab, email_fab, invoice_fab, preview_fab;
+    ExtendedFloatingActionButton mAddFab;
+    TextView addAlarmActionText, addPersonActionText, email_text, MessageDisplay, invoice_text, preview_text;
+    // to check whether sub FABs are visible or not
+    Boolean isAllFabsVisible, isPrint;
+
+    List<String> printList, sbList, idList;
+    String[] sbNumber, storeId;
+    PrintResponse printResponse;
+    int sizeCount = 0, reCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +133,21 @@ public class SOActivity extends AppCompatActivity {
             Toast.makeText(this, "Screen size is neither large, normal or small", Toast.LENGTH_LONG).show();
         }
         prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
+        mAddFab = findViewById(R.id.add_fab);
+        mAddAlarmFab = findViewById(R.id.add_alarm_fab);
+        mAddPersonFab = findViewById(R.id.add_person_fab);
+        preview_fab = findViewById(R.id.preview_fab);
+        email_fab = findViewById(R.id.email_fab);
+        invoice_fab = findViewById(R.id.invoice_fab);
+        MessageDisplay = findViewById(R.id.MessageDisplay);
+        addAlarmActionText =
+                findViewById(R.id.add_alarm_action_text);
+        addPersonActionText =
+                findViewById(R.id.add_person_action_text);
+        email_text = findViewById(R.id.email_text);
+        invoice_text = findViewById(R.id.invoice_text);
+        preview_text = findViewById(R.id.preview_text);
+        initializeFab();
         tvCustomerName = findViewById(R.id.tvCustomerName);
         ic_search = findViewById(R.id.imgBtnSearchItem);
         lvProductlist = findViewById(R.id.lvProductlist);
@@ -162,7 +195,65 @@ public class SOActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+                            mAddAlarmFab.show();
+                            mAddPersonFab.show();
+                            email_fab.show();
+                            invoice_fab.show();
+                            preview_fab.show();
+                            addAlarmActionText
+                                    .setVisibility(View.VISIBLE);
+                            addPersonActionText
+                                    .setVisibility(View.VISIBLE);
+                            email_text.setVisibility(View.VISIBLE);
+                            invoice_text.setVisibility(View.VISIBLE);
+                            preview_text.setVisibility(View.VISIBLE);
+                            mAddFab.extend();
+                            isAllFabsVisible = true;
+                        } else {
+                            mAddAlarmFab.hide();
+                            mAddPersonFab.hide();
+                            email_fab.hide();
+                            invoice_fab.hide();
+                            addAlarmActionText.setVisibility(View.GONE);
+                            addPersonActionText.setVisibility(View.GONE);
+                            email_text.setVisibility(View.GONE);
+                            invoice_text.setVisibility(View.GONE);
+                            mAddFab.shrink();
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+        email_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(SOActivity.this, "Function not yet implemented..", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mAddPersonFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(SOActivity.this, "Function not yet implemented..", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mAddAlarmFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isPrint = true;
+                PrintDocument(isPrint);
 
+            }
+        });
+        preview_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(SOActivity.this,BluetoothActivity.class));
+            }
+        });
         acvItemSearchSOActivity.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -217,6 +308,28 @@ public class SOActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void initializeFab() {
+        // Now set all the FABs and all the action name
+        // texts as GONE
+        mAddAlarmFab.setVisibility(View.GONE);
+        mAddPersonFab.setVisibility(View.GONE);
+        email_fab.setVisibility(View.GONE);
+        preview_fab.setVisibility(View.GONE);
+        addAlarmActionText.setVisibility(View.GONE);
+        addPersonActionText.setVisibility(View.GONE);
+        email_text.setVisibility(View.GONE);
+        invoice_fab.setVisibility(View.GONE);
+        invoice_text.setVisibility(View.GONE);
+        preview_text.setVisibility(View.GONE);
+        // make the boolean variable as false, as all the
+        // action name texts and all the sub FABs are
+        // invisible
+        isAllFabsVisible = false;
+        // Set the Extended floating action button to
+        // shrinked state initially
+        mAddFab.shrink();
     }
 
     public void SearchItem(View view) {
@@ -1056,7 +1169,8 @@ public class SOActivity extends AppCompatActivity {
                         public void onClick(View view) {
                             disableButtons();
                             dialog.dismiss();
-                            startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
+                            mAddFab.setEnabled(true);
+                            // startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
                         }
                     });
 
@@ -1317,6 +1431,341 @@ public class SOActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+
+    private void PrintDocument(Boolean isPrint) {
+        String printStoreID = "", printSBNumber = "", printStoreId, printSbNumber;
+
+        printList = new ArrayList<>();
+        sbList = new ArrayList<>();
+        idList = new ArrayList<>();
+        sizeCount = prefs.getInt("sizeCount", 0);
+        printStoreID = prefs.getString("printStoreID", "");
+        printSBNumber = prefs.getString("printSBNumber", "");
+
+        printStoreId = prefs.getString("printStoreId", "").replace("[", "").replace("]", "");
+        printSbNumber = prefs.getString("printSbNumber", "").replace("[", "").replace("]", "");
+
+        System.out.println("Incoming data is " + printStoreId + "<----------------------------->" + printSbNumber);
+        try {
+            sbNumber = printSbNumber.split(",");
+            storeId = printStoreId.split(",");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (sizeCount == 1) {
+            try {
+                s1 = printStoreID;
+                s2 = printSBNumber;
+                new TakeBillSingle().execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (sizeCount > 1) {
+            if (!printSbNumber.isEmpty() && !printStoreId.isEmpty()) {
+                try {
+                    new TakeBill().execute();
+                    findViewById(R.id.printtsmith).setEnabled(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                Toast.makeText(SOActivity.this, "SbNumber or StoreID is Empty", Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
+    private class TakeBill extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(SOActivity.this);
+            pDialog.setMessage("Loading..Please waitttt.!!");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            strCheckLogin = "";
+
+            //  System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
+            try {
+                //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
+                //URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=15&SBillNo=APPL/22/WS-13");
+                URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=" + storeId[reCount].trim() + "&SBillNo=" + sbNumber[reCount].trim());
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setRequestProperty("authkey", "MGG427A3-F9F6-N7DA-T698-SOF60CE0MEMO");
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                //connection.setRequestProperty("machineid", "saffull@gmail.com");
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                String responseMsg = connection.getResponseMessage();
+                System.out.println("Response message is " + responsecode);
+
+
+                try {
+
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        String str = "";
+                        strCheckLogin = sb.toString();
+                        System.out.println("Response of Print Bill--->" + strCheckLogin);
+                    } else {
+//                        strErrorMsg = connection.getResponseMessage();
+                        strErrorMsg = responseMsg;
+                        strCheckLogin = "httperror";
+                    }
+
+//                    {"Id":9,"Username":"500_9","Name":"500 User 9","Password":"","Email":"pavithrapurushan06@gmail.com","Phone":"","Active":0,"StoreId":50,"StoreCode":"500","StoreName":"SEPL-PHARMA WAREHOUSE","DeviceId":"","PasswordOtp":"","ErrorStatus":0,"Message":"Success"}
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return strCheckLogin;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            printData = s;
+
+
+            if (strCheckLogin.equals("") || strCheckLogin == null) {
+                Toast.makeText(SOActivity.this, "No result", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    Gson gson = new Gson();
+                    printResponse = gson.fromJson(printData, PrintResponse.class);
+                    String test = printResponse.data.replace("\r", "\n");
+                    System.out.println("Print data is " + test);
+                    printList.add(test);
+                    System.out.println("Print List is " + printList);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            CheckCount();
+                        }
+                    }, 2000);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private class TakeBillSingle extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(SOActivity.this);
+            pDialog.setMessage("Loading Single Bill..Please wait.!!");
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            strCheckLogin = "";
+
+            //  System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
+            try {
+                //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
+                //URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=15&SBillNo=APPL/22/WS-13");
+                URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=" + s1 + "&SBillNo=" + s2);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setRequestProperty("authkey", "MGG427A3-F9F6-N7DA-T698-SOF60CE0MEMO");
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                //connection.setRequestProperty("machineid", "saffull@gmail.com");
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                String responseMsg = connection.getResponseMessage();
+                System.out.println("Response message is " + responsecode);
+
+
+                try {
+
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        String str = "";
+                        strCheckLogin = sb.toString();
+                        System.out.println("Response of Print Bill--->" + strCheckLogin);
+                    } else {
+//                        strErrorMsg = connection.getResponseMessage();
+                        strErrorMsg = responseMsg;
+                        strCheckLogin = "httperror";
+                    }
+
+//                    {"Id":9,"Username":"500_9","Name":"500 User 9","Password":"","Email":"pavithrapurushan06@gmail.com","Phone":"","Active":0,"StoreId":50,"StoreCode":"500","StoreName":"SEPL-PHARMA WAREHOUSE","DeviceId":"","PasswordOtp":"","ErrorStatus":0,"Message":"Success"}
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return strCheckLogin;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+            printData = s;
+
+
+            if (strCheckLogin.equals("") || strCheckLogin == null) {
+                Toast.makeText(SOActivity.this, "No result", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    Gson gson = new Gson();
+                    printResponse = gson.fromJson(printData, PrintResponse.class);
+                    String test = printResponse.data.replace("\r", "\n");
+                    System.out.println("Print data is " + test);
+                    printList.add(test);
+                    System.out.println("Print List is " + printList);
+                    MessageDisplay.setText(printList.toString().replace(",", "\n").
+                            replace("[", "").replace("]", ""));
+                    MessageDisplay.setMovementMethod(new ScrollingMovementMethod());
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isPrint)
+                                RcptPrint();
+                            else
+                                System.out.println("do nothing..");
+                        }
+                    }, 1000);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+    private void CheckCount() {
+        reCount++;
+        if (reCount != sizeCount) {
+            try {
+                new TakeBill().execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            findViewById(R.id.printtsmith).setEnabled(true);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isPrint)
+                        RcptPrint();
+                    else
+                        System.out.println("Do nothing....");
+                }
+            }, 1000);
+
+        }
+    }
+
+    private void RcptPrint() {
+        if (isBluetoothEnabled()) {
+            String temp = MessageDisplay.getText().toString();
+            try {
+                Bitmap bitmap = Printama.getBitmapFromVector(this, R.drawable.techsmith);
+                Printama.with(this).connect(printama -> {
+                    printama.addNewLine(1);
+                    // printama.setNormalText();
+                    printama.setSmallText();
+                    printama.printText(temp, Printama.LEFT);
+
+                    printama.addNewLine(3);
+                    printama.close();
+                }, this::showToast);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast toast = Toast.makeText(SOActivity.this,
+                    "Please Enable Bluetooth & Try Again.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    public boolean isBluetoothEnabled() {
+        BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (myBluetoothAdapter.isEnabled()) {
+            return true;
+        } else {
+            return false;
         }
     }
 

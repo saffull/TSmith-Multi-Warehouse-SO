@@ -155,8 +155,8 @@ public class Delivery extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //startActivity(new Intent(Delivery.this, BleActivity.class));
-                startActivity(new Intent(Delivery.this,SoMenu.class));
-                //startActivity(new Intent(Delivery.this, BluetoothActivity.class));
+                // startActivity(new Intent(Delivery.this,SoMenu.class));
+                startActivity(new Intent(Delivery.this, BluetoothActivity.class));
 
             }
         });

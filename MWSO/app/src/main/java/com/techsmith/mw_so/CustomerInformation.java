@@ -11,6 +11,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -195,6 +196,7 @@ public class CustomerInformation extends AppCompatActivity {
 
     public void ClearAll(View view) {
         btnCreateSO.setEnabled(false);
+        etReceivables.setText("");
         btnCreateSO.setAlpha((float) 0.6);
         acvCustomerName.setText("");
         acvCustomerName.setEnabled(true);
@@ -327,7 +329,7 @@ public class CustomerInformation extends AppCompatActivity {
                         billAmount.add(String.valueOf(receivable.data.get(i).billAmount));
                         balancelist.add(String.valueOf(receivable.data.get(i).balance));
                         //if (receivable.data.get(i).docNo.length() < 16)
-                            docId.add(receivable.data.get(i).docNo);
+                        docId.add(receivable.data.get(i).docNo);
                         /*else
                             docId.add(receivable.data.get(i).docNo.substring(0, 15));*/
                     }
@@ -465,6 +467,10 @@ public class CustomerInformation extends AppCompatActivity {
                     if (customerReceivables.statusFlag == 0) {
                         String var = String.valueOf(customerReceivables.data.get(0).receivables);
                         etReceivables.setText(var);
+                        if (Double.parseDouble(var) < 0)
+                            etReceivables.setTextColor(Color.parseColor("#00ff00"));
+                        else
+                            etReceivables.setTextColor(Color.parseColor("#ff0000"));
                     } else {
                         tsMessages(customerReceivables.errorMessage);
                     }

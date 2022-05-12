@@ -17,7 +17,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -55,8 +57,9 @@ public class BluetoothActivity extends AppCompatActivity {
     List<String> printList, sbList, idList;
     String[] sbNumber, storeId;
     ArrayList<String> list1, list2;
-    ImageView imageView;
+    ImageView imageView, qrDisplay;
     int sizeCount = 0, reCount = 0;
+    Bitmap bitmap1, bitmaap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +67,12 @@ public class BluetoothActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bluetooth);
         prefs = PreferenceManager.getDefaultSharedPreferences(BluetoothActivity.this);
         MessageDisplay = findViewById(R.id.MessageDisplay);
+        qrDisplay = findViewById(R.id.qrDisplay);
         imageView = findViewById(R.id.imageView);
         printList = new ArrayList<>();
         sbList = new ArrayList<>();
         idList = new ArrayList<>();
+        qrdo();
         sizeCount = prefs.getInt("sizeCount", 0);
         printStoreID = prefs.getString("printStoreID", "");
         printSBNumber = prefs.getString("printSBNumber", "");
@@ -141,19 +146,39 @@ public class BluetoothActivity extends AppCompatActivity {
     public void SampReceipt(View view) {
 
         if (isBluetoothEnabled()) {
-            String temp1 = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + "\n" + "ccccccccccccccc" + "\n" + "IIIIIIIIIIIIIII" + "\n" + "              ." + "\n" +
-                    "444444444444444" + "\n" + "123456789012345" + "\n" + "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" + "\n" + "Techsmith Software Private Limited";
-           // MessageDisplay.setText(temp1);
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix bitMatrix;
+            try {
+                bitMatrix = writer.encode("https://www.reddit.com/", BarcodeFormat.QR_CODE, 100, 100);
+                int width = bitMatrix.getWidth();
+                int height = bitMatrix.getHeight();
+                Bitmap bitmaap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        int color = Color.WHITE;
+                        if (bitMatrix.get(x, y)) color = Color.BLACK;
+                        bitmaap.setPixel(x, y, color);
+                    }
+                }
+
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+
             String temp = MessageDisplay.getText().toString().trim();
-
-
             try {
                 Bitmap bitmap = Printama.getBitmapFromVector(this, R.drawable.techsmith);
                 Printama.with(this).connect(printama -> {
                     printama.addNewLine(1);
                     // printama.setNormalText();
                     printama.setSmallText();
-                    printama.printText(temp, Printama.LEFT);
+                    if (bitmaap != null) {
+                        printama.printText(temp , Printama.LEFT);
+                        printama.printImage(bitmaap,100, Printama.CENTER);
+                        printama.addNewLine(3);
+                    }
+
+
 
                     printama.addNewLine(3);
                     printama.close();
@@ -343,10 +368,31 @@ public class BluetoothActivity extends AppCompatActivity {
         Printama.showPrinterList(this);
     }
 
+    private void qrdo() {
+        QRCodeWriter writer = new QRCodeWriter();
+        BitMatrix bitMatrix;
+        try {
+            bitMatrix = writer.encode("https://www.youtube.com/", BarcodeFormat.QR_CODE, 200, 200);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            bitmaap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int color = Color.WHITE;
+                    if (bitMatrix.get(x, y)) color = Color.BLACK;
+                    bitmaap.setPixel(x, y, color);
+                }
+            }
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        qrDisplay.setImageBitmap(bitmaap);
+    }
+
 
     private void printOurReceipt() {
         String address = "http://www.tsmith.co.in";
-        Bitmap bitmap1 = Printama.getBitmapFromVector(this, R.drawable.techsmith);
+        bitmap1 = Printama.getBitmapFromVector(this, R.drawable.techsmith);
         Printama.with(this).connect(printama -> {
             printama.printTextln("Techsmith Software Pvt Limited", Printama.CENTER);
             printama.setNormalText();
@@ -356,7 +402,7 @@ public class BluetoothActivity extends AppCompatActivity {
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix bitMatrix;
             try {
-                bitMatrix = writer.encode(address, BarcodeFormat.QR_CODE, 200, 200);
+                bitMatrix = writer.encode(address, BarcodeFormat.QR_CODE, 100, 100);
                 int width = bitMatrix.getWidth();
                 int height = bitMatrix.getHeight();
                 Bitmap bitmaap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
