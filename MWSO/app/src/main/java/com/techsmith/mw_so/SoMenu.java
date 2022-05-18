@@ -51,14 +51,9 @@ public class SoMenu extends AppCompatActivity {
         setContentView(R.layout.activity_so_menu);
         courseRV = findViewById(R.id.my_recycler_view);
         startData();
-        // we are initializing our adapter class and passing our arraylist to it.
         courseAdapter = new CourseAdapter(this, courseModelArrayList);
-
-        // below line is for setting a layout manager for our recycler view.
-        // here we are creating vertical list so we will provide orientation as vertical
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        // in below two lines we are setting layoutmanager and adapter to our recycler view.
         courseRV.setLayoutManager(linearLayoutManager);
         courseRV.setAdapter(courseAdapter);
 
@@ -66,11 +61,11 @@ public class SoMenu extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
                 CardModel movie = courseModelArrayList.get(position);
-               // Toast.makeText(getApplicationContext(), movie.getName()+ " is selected!", Toast.LENGTH_SHORT).show();
-                if (movie.getName().equalsIgnoreCase("Create New SO")){
+                // Toast.makeText(getApplicationContext(), movie.getName()+ " is selected!", Toast.LENGTH_SHORT).show();
+                if (movie.getName().equalsIgnoreCase("Create New SO")) {
                     finish();
                     startActivity(new Intent(SoMenu.this, CustomerInformation.class));
-                }else{
+                } else {
                     Toast.makeText(SoMenu.this, "Function not yet Implemented..", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -109,7 +104,7 @@ public class SoMenu extends AppCompatActivity {
 
     private void startData() {
         courseModelArrayList = new ArrayList<>();
-        int i=R.drawable.ic_list;
+        int i = R.drawable.ic_list;
         courseModelArrayList.add(new CardModel("Create New SO", i));
         courseModelArrayList.add(new CardModel("Sales Report", R.drawable.ic_report));
         courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
@@ -117,9 +112,9 @@ public class SoMenu extends AppCompatActivity {
         courseModelArrayList.add(new CardModel("Menu 5", R.drawable.ic_report));
         courseModelArrayList.add(new CardModel("Menu 6", R.drawable.ic_report));
         courseModelArrayList.add(new CardModel("Menu 7", R.drawable.ic_report));
-       // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
-       // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
-       // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
+        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
+        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
+        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
     }
 
     private void createCollection() {

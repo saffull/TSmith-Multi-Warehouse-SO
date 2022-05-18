@@ -135,11 +135,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
     public boolean isBluetoothEnabled() {
         BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (myBluetoothAdapter.isEnabled()) {
-            return true;
-        } else {
-            return false;
-        }
+        return myBluetoothAdapter.isEnabled();
     }
 
 
@@ -149,7 +145,7 @@ public class BluetoothActivity extends AppCompatActivity {
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix bitMatrix;
             try {
-                bitMatrix = writer.encode("https://www.reddit.com/", BarcodeFormat.QR_CODE, 100, 100);
+                bitMatrix = writer.encode("https://www.reddit.com/", BarcodeFormat.QR_CODE, 150, 150);
                 int width = bitMatrix.getWidth();
                 int height = bitMatrix.getHeight();
                 Bitmap bitmaap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
@@ -173,13 +169,11 @@ public class BluetoothActivity extends AppCompatActivity {
                     // printama.setNormalText();
                     printama.setSmallText();
                     if (bitmaap != null) {
+                        printama.printImage(bitmaap,200, Printama.CENTER);
                         printama.printText(temp , Printama.LEFT);
-                        printama.printImage(bitmaap,100, Printama.CENTER);
+                       // printama.printImage(bitmaap,150, Printama.CENTER);
                         printama.addNewLine(3);
                     }
-
-
-
                     printama.addNewLine(3);
                     printama.close();
                 }, this::showToast);

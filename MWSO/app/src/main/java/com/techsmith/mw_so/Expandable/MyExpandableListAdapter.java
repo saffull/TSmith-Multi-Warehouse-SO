@@ -18,9 +18,9 @@ import java.util.Map;
 
 public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private Context context;
-    private Map<String, List<String>> mobileCollection;
-    private List<String> groupList;
+    private final Context context;
+    private final Map<String, List<String>> mobileCollection;
+    private final List<String> groupList;
 
     public MyExpandableListAdapter(Context context, List<String> groupList,
                                    Map<String, List<String>> mobileCollection){

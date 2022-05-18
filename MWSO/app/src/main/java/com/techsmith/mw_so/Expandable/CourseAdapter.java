@@ -16,8 +16,8 @@ import com.techsmith.mw_so.R;
 import java.util.ArrayList;
 
 public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.Viewholder> {
-    private Context context;
-    private ArrayList<CardModel> courseModelArrayList;
+    private final Context context;
+    private final ArrayList<CardModel> courseModelArrayList;
 
     // Constructor
     public CourseAdapter(Context context, ArrayList<CardModel> courseModelArrayList) {
@@ -47,8 +47,8 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.Viewholder
     }
 
     public class Viewholder extends RecyclerView.ViewHolder {
-        private ImageView ivProfilePic;
-        private TextView tvProfileName;
+        private final ImageView ivProfilePic;
+        private final TextView tvProfileName;
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);

@@ -30,7 +30,7 @@
         android:id="@+id/add_alarm_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-       android:layout_marginBottom="10dp"
+        android:layout_marginBottom="10dp"
         android:contentDescription="@string/app_name"
         app:backgroundTint="@color/purple_500"
         app:fabSize="mini"
@@ -74,11 +74,12 @@
         app:layout_constraintBottom_toBottomOf="@+id/preview_fab"
         app:layout_constraintEnd_toStartOf="@+id/preview_fab"
         app:layout_constraintTop_toTopOf="@+id/preview_fab" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_person_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-       android:layout_marginBottom="10dp"
+        android:layout_marginBottom="10dp"
         android:contentDescription="@string/app_name"
         app:backgroundTint="@color/purple_500"
         app:fabSize="mini"
@@ -123,6 +124,7 @@
         app:layout_constraintBottom_toBottomOf="@id/email_fab"
         app:layout_constraintEnd_toStartOf="@id/email_fab"
         app:layout_constraintTop_toTopOf="@+id/email_fab" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/invoice_fab"
         android:layout_width="wrap_content"
@@ -131,11 +133,13 @@
         android:contentDescription="@string/app_name"
         app:backgroundTint="@color/purple_500"
         app:fabSize="mini"
+        android:onClick="takeInvoice"
         app:layout_constraintBottom_toTopOf="@+id/email_fab"
         app:layout_constraintEnd_toEndOf="@+id/email_fab"
         app:layout_constraintStart_toStartOf="@+id/email_fab"
-        app:srcCompat="@drawable/ic_arrow_up"
+        app:srcCompat="@drawable/ic_invoice"
         app:tint="@color/white" />
+
     <TextView
         android:id="@+id/invoice_text"
         android:layout_width="wrap_content"

@@ -1,6 +1,8 @@
 package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,6 +39,13 @@ import com.anggastudio.printama.Printama;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
+import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
+import com.techsmith.mw_so.Model.CardModel;
+import com.techsmith.mw_so.collection_utils.CollectionPL;
+import com.techsmith.mw_so.e_invoice.Einvoice;
+import com.techsmith.mw_so.e_invoice.EinvoicePL;
+import com.techsmith.mw_so.e_invoice.InvResponse;
+import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
 import com.techsmith.mw_so.utils.AppConfigSettings;
@@ -57,6 +66,7 @@ import com.techsmith.mw_so.utils.UserPL;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -64,6 +74,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -76,13 +87,14 @@ public class SOActivity extends AppCompatActivity {
     SOActivityArrayAdapter arrayAdapter;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", strCheckLogin, printData, s1 = "", s2 = "",
-            cceId = "", multiSOStoredDevId = "", uniqueId;
+            cceId = "", multiSOStoredDevId = "", uniqueId, strfromweb, strerrormsg, strstocktake;
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp;// item made public so that to access in its adapter class
     Boolean isRepeat = false;
     EditText etQty;
     int CustomerId, itemId, itemQty, selectedQty;
     ImageButton ic_search;
+    Gson gson;
     ItemList itemList;
     ItemDetails itemDetails;
     TextView cashDisc, volDisc, allocStore, tvRate, whText, tvSelectedItemName, tvMrp, whSoh, offers;
@@ -111,10 +123,14 @@ public class SOActivity extends AppCompatActivity {
     // to check whether sub FABs are visible or not
     Boolean isAllFabsVisible, isPrint;
 
-    List<String> printList, sbList, idList;
+    List<String> printList, sbList, idList, billnoList, billidList;
     String[] sbNumber, storeId;
     PrintResponse printResponse;
     int sizeCount = 0, reCount = 0;
+    Einvoice einvoice;
+    EinvoicePL einvoicePL;
+    private String[] myImageNameList = new String[]{"15"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +174,7 @@ public class SOActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         tvDate = findViewById(R.id.tvDate);
         loginResponse = prefs.getString("loginResponse", "");
-        Gson gson = new Gson();
+        gson = new Gson();
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
         Url = prefs.getString("MultiSOURL", "");
         multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
@@ -179,6 +195,7 @@ public class SOActivity extends AppCompatActivity {
             cceId = String.valueOf(userPLObj.summary.cceId);
             listSODetailPL = new ArrayList<>();
             detailList = new ArrayList<>();
+
 
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -218,11 +235,13 @@ public class SOActivity extends AppCompatActivity {
                             mAddAlarmFab.hide();
                             mAddPersonFab.hide();
                             email_fab.hide();
+                            preview_fab.hide();
                             invoice_fab.hide();
                             addAlarmActionText.setVisibility(View.GONE);
                             addPersonActionText.setVisibility(View.GONE);
                             email_text.setVisibility(View.GONE);
                             invoice_text.setVisibility(View.GONE);
+                            preview_text.setVisibility(View.GONE);
                             mAddFab.shrink();
                             isAllFabsVisible = false;
                         }
@@ -251,7 +270,7 @@ public class SOActivity extends AppCompatActivity {
         preview_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SOActivity.this,BluetoothActivity.class));
+                startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
             }
         });
         acvItemSearchSOActivity.setOnKeyListener(new View.OnKeyListener() {
@@ -415,6 +434,171 @@ public class SOActivity extends AppCompatActivity {
         startActivity(new Intent(SOActivity.this, CustomerInformation.class));
     }
 
+    public void takeInvoice(View view) {
+        try {
+            billidList = new ArrayList<>();
+            billnoList = new ArrayList<>();
+
+            // billidList.add("24896");
+            billidList.add("24895");
+            // billnoList.add("APPL/22/WS-66");
+            billnoList.add("APPL/22/WS-65");
+
+            gson = new Gson();
+            Toast.makeText(SOActivity.this, "E-invoice", Toast.LENGTH_SHORT).show();
+            einvoice = new Einvoice();
+            einvoicePL = new EinvoicePL();
+            List<EinvoicePL> invDetailPL = new ArrayList<>();
+
+            for (int i = 0; i < billnoList.size(); i++) {
+                System.out.println(i);
+                einvoicePL.billId = billidList.get(i);
+                einvoicePL.storeId = "15";
+                einvoicePL.billNo = billnoList.get(i);
+                invDetailPL.add(einvoicePL);
+                System.out.println("Writing data is " + invDetailPL.get(0).billId);
+            }
+
+            einvoice.list = invDetailPL;
+            strstocktake = gson.toJson(einvoice);
+            System.out.println("Writing data is " + strstocktake);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        popDialog(SOActivity.this);
+
+
+        //new GetEInvoice().execute();
+    }
+
+    private void popDialog(SOActivity activity) {
+        dialog = new Dialog(activity);
+        // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.dialog_invoice_recycler);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+
+        lp.gravity = Gravity.CENTER;
+        dialog.getWindow().setAttributes(lp);
+
+        Button btndialog = (Button) dialog.findViewById(R.id.btndialog);
+        btndialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        RecyclerView recyclerView = dialog.findViewById(R.id.recycler);
+        InvoiceAdapter adapterRe = new InvoiceAdapter(SOActivity.this, myImageNameList, billidList);
+        recyclerView.setAdapter(adapterRe);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                System.out.println("Main activity click" + position);
+                startDialog(billidList.get(position));
+
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+
+        dialog.show();
+
+    }
+
+    private class GetEInvoice extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(SOActivity.this);
+            pDialog.setMessage("Loading E-invoice....");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+
+                URL url = new URL(Url + "UploadEInvoice");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(30000);
+                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
+                connection.setRequestProperty("docguid", uniqueId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(strstocktake);
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strfromweb = sb.toString();
+                        System.out.println("Einvoice Response is " + strfromweb);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strfromweb = "httperror";
+                }
+            } catch (Exception e) {
+                Log.e("ERROR", e.getMessage(), e);
+                return null;
+            }
+
+
+            return strfromweb;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            try {
+                gson = new Gson();
+                InvResponse invResponse= gson.fromJson(strfromweb, InvResponse.class);
+                System.out.println(invResponse.list.get(0).irnNo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
 
     private class GetItemDetailsTask extends AsyncTask<String, String, String> {
         @Override
@@ -499,7 +683,7 @@ public class SOActivity extends AppCompatActivity {
                 if (itemDetails.statusFlag == 0) {
                     try {
                         soplObj = new SOPL();
-                        Gson gson = new Gson();
+                        gson = new Gson();
                         soplObj = gson.fromJson(strGetItemDetail, SOPL.class);
                         offerList = new ArrayList<>();
                         houseList = new ArrayList<>();
@@ -769,7 +953,7 @@ public class SOActivity extends AppCompatActivity {
                         reader.close();
                         String str = "";
                         strGetTotal = sb.toString();
-                        System.out.println("Response of AllocateQty is --->" + sb.toString());
+                        System.out.println("Response of AllocateQty is --->" + sb);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -796,7 +980,7 @@ public class SOActivity extends AppCompatActivity {
 
             try {
 
-                Gson gson = new Gson();
+                gson = new Gson();
                 allocateQty = gson.fromJson(strGetTotal, AllocateQty.class);
                 if (allocateQty.statusFlag == 0) {
 
@@ -927,7 +1111,7 @@ public class SOActivity extends AppCompatActivity {
                 if (strGetItems == null || strGetItems.equals("")) {
                     tsMessages("No result from web");
                 } else {
-                    Gson gson = new Gson();
+                    gson = new Gson();
                     itemList = gson.fromJson(strGetItems, ItemList.class);
                     if (itemList.statusFlag == 0) {
                         String[] arrProducts = new String[itemList.data.size()];
@@ -1022,7 +1206,7 @@ public class SOActivity extends AppCompatActivity {
                         soSave.soMemo = soMemo;
 
 
-                        Gson gson = new Gson();
+                        gson = new Gson();
                         soString = gson.toJson(soSave);
                         System.out.println(soString);
                         new SaveSOTask().execute();
@@ -1115,7 +1299,7 @@ public class SOActivity extends AppCompatActivity {
 
                         reader.close();
                         strSaveMiniSO = sb.toString();
-                        System.out.println("SO Saving Response is " + sb.toString());
+                        System.out.println("SO Saving Response is " + sb);
 
                     } else {
                         strErrorMsg = connection.getResponseMessage();
@@ -1141,7 +1325,7 @@ public class SOActivity extends AppCompatActivity {
             try {
                 printStoreId = new ArrayList<>();
                 printSbNumber = new ArrayList<>();
-                Gson gson = new Gson();
+                gson = new Gson();
 
                 SaveSOResponse saveSOResponse;
                 saveSOResponse = gson.fromJson(strSaveMiniSO, SaveSOResponse.class);
@@ -1418,7 +1602,7 @@ public class SOActivity extends AppCompatActivity {
                 Toast.makeText(SOActivity.this, "No result from web", Toast.LENGTH_SHORT).show();
             } else {
                 try {
-                    Gson gson = new Gson();
+                    gson = new Gson();
                     CustomerReceivables customerReceivables = gson.fromJson(strReceivables, CustomerReceivables.class);
                     if (customerReceivables.statusFlag == 0) {
                         String var = String.valueOf(customerReceivables.data.get(0).receivables);
@@ -1570,7 +1754,7 @@ public class SOActivity extends AppCompatActivity {
                 Toast.makeText(SOActivity.this, "No result", Toast.LENGTH_SHORT).show();
             } else {
                 try {
-                    Gson gson = new Gson();
+                    gson = new Gson();
                     printResponse = gson.fromJson(printData, PrintResponse.class);
                     String test = printResponse.data.replace("\r", "\n");
                     System.out.println("Print data is " + test);
@@ -1686,7 +1870,7 @@ public class SOActivity extends AppCompatActivity {
                 Toast.makeText(SOActivity.this, "No result", Toast.LENGTH_SHORT).show();
             } else {
                 try {
-                    Gson gson = new Gson();
+                    gson = new Gson();
                     printResponse = gson.fromJson(printData, PrintResponse.class);
                     String test = printResponse.data.replace("\r", "\n");
                     System.out.println("Print data is " + test);
@@ -1762,11 +1946,29 @@ public class SOActivity extends AppCompatActivity {
 
     public boolean isBluetoothEnabled() {
         BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (myBluetoothAdapter.isEnabled()) {
-            return true;
-        } else {
-            return false;
-        }
+        return myBluetoothAdapter.isEnabled();
+    }
+
+    private void startDialog(String billid) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("E-Invoice")
+                .setMessage("Do you want to load e-invoice of bill id " + billid + "..?")
+
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        new GetEInvoice().execute();
+                    }
+                })
+
+                // A null listener allows the button to dismiss the dialog and take no further action.
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
     }
 
 }

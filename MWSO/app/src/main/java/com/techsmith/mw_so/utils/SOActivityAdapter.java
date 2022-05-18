@@ -334,7 +334,7 @@ public class SOActivityAdapter extends ArrayAdapter<String> {
                         reader.close();
                         String str = "";
                         strGetTotal = sb.toString();
-                        System.out.println("Response of AllocateQty is --->" + sb.toString());
+                        System.out.println("Response of AllocateQty is --->" + sb);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;

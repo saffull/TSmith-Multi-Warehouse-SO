@@ -49,6 +49,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -316,7 +317,7 @@ public class BleActivity extends AppCompatActivity {
                                         );
 
                                         // specify US-ASCII encoding
-                                        final String data = new String(encodedBytes, "US-ASCII");
+                                        final String data = new String(encodedBytes, StandardCharsets.US_ASCII);
                                         readBufferPosition = 0;
 
                                         // tell the user data were sent to bluetooth printer device

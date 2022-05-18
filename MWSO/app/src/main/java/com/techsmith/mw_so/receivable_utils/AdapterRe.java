@@ -14,9 +14,10 @@ import java.util.List;
 
 public class AdapterRe extends RecyclerView.Adapter<AdapterRe.MyViewHolder> {
 
-    private LayoutInflater inflater;
-    private List<String> docId, billAmount, balancelist;
-    ;
+    private final LayoutInflater inflater;
+    private final List<String> docId;
+    private final List<String> billAmount;
+    private final List<String> balancelist;
 
 
     public AdapterRe(Context ctx, List docId, List billAmount, List balancelist) {

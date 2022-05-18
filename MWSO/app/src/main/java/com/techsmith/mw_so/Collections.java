@@ -213,10 +213,7 @@ public class Collections extends AppCompatActivity {
                 stores[i + 1] = userPLObj.detail.get(i).storeName;
                 storeMap.put(userPLObj.detail.get(i).storeName, String.valueOf(userPLObj.detail.get(i).storeId));
             }
-            if (acvCustomerName.getText().toString().isEmpty())
-                storeSelect.setEnabled(false);
-            else
-                storeSelect.setEnabled(true);
+            storeSelect.setEnabled(!acvCustomerName.getText().toString().isEmpty());
 
             ArrayAdapter ad
                     = new ArrayAdapter(

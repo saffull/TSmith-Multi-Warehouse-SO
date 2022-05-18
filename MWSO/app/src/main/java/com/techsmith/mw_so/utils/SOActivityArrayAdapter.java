@@ -380,7 +380,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                         reader.close();
                         String str = "";
                         strGetItemDetail = sb.toString();
-                        System.out.println("Adapter Response is "+sb.toString());
+                        System.out.println("Adapter Response is "+ sb);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
