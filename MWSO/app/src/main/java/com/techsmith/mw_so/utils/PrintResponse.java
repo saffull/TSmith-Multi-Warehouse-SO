@@ -5,4 +5,6 @@ public class PrintResponse {
     public String errorMessage;
     public String info;
     public String data;
+    public EinvString einvString;
+    public String irn;
 }

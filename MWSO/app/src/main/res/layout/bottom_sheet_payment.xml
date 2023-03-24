@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetPayment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    app:behavior_peekHeight="?actionBarSize"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@color/activity_bg_color"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <ToggleButton
+                android:id="@+id/toggleButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/tb_up_down"
+                android:text=""
+                android:textOff=""
+                android:textOn="" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/toggleButton"
+                android:text="Bill Amount:"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/billAmt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="end"
+                android:text="00.00"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="25dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:text="Card" />
+
+            <TextView
+                android:id="@+id/cardAmt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:text="0.0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:text="Cash" />
+
+            <TextView
+                android:id="@+id/cashAmt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:text="0.0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/totalLL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:text="Payment Total" />
+
+            <TextView
+                android:id="@+id/pay_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:gravity="end"
+                android:maxLength="6"
+                android:text="0.00" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/buttonLL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/updatePayment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Ok" />
+
+            <Button
+                android:id="@+id/cancelBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Cancel" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--expand to top android:layout_height="match_parent"-->
+  <!--  <LinearLayout
+        android:id="@+id/llAddRx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/activity_bg_color"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:id="@+id/rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="20dp">
+            &lt;!&ndash;android:background="#00FF00"&ndash;&gt;
+            <ToggleButton
+                android:id="@+id/toggleButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/tb_up_down"
+                android:text=""
+                android:textOff=""
+                android:textOn="" />
+
+            <TextView
+                android:id="@+id/totl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/toggleButton"
+                android:fontFamily="@font/ralewaybold"
+                android:visibility="gone"
+                android:text="Total "
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/toggleButton"
+                android:fontFamily="@font/ralewaybold"
+                android:text="Tota Due :₹ "
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDueValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toRightOf="@+id/tvDue"
+                android:background="#4A7BCB"
+                android:fontFamily="@font/fabrica"
+                android:inputType="numberDecimal"
+                android:padding="15dp"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="1dp"
+                android:layout_toRightOf="@+id/tvDueValue"
+                android:fontFamily="@font/ralewaybold"
+                android:text="Received:₹ "
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            &lt;!&ndash;   android:text="Approx.Amount:₹ "&ndash;&gt;
+            <EditText
+                android:id="@+id/tvAmountValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_toRightOf="@+id/tvAmount"
+                android:background="#4A7BCB"
+                android:editable="false"
+                android:fontFamily="@font/fabrica"
+                android:inputType="none"
+                android:padding="15dp"
+                android:singleLine="true"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+            &lt;!&ndash;android:layout_alignParentRight="true"&ndash;&gt;
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget377"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:background="@color/activity_bg_color"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="3">
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCOL_Reset"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/corners_round_btn"
+            android:fontFamily="@font/fabrica"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="Reset"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCOL_Remarks"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/corners_round_btn"
+            android:fontFamily="@font/fabrica"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="Remarks"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnCOL_Save"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/corners_round_btn"
+            android:fontFamily="@font/fabrica"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="Save"
+            android:textColor="@color/white" />
+        <Button
+            android:id="@+id/btnCOL_Last"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:enabled="false"
+            android:visibility="gone"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/corners_round_btn"
+            android:fontFamily="@font/fabrica"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:text="Last"
+            android:textColor="@color/white" />
+    </LinearLayout>-->
+</LinearLayout>
+
+<!--
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id="@+id/bottomSheetPayment"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@color/activity_bg_color"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <ToggleButton
+                android:id="@+id/toggleButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/tb_up_down"
+                android:text=""
+                android:textOff=""
+                android:textOn="" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/toggleButton"
+                android:text="Bill Amount:"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/billAmt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:gravity="end"
+                android:text="00.00"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:text="Card" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:text="0.0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:text="Cash" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:text="0.0" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/totalLL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:text="Payment Total" />
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:gravity="end"
+                android:text="0.00" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/balanceLL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:text="Balance" />
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/fabrica"
+                android:text="0.00" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/buttonLL"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Ok" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:text="Cancel" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>-->

@@ -35,7 +35,6 @@ import android.widget.ToggleButton;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.collection_utils.CSpinner;
-import com.techsmith.mw_so.collection_utils.CollectionPL;
 import com.techsmith.mw_so.collection_utils.SaveResponse;
 import com.techsmith.mw_so.delivery_utils.DeliveryItems;
 import com.techsmith.mw_so.delivery_utils.DeliveryResponse;
@@ -154,9 +153,9 @@ public class Delivery extends AppCompatActivity {
         btnsendotp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(Delivery.this, BleActivity.class));
+               // startActivity(new Intent(Delivery.this, BleActivity.class));
                 // startActivity(new Intent(Delivery.this,SoMenu.class));
-                startActivity(new Intent(Delivery.this, BluetoothActivity.class));
+                //startActivity(new Intent(Delivery.this, BluetoothActivity.class));
 
             }
         });
@@ -379,9 +378,10 @@ public class Delivery extends AppCompatActivity {
                     custSelect.setEnabled(true);
                     Toast.makeText(Delivery.this, strfromweb, Toast.LENGTH_SHORT).show();
                 }
-            } catch (Exception e) {
-                Log.e("ERROR", e.getMessage(), e);
-                return null;
+            } catch (java.net.SocketTimeoutException e) {
+                strfromweb = "Request Timeout";
+            } catch (java.io.IOException e) {
+                strfromweb = "IOException";
             }
 
             return strfromweb;
@@ -393,7 +393,17 @@ public class Delivery extends AppCompatActivity {
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
+
+
             try {
+
+                if (strfromweb.equalsIgnoreCase("Request Timeout")||
+                        strfromweb.equalsIgnoreCase("IOException")||strfromweb.equalsIgnoreCase("httperror")){
+                    Toast.makeText(Delivery.this,strfromweb+"...Try Again",Toast.LENGTH_LONG).show();
+                }else{
+
+                }
+
                 saveResponse = gson.fromJson(s, SaveResponse.class);
                 if (saveResponse.errorStatus == 0) {
 

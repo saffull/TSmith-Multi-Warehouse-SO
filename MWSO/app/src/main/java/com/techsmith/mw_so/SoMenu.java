@@ -2,6 +2,8 @@ package com.techsmith.mw_so;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,10 +12,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -21,6 +29,9 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.dantsu.escposprinter.EscPosPrinter;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.techsmith.mw_so.Expandable.CourseAdapter;
 import com.techsmith.mw_so.Expandable.MyExpandableListAdapter;
 import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
@@ -33,6 +44,9 @@ public class SoMenu extends AppCompatActivity {
     Map<String, List<String>> mobileCollection;
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
+    SharedPreferences myPrefs;
+    SharedPreferences.Editor editor;
+
 
     private RecyclerView courseRV;
     CourseAdapter courseAdapter;
@@ -50,6 +64,11 @@ public class SoMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_so_menu);
         courseRV = findViewById(R.id.my_recycler_view);
+        myPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = myPrefs.edit();
+        editor.remove("cardSave");
+        editor.remove("cashSave");
+        editor.apply();
         startData();
         courseAdapter = new CourseAdapter(this, courseModelArrayList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -65,6 +84,12 @@ public class SoMenu extends AppCompatActivity {
                 if (movie.getName().equalsIgnoreCase("Create New SO")) {
                     finish();
                     startActivity(new Intent(SoMenu.this, CustomerInformation.class));
+                } else if (movie.getName().equalsIgnoreCase("Test Print")) {
+                    startActivity(new Intent(SoMenu.this, PaymentActivity.class));
+                } else if (movie.getName().equalsIgnoreCase("New Payment")) {
+                    startActivity(new Intent(SoMenu.this, PaymentMenu.class));
+                } else if (movie.getName().equalsIgnoreCase("Retail SO")) {
+                    startActivity(new Intent(SoMenu.this, RetailCustomerInformation.class));
                 } else {
                     Toast.makeText(SoMenu.this, "Function not yet Implemented..", Toast.LENGTH_SHORT).show();
                 }
@@ -106,12 +131,12 @@ public class SoMenu extends AppCompatActivity {
         courseModelArrayList = new ArrayList<>();
         int i = R.drawable.ic_list;
         courseModelArrayList.add(new CardModel("Create New SO", i));
-        courseModelArrayList.add(new CardModel("Sales Report", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("Menu 4", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("Menu 5", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("Menu 6", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("Menu 7", R.drawable.ic_report));
+        courseModelArrayList.add(new CardModel("Retail SO", i));
+        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
+        // courseModelArrayList.add(new CardModel("View Invoices", R.drawable.ic_report));
+        //courseModelArrayList.add(new CardModel("Party Ledger", R.drawable.ic_report));
+        courseModelArrayList.add(new CardModel("Test Print", R.drawable.ic_report));
+        courseModelArrayList.add(new CardModel("New Payment", R.drawable.ic_report));
         // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
         // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
         // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));

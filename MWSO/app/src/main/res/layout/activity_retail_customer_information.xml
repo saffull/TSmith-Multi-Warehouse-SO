@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RetailCustomerInformation">
+    <LinearLayout
+        android:id="@+id/llCustInfoToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/activity_bg_color"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fabrica"
+            android:text="@string/customer_information"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_below="@+id/llCustInfoToolbar"
+        android:layout_height="520dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="Loyalty Card No"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acvLcardNo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Loyalty Card No"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+                <ImageButton
+                    android:id="@+id/imgBtnCustSearchbyCardNo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="SearchItemByLcard"
+                    android:layout_alignRight="@+id/acvLcardNo"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:src="@drawable/ic_search" />
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="Mobile No"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acvmobileNo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Mobile No"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+                <ImageButton
+                    android:id="@+id/imgBtnCustSearchbyMobile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="SearchItemByMobile"
+                    android:layout_alignRight="@+id/acvmobileNo"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:src="@drawable/ic_search" />
+            </RelativeLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="Customer Name"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acvCustomerName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Customer Name"
+                    android:textColor="@color/custinfo_edittext_color" />
+
+                <ImageButton
+                    android:id="@+id/imgBtnCustSearchbyName"
+                    android:layout_width="wrap_content"
+                    android:onClick="SearchItemByName"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@+id/acvCustomerName"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:src="@drawable/ic_search" />
+            </RelativeLayout>
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="Card Type"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:hint="Card Type"
+                android:id="@+id/cardType"
+                android:singleLine="true"
+                android:textColor="@color/custinfo_edittext_color" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="Place"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Place"
+                android:id="@+id/place"
+                android:inputType="none"
+                android:singleLine="true"
+                android:textColor="@color/custinfo_edittext_color" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="Pincode"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Pincode"
+                android:id="@+id/pincode"
+                android:inputType="none"
+                android:singleLine="true"
+                android:textColor="@color/custinfo_edittext_color" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="State"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="State"
+                android:id="@+id/state"
+                android:inputType="none"
+                android:singleLine="true"
+                android:textColor="@color/custinfo_edittext_color" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="@string/customer_address"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etCustomerAdrs"
+                android:layout_width="match_parent"
+                android:hint="@string/customer_address"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences|textMultiLine"
+                android:textColor="@color/custinfo_edittext_color" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/fabrica"
+                android:text="GST NO"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="GST NO"
+                android:id="@+id/gstno"
+                android:inputType="none"
+                android:singleLine="true"
+                android:textColor="@color/custinfo_edittext_color" />
+
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#FF0000FF" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:id="@+id/llCustInfoBottombar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal"
+            android:padding="15px">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="vertical"
+                android:padding="10px">
+
+                <Button
+                    android:id="@+id/btnPayables"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/corners_round_btn_black"
+                    android:drawableLeft="@drawable/ic_rec"
+                    android:fontFamily="@font/fabrica"
+                    android:onClick="GetReceivables"
+                    android:visibility="gone"
+                    android:paddingLeft="10dp"
+                    android:text="RECEIVABLES"
+                    android:textColor="@color/white"
+                    tools:ignore="OnClick" />
+
+                <Button
+                    android:id="@+id/btnClear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/corners_round_btn_black"
+                    android:drawableLeft="@drawable/ic_list_clear"
+                    android:fontFamily="@font/fabrica"
+                    android:onClick="ClearAll"
+                    android:paddingLeft="10dp"
+                    android:text="CLEAR"
+                    android:textColor="@color/white" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="vertical"
+                android:padding="10px">
+
+                <Button
+                    android:id="@+id/btnSOReport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.4"
+                    android:background="@drawable/corners_round_btn_black"
+                    android:enabled="false"
+                    android:visibility="gone"
+                    android:paddingLeft="10dp"
+                    android:text="SO REPORT"
+                    android:textColor="@color/white" />
+
+
+                <Button
+                    android:id="@+id/btnCreateSO"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/corners_round_btn"
+                    android:drawableLeft="@drawable/ic_so"
+                    android:fontFamily="@font/fabrica"
+                    android:onClick="CreateSO"
+                    android:paddingLeft="10dp"
+                    android:text="CREATE SO"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

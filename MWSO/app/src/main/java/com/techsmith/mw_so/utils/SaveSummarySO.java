@@ -12,4 +12,17 @@ public class SaveSummarySO {
     public String cceId;
     public String userId;
     public String docGuid;
+
+    //payment Details
+    public String cashAmount;
+    public String cashRemarks;
+    public String cardAmount;
+    public String auCode;
+    public String cardNo;
+    public String cardName;
+    public String accquringBank;
+    public String issuingBank;
+    public String swipingMachineId;
+    public String expiry;
+    public String cardRemarks;
 }

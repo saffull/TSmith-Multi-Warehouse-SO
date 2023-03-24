@@ -581,7 +581,7 @@ public class Collections extends AppCompatActivity {
                 connection.setRequestProperty("remarks", "");
                 connection.setRequestProperty("machineid", "saffull@gmail.com");
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.connect(); 
+                connection.connect();
 
                 int responsecode = connection.getResponseCode();
                 String responseMsg = connection.getResponseMessage();

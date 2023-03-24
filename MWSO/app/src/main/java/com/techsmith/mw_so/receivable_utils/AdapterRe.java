@@ -29,7 +29,7 @@ public class AdapterRe extends RecyclerView.Adapter<AdapterRe.MyViewHolder> {
     }
 
     @Override
-    public AdapterRe.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = inflater.inflate(R.layout.rv_layout, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
@@ -38,7 +38,7 @@ public class AdapterRe extends RecyclerView.Adapter<AdapterRe.MyViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(AdapterRe.MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
         try {
 
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class AdapterRe extends RecyclerView.Adapter<AdapterRe.MyViewHolder> {
         public MyViewHolder(View itemView) {
             super(itemView);
 
-            DocId = (TextView) itemView.findViewById(R.id.docno);
+            DocId = itemView.findViewById(R.id.docno);
             txtBalance = itemView.findViewById(R.id.overdue);
             txtAmount = itemView.findViewById(R.id.Billamount);
 

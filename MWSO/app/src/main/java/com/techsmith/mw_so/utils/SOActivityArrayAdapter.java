@@ -61,7 +61,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
     AllocateQty allocateQty, Allocateqty;
     List<String> houseList, sohList, offerList;
     UserPL userPLObj;
-
+//Line 103 and 104
 
     public SOActivityArrayAdapter(Context context, int resource, List<AllocateQtyPL> listSODetailPL, int size, ArrayList<AllocateQtyPL> detailList, Double total) {
         super(context, resource);
@@ -70,6 +70,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
         this.listSODetailPL = listSODetailPL;
         this.size = size;
         this.total = total;
+        System.out.println("Size now is "+size);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         editor = prefs.edit();
@@ -92,6 +93,16 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
 
     }
 
+    private void callItemList(int position){
+        try{
+            itemArraylist.remove(itemArraylist.size()-1);
+            itemDetail = itemArraylist.get(position);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("SOActivityAdapter)");
+        }
+
+    }
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -100,8 +111,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
             itemDetail = itemArraylist.get(position);
         } catch (Exception e) {
             e.printStackTrace();
-            itemArraylist.remove(itemArraylist.size()-1);
-            itemDetail = itemArraylist.get(position);
+           callItemList(position);
         }
 
         try {
@@ -131,15 +141,19 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
             btnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    System.out.println("Clicked Position is " + position+"\n"+itemArraylist.size());
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
                     alertDialogBuilder.setMessage("Do you want to delete the entry ...?");
                     alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int arg1) {
-                            System.out.println("Clicked Position is " + position);
                             total = total - (itemArraylist.get(position).qty * itemArraylist.get(position).MRP);
                             itemArraylist.remove(position);
+                            listSODetailPL.remove(position);
+                            System.out.println("After Deletion size is  " +itemArraylist.size());
                             ((SOActivity) context).detailList=itemArraylist;
+                            System.out.println("After Deletion new main size is  " +((SOActivity) context).detailList.size()+"\nlistso detail size is "
+                                    +listSODetailPL.size());
                             SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(context,
                                     R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist, total);
                             ((SOActivity) context).lvProductlist.setAdapter(arrayAdapter);
@@ -245,6 +259,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                         reader.close();
                         String str = "";
                         strGetTotal = sb.toString();
+                        System.out.println("Internal-Adapter response is "+strGetTotal);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -278,9 +293,9 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                     volDisc.setText("Vol Disc:  " + allocateQty.data.volDiscPer + "%");
                     tvSOH.setText("Rate: " + String.format("%.2f", allocateQty.data.rate));
                     allocStore.setText("Allocated Warehouse: " + allocateQty.data.allocStoreCode);
-                    Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
+                    Freeqty.setText("Free-Quantity: " + allocateQty.data.freeQty);
 
-                    listSODetailPL.add(allocateQty.data);
+                   // listSODetailPL.add(allocateQty.data);
                     // detailList.add(allocateQty.data);
                 } else {
                     tsMessages(allocateQty.errorMessage);
@@ -593,8 +608,14 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                                         return;
                                     } else {
                                         ((SOActivity) context).detailList=itemArraylist;
+//                                        listSODetailPL.remove(pos+1);
                                         SOActivityArrayAdapter arrayAdapter = new SOActivityArrayAdapter(context,
                                                 R.layout.list_row, listSODetailPL, itemArraylist.size(), itemArraylist, total);
+                                        System.out.println("test came here -3\t"+itemArraylist.size()+"\t listso size is "+listSODetailPL.size());
+                                        for (int i = 0; i < listSODetailPL.size(); i++) {
+                                            System.out.println(listSODetailPL.get(i).qty);
+
+                                        }
                                         ((SOActivity) context).lvProductlist.setAdapter(arrayAdapter);
                                         ((SOActivity) context).tvAmountValue.setText(String.format("%.2f", total));
                                         arrayAdapter.notifyDataSetChanged();
@@ -730,7 +751,7 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
                 for (int i = 0; i < itemArraylist.size(); i++) {
 
                     total = total + (itemArraylist.get(i).qty * itemArraylist.get(i).MRP);
-                    System.out.println("New total is \t" + i + "-------" + total);
+                    System.out.println("New total is \t" + i + "-------" + total+"<------------------>"+itemArraylist.size());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

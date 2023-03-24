@@ -19,6 +19,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="116dp"
         android:text="Menu"
+        android:enabled="false"
         android:textColor="@color/white"
         app:backgroundTint="@color/purple_500"
         app:icon="@drawable/ic_arrow_up"
@@ -152,7 +153,7 @@
         app:layout_constraintTop_toTopOf="@+id/invoice_fab" />
 
 
-    <RelativeLayout xmlns:fab="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".SOActivity">
@@ -601,6 +602,8 @@
                                     android:paddingEnd="10dp">
                                     <!--android:background="#00FF00"-->
 
+
+
                                     <TextView
                                         android:id="@+id/tvAmount"
                                         android:layout_width="wrap_content"
@@ -621,8 +624,17 @@
                                         android:padding="15dp"
                                         android:text=""
                                         android:textColor="@color/white" />
-                                    <!--android:layout_alignParentRight="true"-->
 
+                                    <Button
+                                        android:id="@+id/paymentBtn"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentEnd="true"
+                                        android:layout_marginTop="5dp"
+                                        android:drawableLeft="@drawable/ic_payment_method"
+                                        android:text="Pay"
+                                        android:textColor="@color/white" />
+                                    <!--android:layout_alignParentRight="true"-->
                                 </RelativeLayout>
 
                                 <!-- <com.google.android.material.floatingactionbutton.FloatingActionButton

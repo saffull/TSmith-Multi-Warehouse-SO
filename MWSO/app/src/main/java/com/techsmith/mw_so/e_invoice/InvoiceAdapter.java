@@ -18,21 +18,23 @@ import java.util.List;
 
 public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.MyViewHolder> {
 
-    private LayoutInflater inflater;
-    private String[] myImageNameList;
+    private final LayoutInflater inflater;
+    private final String[] myImageNameList;
 
-    List<String> billidList;
+    List<String> billidList, billnoList, storeidList;
 
-    public InvoiceAdapter(Context ctx, String[] myImageNameList, List<String> billidList) {
+    public InvoiceAdapter(Context ctx, String[] myImageNameList, List<String> billidList, List<String> billnoList, List<String> storeidList) {
         inflater = LayoutInflater.from(ctx);
         this.myImageNameList = myImageNameList;
         this.billidList = billidList;
+        this.billnoList = billnoList;
+        this.storeidList = storeidList;
         System.out.println("new list is " + billidList);
     }
 
     @NonNull
     @Override
-    public InvoiceAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.invoice_recycler, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
 
@@ -40,14 +42,19 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.MyViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull InvoiceAdapter.MyViewHolder holder, int position) {
-        holder.name.setText(myImageNameList[position]);
-        holder.billid.setText(billidList.get(position));
+    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        try {
+            holder.name.setText(storeidList.get(position));
+            holder.billid.setText(billidList.get(position));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        return myImageNameList.length;
+        return billidList.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -58,9 +65,9 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.MyViewHo
         public MyViewHolder(View itemView) {
             super(itemView);
 
-            name = (TextView) itemView.findViewById(R.id.name);
+            name = itemView.findViewById(R.id.name);
             billid = itemView.findViewById(R.id.billid);
-            invbtn=itemView.findViewById(R.id.invBtn);
+            invbtn = itemView.findViewById(R.id.invBtn);
 
 
         }

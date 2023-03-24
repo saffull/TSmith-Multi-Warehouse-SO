@@ -6,6 +6,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,17 +36,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     TextInputEditText etUsername, etPassword;
-    SharedPreferences prefs;
+    SharedPreferences prefs, prefsD;
     ProgressDialog pDialog;
     Double tsMsgDialogWindowHeight;
-    String username, password, Url, multiSOStoredDevId, strCheckLogin, strErrorMsg;
+    Boolean firstTime;
+    String username, password, Url, multiSOStoredDevId, strCheckLogin, strErrorMsg, secret = "";
     String[] permissions = {Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+            Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.BLUETOOTH_CONNECT};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         int screen_height = displayMetrics.heightPixels;
         int screen_width = displayMetrics.widthPixels;
         tsMsgDialogWindowHeight = Double.valueOf((screen_height * 38) / 100);
-
 
         Dexter.withContext(this)
                 .withPermissions(
@@ -75,14 +79,18 @@ public class MainActivity extends AppCompatActivity {
 
         }).check();
         prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        firstTime = prefs.getBoolean("firstTime", true);
+      /*  if (firstTime)
+            startActivity(new Intent(MainActivity.this, Settings.class));*/
+
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
-        String string = "5, 15",string1="5002/22/WS-16, APPL/22/WS-27";
+        String string = "5, 15", string1 = "5002/22/WS-16, APPL/22/WS-27";
         String[] parts = string.split(",");
-        String [] parts1=string1.split(",");
-      //  System.out.println(parts.length+"--<>"+parts[0]+"\n"+parts[1].trim());
+        String[] parts1 = string1.split(",");
+        //  System.out.println(parts.length+"--<>"+parts[0]+"\n"+parts[1].trim());
         for (int i = 0; i < parts.length; i++) {
-            System.out.println(parts[i].trim()+"\n"+parts1[i].trim());
+            System.out.println(parts[i].trim() + "\n" + parts1[i].trim());
 
         }
 
@@ -102,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
     public void Login(View view) {
 
         try {
-
             username = etUsername.getText().toString();
             password = etPassword.getText().toString();
             SharedPreferences.Editor editor = prefs.edit();
@@ -110,7 +117,10 @@ public class MainActivity extends AppCompatActivity {
             editor.putString("password", password);
             editor.commit();
             editor.apply();
-
+            // startActivity(new Intent(MainActivity.this, Category.class));
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                secret = Base64.getEncoder().encodeToString(password.getBytes());
+            }
             new CheckLoginTask().execute();
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
     public void SaveUrl(View view) {
         startActivity(new Intent(MainActivity.this, Settings.class));
     }
+
 
     private class CheckLoginTask extends AsyncTask<String, String, String> {
 
@@ -140,8 +151,10 @@ public class MainActivity extends AppCompatActivity {
 
             System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
             try {
+
+                secret = "1237124122119128125111115";
                 //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
-                URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=" + username + "&secret=1047109119116122626466");
+                URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=" + username + "&secret=" + secret);
                 System.out.println(Url + "LoginVer2?Name=" + username + "&pwd=" + password);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
@@ -220,6 +233,11 @@ public class MainActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("loginResponse", strCheckLogin);
                         editor.putString("BillRemarksMWSO", "");
+                        editor.putString("user_name", username.trim());
+                        editor.putString("billTotal", "0.0");
+                        editor.putString("billCash", "");
+                        editor.putString("billCard", "");
+                        deletePrefData();
                         editor.apply();
                         startActivity(new Intent(MainActivity.this, Category.class));
 
@@ -232,6 +250,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    private void deletePrefData() {
+        prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefsD.edit();
+        editor.putString("cashSave", "");
+        editor.putString("cardSave", "");
+        editor.apply();
     }
 
     private void tsMessages(String msg) {

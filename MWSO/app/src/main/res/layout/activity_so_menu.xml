@@ -12,6 +12,10 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_bg1">
 
+
+
+
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar1"
             android:layout_width="460dp"
@@ -48,14 +52,20 @@
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:id="@+id/fl"
+            android:layout_below="@+id/toolbar1"
+            android:layout_height="wrap_content"/>
+
 
         <LinearLayout
             android:id="@+id/rec"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar1"
+            android:layout_below="@+id/fl"
             android:layout_centerInParent="true"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="25dp"
             android:orientation="vertical"
             android:padding="16dp">
 

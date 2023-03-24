@@ -9,4 +9,5 @@ public class SaveSOResponseData {
     public String SB_Number;
     public String Remarks ;
     public String SOMemoNo ;
+    public String SB_Id;
 }

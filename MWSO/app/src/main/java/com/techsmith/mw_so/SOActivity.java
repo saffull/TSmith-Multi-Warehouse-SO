@@ -1,18 +1,24 @@
 package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +33,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,16 +43,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anggastudio.printama.Printama;
+import com.dantsu.escposprinter.EscPosPrinter;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
 import com.techsmith.mw_so.Model.CardModel;
 import com.techsmith.mw_so.collection_utils.CollectionPL;
 import com.techsmith.mw_so.e_invoice.Einvoice;
 import com.techsmith.mw_so.e_invoice.EinvoicePL;
+import com.techsmith.mw_so.e_invoice.IRNAdapter;
 import com.techsmith.mw_so.e_invoice.InvResponse;
 import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
+import com.techsmith.mw_so.payment_util.PaymentList;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
 import com.techsmith.mw_so.utils.AppConfigSettings;
@@ -83,16 +99,18 @@ import java.util.UUID;
 
 public class SOActivity extends AppCompatActivity {
 
-    SharedPreferences prefs;
+    SharedPreferences prefs, prefsD;
     SOActivityArrayAdapter arrayAdapter;
+    List<String> storeidList;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "",
             strReceivables, CustomerName, strGetItemDetail, itemName, strGetTotal, itemCode, soString = "", strCheckLogin, printData, s1 = "", s2 = "",
             cceId = "", multiSOStoredDevId = "", uniqueId, strfromweb, strerrormsg, strstocktake;
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
-    public String itemMrp;// item made public so that to access in its adapter class
+    public String itemMrp, irnNo = "", qrString = "NO Data", doc_no = "";// item made public so that to access in its adapter class
     Boolean isRepeat = false;
     EditText etQty;
-    int CustomerId, itemId, itemQty, selectedQty;
+    Bitmap bitmap;
+    int CustomerId, itemId, itemQty, selectedQty, soResponseCount = 0, responsecode;
     ImageButton ic_search;
     Gson gson;
     ItemList itemList;
@@ -101,7 +119,7 @@ public class SOActivity extends AppCompatActivity {
     public TextView tvAmountValue; // item made public so that to access in its adapter class
     SOPL soplObj;
     EditText etAddRemarks;
-    Button caculate, btnAdd, btnAllClear, btnSave;
+    public Button caculate, btnAdd, btnAllClear, btnSave;
     List<String> offerList, houseList, sohList, printStoreId, printSbNumber;
     TextView tvCustomerName, tvDate, Freeqty, etReceivables;
     AutoCompleteTextView acvItemSearchSOActivity;
@@ -109,9 +127,12 @@ public class SOActivity extends AppCompatActivity {
     ImageButton imgBtnRemarksPrescrptn;
     Dialog qtydialog, dialog;
     UserPL userPLObj;
-    Double tsMsgDialogWindowHeight, saveDialogWindowHeight;
+    double calc = 0.0;
+    Double tsMsgDialogWindowHeight;
+    Double saveDialogWindowHeight;
     public ListView lvProductlist;// item made public so that to access in its adapter class
     AllocateQty allocateQty;
+    SharedPreferences.Editor editor;
     List<AllocateQtyPL> listSODetailPL;
     public ArrayList<AllocateQtyPL> detailList;/*list made common to both main & adapter class, so that UI changes done in adapter class
     eg: changing the qty or deleting get reflected globally*/
@@ -129,8 +150,10 @@ public class SOActivity extends AppCompatActivity {
     int sizeCount = 0, reCount = 0;
     Einvoice einvoice;
     EinvoicePL einvoicePL;
-    private String[] myImageNameList = new String[]{"15"};
-
+    InvResponse invResponse;
+    private final String[] myImageNameList = new String[]{"15"};
+    private Button paymentBtn;
+    String billCash = "", billCard = "", CardRemarks = "", CashRemarks = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,16 +161,7 @@ public class SOActivity extends AppCompatActivity {
         setContentView(R.layout.activity_so);
 //        getSupportActionBar().hide();
 
-        //Determine screen size
-        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) {
-            Toast.makeText(this, "Large screen", Toast.LENGTH_LONG).show();
-        } else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
-            Toast.makeText(this, "Normal sized screen", Toast.LENGTH_LONG).show();
-        } else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) {
-            Toast.makeText(this, "Small sized screen", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Screen size is neither large, normal or small", Toast.LENGTH_LONG).show();
-        }
+
         prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
         mAddFab = findViewById(R.id.add_fab);
         mAddAlarmFab = findViewById(R.id.add_alarm_fab);
@@ -156,13 +170,12 @@ public class SOActivity extends AppCompatActivity {
         email_fab = findViewById(R.id.email_fab);
         invoice_fab = findViewById(R.id.invoice_fab);
         MessageDisplay = findViewById(R.id.MessageDisplay);
-        addAlarmActionText =
-                findViewById(R.id.add_alarm_action_text);
-        addPersonActionText =
-                findViewById(R.id.add_person_action_text);
+        addAlarmActionText = findViewById(R.id.add_alarm_action_text);
+        addPersonActionText = findViewById(R.id.add_person_action_text);
         email_text = findViewById(R.id.email_text);
         invoice_text = findViewById(R.id.invoice_text);
         preview_text = findViewById(R.id.preview_text);
+        paymentBtn = findViewById(R.id.paymentBtn);
         initializeFab();
         tvCustomerName = findViewById(R.id.tvCustomerName);
         ic_search = findViewById(R.id.imgBtnSearchItem);
@@ -174,9 +187,10 @@ public class SOActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         tvDate = findViewById(R.id.tvDate);
         loginResponse = prefs.getString("loginResponse", "");
+
         gson = new Gson();
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
-        Url = prefs.getString("MultiSOURL", "");
+        Url = prefs.getString("MultiSOURL", "http://tsmithy.in/somemouat/api/");
         multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
         uniqueId = prefs.getString("guid", "");
         System.out.println("Unique Id is " + uniqueId);
@@ -188,15 +202,30 @@ public class SOActivity extends AppCompatActivity {
                 CustomerName = userPLObj.summary.customerName;
                 CustomerId = userPLObj.summary.customerId;
             }
-
+            System.out.println("CustomerId is " + CustomerId);
             if (CustomerId != 0) {
                 new GetReceivablesTask().execute();
+            } else {
+                String cust = prefs.getString("customer_id", "");
+                try {
+                    CustomerId = Integer.parseInt(cust);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (CustomerName.isEmpty()) {
+                CustomerName = prefs.getString("customer_name", "");
+            } else {
+                System.out.println("Customer name already there...");
             }
             cceId = String.valueOf(userPLObj.summary.cceId);
             listSODetailPL = new ArrayList<>();
             detailList = new ArrayList<>();
 
-
+            Printama.with(SOActivity.this).connect(printama -> {
+                printama.printText(Printama.CENTER, "Sample Text");
+                printama.close();
+            });
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int screen_height = displayMetrics.heightPixels;
@@ -212,6 +241,39 @@ public class SOActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        paymentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String d = tvAmountValue.getText().toString();
+                double dle = 0.0;
+                if (!d.isEmpty())
+                    dle = Double.parseDouble(d);
+                else
+                    dle = 0.0;
+
+                if (dle > 0.0) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("billTotal", d);
+                    System.out.println("total amount is " + d);
+                    editor.apply();
+                    startActivity(new Intent(SOActivity.this, PaymentMenu.class));
+                } else {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+                    alertDialogBuilder.setMessage("No Items Found.....!!");
+                    alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int arg1) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setCanceledOnTouchOutside(true);
+                    alertDialog.show();
+                }
+
+            }
+        });
         mAddFab.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -271,6 +333,24 @@ public class SOActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
+            }
+        });
+        acvItemSearchSOActivity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                System.out.println("text length is " + charSequence.toString().length());
+                if (charSequence.toString().length() == 0)
+                    acvItemSearchSOActivity.setAdapter(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
         acvItemSearchSOActivity.setOnKeyListener(new View.OnKeyListener() {
@@ -356,7 +436,7 @@ public class SOActivity extends AppCompatActivity {
         if (filter.length() >= 3) {
             new GetItemsTask().execute();
         } else {
-            Toast.makeText(SOActivity.this, "Add atleast 3 characters", Toast.LENGTH_LONG).show();
+            popUp("Add atleast 3 characters");
         }
     }
 
@@ -436,40 +516,85 @@ public class SOActivity extends AppCompatActivity {
 
     public void takeInvoice(View view) {
         try {
-            billidList = new ArrayList<>();
-            billnoList = new ArrayList<>();
+            if (soResponseCount == 1) {
+                billidList = new ArrayList<>();
+                billnoList = new ArrayList<>();
+                storeidList = new ArrayList();
+                prefs = PreferenceManager.getDefaultSharedPreferences(SOActivity.this);
+                storeidList.add(prefs.getString("printStoreID", ""));
+                billidList.add(prefs.getString("printSBID", ""));
+                billnoList.add(prefs.getString("printSBNumber", ""));
+                gson = new Gson();
 
-            // billidList.add("24896");
-            billidList.add("24895");
-            // billnoList.add("APPL/22/WS-66");
-            billnoList.add("APPL/22/WS-65");
+                einvoice = new Einvoice();
+                einvoicePL = new EinvoicePL();
+                List<EinvoicePL> invDetailPL = new ArrayList<>();
+                // billnoList.add("APPL/22/WS-234");
 
-            gson = new Gson();
-            Toast.makeText(SOActivity.this, "E-invoice", Toast.LENGTH_SHORT).show();
-            einvoice = new Einvoice();
-            einvoicePL = new EinvoicePL();
-            List<EinvoicePL> invDetailPL = new ArrayList<>();
+                for (int i = 0; i < billnoList.size(); i++) {
+                    System.out.println(i);
+                    einvoicePL.billId = billidList.get(i);
+                    einvoicePL.storeId = storeidList.get(i);
+                    einvoicePL.billNo = billnoList.get(i);
+                    // einvoicePL.billNo="APPL/22/WS-236";
+                    invDetailPL.add(einvoicePL);
+                    System.out.println(invDetailPL);
+                }
 
-            for (int i = 0; i < billnoList.size(); i++) {
-                System.out.println(i);
-                einvoicePL.billId = billidList.get(i);
-                einvoicePL.storeId = "15";
-                einvoicePL.billNo = billnoList.get(i);
-                invDetailPL.add(einvoicePL);
-                System.out.println("Writing data is " + invDetailPL.get(0).billId);
+               // einvoicePL.billId = "25148";
+               // einvoicePL.billNo = "APPL/22/WS-241";
+               // einvoicePL.storeId = "15";
+                einvoice.list = invDetailPL;
+                strstocktake = gson.toJson(einvoice);
+                System.out.println("Invoice Writing data is " + strstocktake);
+                popDialog(SOActivity.this);
+
+            } else {
+                billidList = new ArrayList<>();
+                billnoList = new ArrayList<>();
+                storeidList = new ArrayList();
+
+              /*  billidList.add("24994");
+                billidList.add("25013");
+                billnoList.add("APPL/22/WS-149");
+                billnoList.add("APPL/22/WS-162");
+                storeidList.add("15");
+                storeidList.add("15");*/
+                // billnoList.add("APPL/22/WS-236");
+
+                gson = new Gson();
+                Toast.makeText(SOActivity.this, "E-invoice", Toast.LENGTH_SHORT).show();
+                einvoice = new Einvoice();
+                einvoicePL = new EinvoicePL();
+                List<EinvoicePL> invDetailPL = new ArrayList<>();
+                for (int i = 0; i < billidList.size(); i++) {
+                    System.out.println(i);
+                    einvoicePL.billId = billidList.get(i);
+                    einvoicePL.storeId = storeidList.get(i);
+                    einvoicePL.billNo = billnoList.get(i);
+                    invDetailPL.add(einvoicePL);
+                    System.out.println("InvDetailPL" + invDetailPL);
+                }
+
+                //einvoicePL.billId = "25148";
+                //einvoicePL.storeId = "15";
+               // einvoicePL.billNo = "APPL/22/WS-241";
+
+                einvoice.list = invDetailPL;
+                strstocktake = gson.toJson(einvoice);
+                System.out.println("Writing data is " + strstocktake);
+
+                popDialog(SOActivity.this);
+
+
+                //new GetEInvoice().execute();
             }
 
-            einvoice.list = invDetailPL;
-            strstocktake = gson.toJson(einvoice);
-            System.out.println("Writing data is " + strstocktake);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        popDialog(SOActivity.this);
 
-
-        //new GetEInvoice().execute();
     }
 
     private void popDialog(SOActivity activity) {
@@ -479,13 +604,13 @@ public class SOActivity extends AppCompatActivity {
         dialog.setContentView(R.layout.dialog_invoice_recycler);
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
         lp.gravity = Gravity.CENTER;
         dialog.getWindow().setAttributes(lp);
 
-        Button btndialog = (Button) dialog.findViewById(R.id.btndialog);
+        Button btndialog = dialog.findViewById(R.id.btndialog);
         btndialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -494,8 +619,14 @@ public class SOActivity extends AppCompatActivity {
             }
         });
 
+        //einvoicePL.billId = "25148";
+        //einvoicePL.storeId = "15";
+        //einvoicePL.billNo = "APPL/22/WS-241";
+        //billidList.add("25148");
+        //storeidList.add("15");
+        //billnoList.add("APPL/22/WS-241");
         RecyclerView recyclerView = dialog.findViewById(R.id.recycler);
-        InvoiceAdapter adapterRe = new InvoiceAdapter(SOActivity.this, myImageNameList, billidList);
+        InvoiceAdapter adapterRe = new InvoiceAdapter(SOActivity.this, myImageNameList, billidList, billnoList, storeidList);
         recyclerView.setAdapter(adapterRe);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
 
@@ -504,7 +635,6 @@ public class SOActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 System.out.println("Main activity click" + position);
                 startDialog(billidList.get(position));
-
             }
 
             @Override
@@ -536,7 +666,7 @@ public class SOActivity extends AppCompatActivity {
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setReadTimeout(15000);
-                connection.setConnectTimeout(30000);
+                connection.setConnectTimeout(180000);
                 connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
                 connection.setRequestProperty("docguid", uniqueId);
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
@@ -586,16 +716,89 @@ public class SOActivity extends AppCompatActivity {
             super.onPostExecute(s);
             if (pDialog.isShowing())
                 pDialog.dismiss();
-
             try {
                 gson = new Gson();
-                InvResponse invResponse= gson.fromJson(strfromweb, InvResponse.class);
-                System.out.println(invResponse.list.get(0).irnNo);
+                invResponse = gson.fromJson(strfromweb, InvResponse.class);
+
+
+                if (strfromweb.isEmpty() || strfromweb.equalsIgnoreCase("httperror")) {
+                    tsMessages("Response Empty");
+                } else {
+                    if (invResponse.list.size() == 0) {
+                        tsMessages("Incoming Data is Empty");
+                    } else if (invResponse.list.get(0).statusFlag == 1) {
+                       // tsMessages();
+                        popUp("Message is\t"+invResponse.list.get(0).errorMessage+"\n Remarks are:\t"+invResponse.list.get(0).eInvRemarks);
+                    } else {
+                        try {
+
+                            System.out.println(invResponse.list.get(0).irnNo);
+                            if (!invResponse.list.get(0).irnNo.isEmpty()) {
+                                popUp(SOActivity.this);
+                            } else {
+                                Toast.makeText(SOActivity.this, "IRN Number Empty", Toast.LENGTH_LONG).show();
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            popUp("Timeout/Http/Data Error..!!");
+                        }
+                    }
+                }/*else if (invResponse.list.get(0).statusFlag == 1) {
+                    tsMessages(invResponse.list.get(0).errorMessage);
+                } else if (invResponse.list.size()==0) {
+                    tsMessages("Incoming Data is Empty");
+                } else {
+                    try {
+
+                        System.out.println(invResponse.list.get(0).irnNo);
+                        if (!invResponse.list.get(0).irnNo.isEmpty()) {
+                            popUp(SOActivity.this);
+                        } else {
+                            Toast.makeText(SOActivity.this, "IRN Number Empty", Toast.LENGTH_LONG).show();
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }*/
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
 
+
+        }
+    }
+
+    private void popUp(SOActivity activity) {
+        final Dialog dialog = new Dialog(activity);
+        // dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.dialog_invoice_listview);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.gravity = Gravity.CENTER;
+        dialog.getWindow().setAttributes(lp);
+
+        Button btndialog = dialog.findViewById(R.id.btndialog);
+        btndialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+        RecyclerView recyclerView = dialog.findViewById(R.id.recycler);
+        IRNAdapter adapterRe = new IRNAdapter(SOActivity.this, myImageNameList, strfromweb);
+        recyclerView.setAdapter(adapterRe);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+
+
+        dialog.show();
 
     }
 
@@ -613,7 +816,6 @@ public class SOActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             try {
-
                 //https://tsmithy.in/somemouat/api/GetSOHAndSchemes?ItemId=14290&CustId=382
                 URL url = new URL(Url + "GetSOHAndSchemes?ItemId=" + itemId + "&CustId=" + CustomerId);
 
@@ -754,13 +956,17 @@ public class SOActivity extends AppCompatActivity {
 
                         @Override
                         public void afterTextChanged(Editable s) {
-                            System.out.println(s.toString());
+                            System.out.println("----------------->" + s.toString());
                             btnAdd.setEnabled(false);
                             if (Double.parseDouble(s.toString()) > totalSOH) {
                                 Toast.makeText(SOActivity.this, "Max units exceeded...", Toast.LENGTH_LONG).show();
                                 caculate.setEnabled(false);
                             } else {
                                 caculate.setEnabled(true);
+                                if (Integer.parseInt(s.toString()) > 0) {
+                                    selectedQty = Integer.parseInt(etQty.getText().toString());
+                                    //new AllocateQtyTask().execute();
+                                }
                             }
                         }
                     });
@@ -870,6 +1076,7 @@ public class SOActivity extends AppCompatActivity {
                                     int[] to = {R.id.itemcode, R.id.name, R.id.batchcode, R.id.batchbarcode, R.id.location, R.id.uperpack, R.id.expiry, R.id.sysstock, R.id.currentsoh};
                                     arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                                             listSODetailPL.size(), detailList, total);
+                                    System.out.println("test came here -1\t listso size\t"+listSODetailPL.size());
                                     lvProductlist.setAdapter(arrayAdapter);
                                     arrayAdapter.notifyDataSetChanged();
                                     tvAmountValue.setText(String.format("%.2f", total));
@@ -918,8 +1125,8 @@ public class SOActivity extends AppCompatActivity {
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
-                connection.setReadTimeout(300000);
-                connection.setConnectTimeout(300000);
+                connection.setReadTimeout(120000);
+                connection.setConnectTimeout(120000);
                 connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
                 connection.setRequestProperty("name", "");
                 connection.setRequestProperty("password", "");
@@ -1042,11 +1249,11 @@ public class SOActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             try {
                 URL url = new URL(Url + "GetProduct?name=" + filter);
-
+                System.out.println(Url + "GetProduct?name=" + filter);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setReadTimeout(300000);
-                connection.setConnectTimeout(300000);
+                connection.setReadTimeout(180000);
+                connection.setConnectTimeout(180000);
                 connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
                 connection.setRequestProperty("name", "");
                 connection.setRequestProperty("password", "");
@@ -1170,80 +1377,6 @@ public class SOActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public void SaveSO(View view) {
-        try {
-            if (detailList.size() > 0) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
-                alertDialogBuilder.setMessage("Do you want to continue saving?");
-                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        listSODetailPL = detailList;
-                        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-                        SaveSODetail saveSODetail = new SaveSODetail();
-                        saveSODetail.item = listSODetailPL;
-
-                        SaveSummarySO saveSummarySO = new SaveSummarySO();
-                        saveSummarySO.custId = CustomerId;
-                        saveSummarySO.customer = CustomerName;
-                        saveSummarySO.docSeries = "SOM";
-                        saveSummarySO.docDate = date;
-                        saveSummarySO.docComplete = 1;
-                        saveSummarySO.docSeries = "";
-                        saveSummarySO.remarks = billRemarks;
-                        saveSummarySO.cceId = cceId;
-                        saveSummarySO.docGuid = uniqueId;
-                        saveSummarySO.machineId = "";
-                        saveSummarySO.userId = "";
-
-
-                        SOMemo soMemo = new SOMemo();
-                        soMemo.detail = saveSODetail;
-                        soMemo.summary = saveSummarySO;
-
-
-                        SOSave soSave = new SOSave();
-                        soSave.soMemo = soMemo;
-
-
-                        gson = new Gson();
-                        soString = gson.toJson(soSave);
-                        System.out.println(soString);
-                        new SaveSOTask().execute();
-                    }
-                });
-                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-
-                    }
-                });
-
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
-
-            } else {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
-                alertDialogBuilder.setMessage("No SO to save.....!!");
-                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int arg1) {
-                        dialog.cancel();
-                    }
-                });
-
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.setCanceledOnTouchOutside(true);
-                alertDialog.show();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        //tsMessages("Function not yet implemented...");
-    }
 
     private class SaveSOTask extends AsyncTask<String, String, String> {
         @Override
@@ -1274,8 +1407,8 @@ public class SOActivity extends AppCompatActivity {
                 connection.setRequestProperty("custid", String.valueOf(CustomerId));
                 connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
                 connection.setRequestProperty("Content-Type", "application/json");
-                connection.setReadTimeout(300000);
-                connection.setConnectTimeout(300000);
+                connection.setReadTimeout(30000);
+                connection.setConnectTimeout(30000);
                 connection.setDoOutput(true);
 
                 OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
@@ -1284,8 +1417,8 @@ public class SOActivity extends AppCompatActivity {
 
                 connection.connect();
 
-                int responsecode = connection.getResponseCode();
                 try {
+                    responsecode = connection.getResponseCode();
                     if (responsecode == 200) {
                         InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
                         BufferedReader reader = new BufferedReader(streamReader);
@@ -1304,15 +1437,17 @@ public class SOActivity extends AppCompatActivity {
                     } else {
                         strErrorMsg = connection.getResponseMessage();
                         strSaveMiniSO = "httperror";
+
                     }
 
                 } finally {
                     connection.disconnect();
                 }
 
-            } catch (Exception e) {
-                Log.e("ERROR", e.getMessage(), e);
-                return null;
+            } catch (java.net.SocketTimeoutException e) {
+                strSaveMiniSO = "Request Timeout";
+            } catch (java.io.IOException e) {
+                strSaveMiniSO = "IOException";
             }
             return strSaveMiniSO;
         }
@@ -1322,83 +1457,118 @@ public class SOActivity extends AppCompatActivity {
             super.onPostExecute(s);
             if (pDialog.isShowing())
                 pDialog.dismiss();
-            try {
-                printStoreId = new ArrayList<>();
-                printSbNumber = new ArrayList<>();
-                gson = new Gson();
 
-                SaveSOResponse saveSOResponse;
-                saveSOResponse = gson.fromJson(strSaveMiniSO, SaveSOResponse.class);
-                if (saveSOResponse.statusFlag == 0) {
-                    dialog = new Dialog(SOActivity.this);
-                    dialog.setContentView(R.layout.save_dialogwindow);
+            if (strSaveMiniSO.equalsIgnoreCase("Request Timeout") || strSaveMiniSO.equalsIgnoreCase("IOException")) {
+                Toast.makeText(SOActivity.this, strSaveMiniSO + ".... Try Again", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    printStoreId = new ArrayList<>();
+                    printSbNumber = new ArrayList<>();
+                    gson = new Gson();
+
+                    SaveSOResponse saveSOResponse;
+                    saveSOResponse = gson.fromJson(strSaveMiniSO, SaveSOResponse.class);
+                    if (saveSOResponse.statusFlag == 0) {
+                        editor = prefs.edit();
+                        editor.putString("billTotal", String.valueOf(total));
+                        editor.apply();
+                        dialog = new Dialog(SOActivity.this);
+                        dialog.setContentView(R.layout.save_dialogwindow);
 //                        dialog.setCanceledOnTouchOutside(false);
-                    dialog.setCanceledOnTouchOutside(true);
-                    dialog.setTitle("Save");
-                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                        dialog.setCanceledOnTouchOutside(true);
+                        dialog.setTitle("Save");
+                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
 //                        ImageButton imgBtnCloseSaveWindow = (ImageButton) dialog.findViewById(R.id.imgBtnCloseSaveWindow);
-                    Button btnOkSavePopup = dialog.findViewById(R.id.btnOkSavePopup);
-                    TextView tvSaveStatus = dialog.findViewById(R.id.tvSaveStatus);
+                        Button btnOkSavePopup = dialog.findViewById(R.id.btnOkSavePopup);
+                        TextView tvSaveStatus = dialog.findViewById(R.id.tvSaveStatus);
 
-                    WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                    lp.copyFrom(dialog.getWindow().getAttributes());
-                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                    lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                    lp.gravity = Gravity.CENTER;
-                    dialog.getWindow().setAttributes(lp);
+                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                        lp.copyFrom(dialog.getWindow().getAttributes());
+                        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                        lp.gravity = Gravity.CENTER;
+                        dialog.getWindow().setAttributes(lp);
 
-                    btnOkSavePopup.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            disableButtons();
-                            dialog.dismiss();
-                            mAddFab.setEnabled(true);
-                            // startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
+                        btnOkSavePopup.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                disableButtons();
+                                dialog.dismiss();
+                                mAddFab.setEnabled(true);
+                                paymentBtn.setEnabled(false);
+                                paymentBtn.setVisibility(View.GONE);
+                                clearPaymentSave();
+                                // startActivity(new Intent(SOActivity.this, BluetoothActivity.class));
+                            }
+                        });
+
+                        // tvSaveStatus.setText("Saved \n\nToken No: " + tokenNo);
+                        tvSaveStatus.setText("Saved\n\n SOMemoNo:\t" + saveSOResponse.data.get(saveSOResponse.data.size() - 1).SOMemoNo + "\n Bill No: " +
+                                saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number);
+                        //printSbNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number;
+                        //printStoreId = saveSOResponse.data.get(saveSOResponse.data.size() - 1).storeId;
+                        if (saveSOResponse.data.size() > 1) {
+                            for (int i = 0; i < saveSOResponse.data.size(); i++) {
+                                printSbNumber.add(saveSOResponse.data.get(i).SB_Number);
+                                //printSbNumber.add(saveSOResponse.data.get(i).SO_Number);
+                                printStoreId.add(saveSOResponse.data.get(i).storeId);
+                                //printStoreId.add("35");
+                            }
+                            System.out.println("First List is " + printSbNumber + "\n" + printStoreId);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("printStoreId", printStoreId.toString());
+                            editor.putString("printSbNumber", printSbNumber.toString());
+                            editor.putInt("sizeCount", saveSOResponse.data.size());
+                            editor.apply();
+
+                        } else if (saveSOResponse.data.size() == 1) {
+                            soResponseCount = saveSOResponse.data.size();
+                            String printSBNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number;
+                            //String printSBNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SO_Number;
+                            String printStoreID = saveSOResponse.data.get(saveSOResponse.data.size() - 1).storeId;
+                            String printSBID = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Id;
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("printStoreID", printStoreID);
+                            editor.putString("printSBNumber", printSBNumber);
+                            editor.putString("printSBID", printSBID);
+                            editor.putInt("sizeCount", saveSOResponse.data.size());
+                            editor.apply();
                         }
-                    });
 
-                    // tvSaveStatus.setText("Saved \n\nToken No: " + tokenNo);
-                    tvSaveStatus.setText("Saved\n\n SOMemoNo:\t" + saveSOResponse.data.get(saveSOResponse.data.size() - 1).SOMemoNo);
-                    //printSbNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number;
-                    //printStoreId = saveSOResponse.data.get(saveSOResponse.data.size() - 1).storeId;
-                    if (saveSOResponse.data.size() > 1) {
-                        for (int i = 0; i < saveSOResponse.data.size(); i++) {
-                            printSbNumber.add(saveSOResponse.data.get(i).SB_Number);
-                            printStoreId.add(saveSOResponse.data.get(i).storeId);
-                        }
-                        System.out.println("First List is " + printSbNumber + "\n" + printStoreId);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("printStoreId", printStoreId.toString());
-                        editor.putString("printSbNumber", printSbNumber.toString());
-                        editor.putInt("sizeCount", saveSOResponse.data.size());
-                        editor.apply();
 
-                    } else if (saveSOResponse.data.size() == 1) {
-                        String printSBNumber = saveSOResponse.data.get(saveSOResponse.data.size() - 1).SB_Number;
-                        String printStoreID = saveSOResponse.data.get(saveSOResponse.data.size() - 1).storeId;
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("printStoreID", printStoreID);
-                        editor.putString("printSBNumber", printSBNumber);
-                        editor.putInt("sizeCount", saveSOResponse.data.size());
-                        editor.apply();
+                        System.out.println("size count is " + saveSOResponse.data.size());
+                        tvSaveStatus.setMovementMethod(new ScrollingMovementMethod());
+                        dialog.setCanceledOnTouchOutside(false);
+                        dialog.show();
+
+                    } else {
+                        tsMessages(saveSOResponse.errorMessage);
                     }
 
 
-                    System.out.println("size count is " + saveSOResponse.data.size());
-                    tvSaveStatus.setMovementMethod(new ScrollingMovementMethod());
-                    dialog.setCanceledOnTouchOutside(false);
-                    dialog.show();
-
-                } else {
-                    tsMessages(saveSOResponse.errorMessage);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+
+
         }
+    }
+
+    private void clearPaymentSave() {
+        SharedPreferences.Editor editor1 = prefs.edit();
+        editor1.putString("billTotal", "0.0");
+        editor1.putString("billCash", "");
+        editor1.putString("billCard", "");
+        editor1.apply();
+
+
+        prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefsD.edit();
+        editor.putString("cashSave", "");
+        editor.putString("cardSave", "");
+        editor.apply();
     }
 
     private void disableButtons() {
@@ -1411,6 +1581,7 @@ public class SOActivity extends AppCompatActivity {
 
     public void ClearList(View view) {
         if (detailList.size() > 0) {
+            System.out.println("before Delete size is " + listSODetailPL.size());
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
             alertDialogBuilder.setMessage("Do you want to delete the full SO..?");
             alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -1418,14 +1589,18 @@ public class SOActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int arg1) {
                     detailList.clear();
                     total = total * 0.0;
+                    listSODetailPL.clear();
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString("BillRemarksMWSO", "");
                     editor.apply();
                     arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                             listSODetailPL.size(), detailList, total);
+                    System.out.println("test came here -2\t"+listSODetailPL.size());
                     lvProductlist.setAdapter(arrayAdapter);
+                    lvProductlist.setAdapter(null);
                     arrayAdapter.notifyDataSetChanged();
                     tvAmountValue.setText("");
+                    clearPaymentSave();
                 }
             });
             alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -1469,8 +1644,10 @@ public class SOActivity extends AppCompatActivity {
                     editor.putString("guid", uniqueID);
                     editor.apply();
                     Intent intent = getIntent();
+                    clearPaymentSave();
                     finish();
-                    startActivity(intent);
+                    //startActivity(intent);
+                    startActivity(new Intent(SOActivity.this, CustomerInformation.class));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1524,100 +1701,6 @@ public class SOActivity extends AppCompatActivity {
 
     }
 
-    private class GetReceivablesTask extends AsyncTask<String, String, String> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(SOActivity.this);
-            pDialog.setMessage("Loading...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            //https://tsmithy.in/somemouat/api/GetReceivables?CustId=382
-            try {
-                URL url = new URL(Url + "GetReceivables?CustId=" + CustomerId);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setReadTimeout(300000);
-                connection.setConnectTimeout(300000);
-                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
-                connection.setRequestProperty("name", "");
-                connection.setRequestProperty("password", "");
-                connection.setRequestProperty("debugkey", "");
-                connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("docguid", uniqueId);
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.connect();
-
-                int responsecode = connection.getResponseCode();
-                String responseMsg = connection.getResponseMessage();
-
-                try {
-
-                    if (responsecode == 200) {
-                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-                        BufferedReader reader = new BufferedReader(streamReader);
-                        StringBuilder sb = new StringBuilder();
-                        String inputLine = "";
-
-                        while ((inputLine = reader.readLine()) != null) {
-                            sb.append(inputLine);
-                            break;
-                        }
-
-                        reader.close();
-                        String str = "";
-                        strReceivables = sb.toString();
-                        System.out.println("Response of Customer Recievables is--->" + strReceivables);
-                    } else {
-//                        strErrorMsg = connection.getResponseMessage();
-                        strErrorMsg = responseMsg;
-                        strReceivables = "httperror";
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    connection.disconnect();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return strReceivables;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (pDialog.isShowing()) {
-                pDialog.dismiss();
-            }
-
-            if (strReceivables == null || strReceivables.isEmpty()) {
-                Toast.makeText(SOActivity.this, "No result from web", Toast.LENGTH_SHORT).show();
-            } else {
-                try {
-                    gson = new Gson();
-                    CustomerReceivables customerReceivables = gson.fromJson(strReceivables, CustomerReceivables.class);
-                    if (customerReceivables.statusFlag == 0) {
-                        String var = String.valueOf(customerReceivables.data.get(0).receivables);
-                        etReceivables.setText("Receivables: " + var);
-                    } else {
-                        tsMessages(customerReceivables.errorMessage);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
 
     private void PrintDocument(Boolean isPrint) {
         String printStoreID = "", printSBNumber = "", printStoreId, printSbNumber;
@@ -1644,6 +1727,7 @@ public class SOActivity extends AppCompatActivity {
             try {
                 s1 = printStoreID;
                 s2 = printSBNumber;
+                System.out.println("came 1");
                 new TakeBillSingle().execute();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1670,7 +1754,7 @@ public class SOActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(SOActivity.this);
-            pDialog.setMessage("Loading..Please waitttt.!!");
+            pDialog.setMessage("Loading..Please wait..!!");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -1683,7 +1767,7 @@ public class SOActivity extends AppCompatActivity {
             try {
                 //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
                 //URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=15&SBillNo=APPL/22/WS-13");
-                URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=" + storeId[reCount].trim() + "&SBillNo=" + sbNumber[reCount].trim());
+                URL url = new URL(Url + "PrintBill?StoreId=" + storeId[reCount].trim() + "&SBillNo=" + sbNumber[reCount].trim());
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(300000);
@@ -1794,12 +1878,14 @@ public class SOActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             strCheckLogin = "";
-
+            System.out.println("S1 and s2..!!" + s1 + "\t\t" + s2);
+            // s2="APPL/22/WS-236";
+            //s1="15";
             //  System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
             try {
                 //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
                 //URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=15&SBillNo=APPL/22/WS-13");
-                URL url = new URL("https://tsmithy.in/somemouat/api/PrintBill?StoreId=" + s1 + "&SBillNo=" + s2);
+                URL url = new URL(Url + "PrintBill?StoreId=" + s1 + "&SBillNo=" + s2);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(300000);
@@ -1835,7 +1921,7 @@ public class SOActivity extends AppCompatActivity {
                         reader.close();
                         String str = "";
                         strCheckLogin = sb.toString();
-                        System.out.println("Response of Print Bill--->" + strCheckLogin);
+                        System.out.println("Response of Print Bill Single is--->" + strCheckLogin);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -1864,14 +1950,20 @@ public class SOActivity extends AppCompatActivity {
                 pDialog.dismiss();
             }
             printData = s;
+            try {
+                gson = new Gson();
+                printResponse = gson.fromJson(printData, PrintResponse.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-
-            if (strCheckLogin.equals("") || strCheckLogin == null) {
+            if (strCheckLogin.equals("")) {
                 Toast.makeText(SOActivity.this, "No result", Toast.LENGTH_SHORT).show();
+            } else if (printResponse.statusFlag == 1) {
+                tsMessages(printResponse.errorMessage);
             } else {
                 try {
-                    gson = new Gson();
-                    printResponse = gson.fromJson(printData, PrintResponse.class);
+
                     String test = printResponse.data.replace("\r", "\n");
                     System.out.println("Print data is " + test);
                     printList.add(test);
@@ -1879,13 +1971,41 @@ public class SOActivity extends AppCompatActivity {
                     MessageDisplay.setText(printList.toString().replace(",", "\n").
                             replace("[", "").replace("]", ""));
                     MessageDisplay.setMovementMethod(new ScrollingMovementMethod());
+                    if (printResponse.einvString != null) {
+
+                        JSONObject obj = new JSONObject();
+                        obj.put("BuyerGstin", printResponse.einvString.BuyerGstin);
+                        obj.put("SellerGstin", printResponse.einvString.SellerGstin);
+                        obj.put("DocDt", printResponse.einvString.DocDt);
+                        obj.put("DocNo", doc_no);
+                        obj.put("DocTyp", printResponse.einvString.DocTyp);
+                        obj.put("Irn", printResponse.einvString.Irn);
+                        obj.put("ItemCnt", printResponse.einvString.ItemCnt);
+                        obj.put("TotInvVal", String.valueOf(printResponse.einvString.TotInvVal));
+                        obj.put("MainHsnCode", String.valueOf(printResponse.einvString.MainHsnCode));
+                        irnNo = String.valueOf(printResponse.einvString.Irn);
+
+
+                        qrString = obj.toString();
+                        //qrString=printResponse.einvString.Irn;
+                        // qrString=printResponse.irn;
+                        System.out.println("came 2");
+                        System.out.println(qrString);
+                    } else {
+                        //tsMessages("E-Invoice Data Empty..");
+                        Toast.makeText(SOActivity.this, "E-Invoice Data Empty..", Toast.LENGTH_LONG).show();
+                    }
+
+                    qrdo();
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (isPrint)
+                            if (isPrint) {
                                 RcptPrint();
-                            else
-                                System.out.println("do nothing..");
+                            } else {
+                                System.out.println("came 4");
+                            }
+
                         }
                     }, 1000);
 
@@ -1894,6 +2014,27 @@ public class SOActivity extends AppCompatActivity {
                 }
             }
 
+        }
+    }
+
+    private void qrdo() {
+        QRCodeWriter writer = new QRCodeWriter();
+        BitMatrix bitMatrix;
+        try {
+            System.out.println("QrString is " + qrString);
+            bitMatrix = writer.encode(qrString, BarcodeFormat.QR_CODE, 150, 150);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int color = Color.WHITE;
+                    if (bitMatrix.get(x, y)) color = Color.BLACK;
+                    bitmap.setPixel(x, y, color);
+                }
+            }
+        } catch (WriterException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1922,27 +2063,57 @@ public class SOActivity extends AppCompatActivity {
 
     private void RcptPrint() {
         if (isBluetoothEnabled()) {
-            String temp = MessageDisplay.getText().toString();
             try {
-                Bitmap bitmap = Printama.getBitmapFromVector(this, R.drawable.techsmith);
-                Printama.with(this).connect(printama -> {
-                    printama.addNewLine(1);
-                    // printama.setNormalText();
-                    printama.setSmallText();
-                    printama.printText(temp, Printama.LEFT);
+                System.out.println("Came here..!!" + qrString);
+                String temp = MessageDisplay.getText().toString();
+                //qrString="hello world";
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
+                } else {
+                    /*  "[L]" + df.format(new Date()) + "\n" */
+                    BluetoothConnection connection = BluetoothPrintersConnections.selectFirstPaired();
+                    if (connection != null) {
+                        EscPosPrinter printer = new EscPosPrinter(connection, 203, 48f, 32);
+                        if (irnNo.isEmpty() || irnNo == null) {
 
-                    printama.addNewLine(3);
-                    printama.close();
-                }, this::showToast);
+                            final String text =
+                                    "[L]" + temp + "\n" +
+                                            "[C]--------------------------------\n";
+                            printer.printFormattedText(text);
+                        } else {
+                            final String text =
+                                    "[L]" + temp + "\n" +
+                                            "[C]--------------------------------\n" +
+                                            "[C]<qrcode size='20'>" + qrString + "</qrcode>\n" +
+                                            "[L]<b>\tIRN Number</b>" +
+                                            "[L]<b>\n" + irnNo + "</b>";
+                            printer.printFormattedText(text);
+                        }
+                        connection.disconnect();
+
+                      /*  final String text =
+                                "[L]" + temp + "\n" +
+                                        "[C]--------------------------------\n" +
+                                        "[C]<qrcode size='20'>" + qrString + "</qrcode>\n" +
+                                        "[L]<b>\tIRN Number</b>" +
+                                        "[L]<b>\n" + irnNo + "</b>";
+
+                        printer.printFormattedText(text);*/
+                    } else {
+                        Toast.makeText(this, "No printer was connected..! Try Again", Toast.LENGTH_SHORT).show();
+                    }
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("printer_name", connection.getDevice().getName());
+                    editor.apply();
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("APP", "Can't print", e);
             }
         } else {
-            Toast toast = Toast.makeText(SOActivity.this,
-                    "Please Enable Bluetooth & Try Again.", Toast.LENGTH_SHORT);
-            toast.show();
+            popUp("Turn On Bluetooth First");
         }
     }
+
 
     public boolean isBluetoothEnabled() {
         BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -1971,4 +2142,362 @@ public class SOActivity extends AppCompatActivity {
                 .show();
     }
 
+
+    private class GetReceivablesTask extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            super.onPreExecute();
+            pDialog = new ProgressDialog(SOActivity.this);
+            pDialog.setMessage("Loading...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            //https://tsmithy.in/somemouat/api/GetReceivables?CustId=382
+            try {
+                URL url = new URL(Url + "GetReceivables?CustId=" + CustomerId);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setReadTimeout(300000);
+                connection.setConnectTimeout(300000);
+                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
+                connection.setRequestProperty("name", "");
+                connection.setRequestProperty("password", "");
+                connection.setRequestProperty("debugkey", "");
+                connection.setRequestProperty("remarks", "");
+                connection.setRequestProperty("docguid", uniqueId);
+                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                int responsecode = connection.getResponseCode();
+                String responseMsg = connection.getResponseMessage();
+
+                try {
+
+                    if (responsecode == 200) {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        String str = "";
+                        strReceivables = sb.toString();
+                        System.out.println("Response of Customer Recievables is--->" + strReceivables);
+                    } else {
+//                        strErrorMsg = connection.getResponseMessage();
+                        strErrorMsg = responseMsg;
+                        strReceivables = "httperror";
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    connection.disconnect();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return strReceivables;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
+
+            if (strReceivables == null || strReceivables.isEmpty()) {
+                popUp("No result from web..!!");
+            } else {
+                try {
+                    gson = new Gson();
+                    CustomerReceivables customerReceivables = gson.fromJson(strReceivables, CustomerReceivables.class);
+                    if (customerReceivables.statusFlag == 0) {
+                        String var = String.valueOf(customerReceivables.data.get(0).receivables);
+                        etReceivables.setText("Receivables: " + var);
+                    } else {
+                        tsMessages(customerReceivables.errorMessage);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void RcptrPrint() {
+        String temp = MessageDisplay.getText().toString().trim();
+        if (isBluetoothEnabled()) {
+            if (irnNo.isEmpty()) {
+                Toast toast = Toast.makeText(SOActivity.this,
+                        "IRN Number is Empty...", Toast.LENGTH_SHORT);
+                toast.show();
+
+            } else if (temp.isEmpty()) {
+                Toast toast = Toast.makeText(SOActivity.this,
+                        "Bill data is Empty", Toast.LENGTH_SHORT);
+                toast.show();
+            } else {
+                String nota = "Some Text";
+                Printama.with(this).connect(printama -> {
+                    // printama.addNewLine();
+                    //printama.printTextln(temp, Printama.LEFT);
+                    // printama.setNormalText();
+                    // printama.printTextln("Some Text", Printama.CENTER);
+                    // printama.printDashedLine();
+                    // printama.addNewLine();
+                    QRCodeWriter writer = new QRCodeWriter();
+                    BitMatrix bitMatrix;
+                    try {
+                        bitMatrix = writer.encode(qrString, BarcodeFormat.QR_CODE, 150, 150);
+                        int width = bitMatrix.getWidth();
+                        int height = bitMatrix.getHeight();
+                        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+                        for (int x = 0; x < width; x++) {
+                            for (int y = 0; y < height; y++) {
+                                int color = Color.WHITE;
+                                if (bitMatrix.get(x, y)) color = Color.BLACK;
+                                bitmap.setPixel(x, y, color);
+                            }
+                        }
+                        if (bitmap != null) {
+                            printama.printImage(bitmap);
+                        }
+                        //printama.printDashedLine();
+                        printama.setSmallText();
+                        //printama.printTextln(temp, Printama.LEFT);
+                        printama.printTextln("IRN Number", Printama.CENTER);
+                        printama.setNormalText();
+                        printama.printTextln(irnNo, Printama.CENTER);
+                        printama.printDashedLine();
+                        printama.addNewLine();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    printama.addNewLine();
+                    printama.feedPaper();
+                    printama.close();
+                }, this::showToast);
+
+            }
+        } else {
+            popUp("Please Enable Bluetooth & Try Again..!");
+        }
+    }
+
+    public void SaveSO(View view) {
+        try {
+            System.out.println(tvAmountValue.getText().toString());
+            double dd = Double.parseDouble(tvAmountValue.getText().toString());
+            System.out.println("Current Bill Amount is "+dd);
+            calc = 0.0;
+            gson = new Gson();
+            billCash = prefs.getString("billCash", "");
+            billCard = prefs.getString("billCard", "");
+
+            prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+            String cc = prefsD.getString("cardSave", "");
+            String cam = prefsD.getString("cashSave", "");
+
+
+            PaymentList paymentList = gson.fromJson(cc, PaymentList.class);
+            PaymentList paymentList1 = gson.fromJson(cam, PaymentList.class);
+            System.out.println("Incoming amounts is " + cc + "<--->" + cam);
+            try {
+
+                if (cc.isEmpty() && !cam.isEmpty()) { // c-card empty and cash there
+                    calc = calc + Double.parseDouble(paymentList1.cashAmount);
+                } else if (cam.isEmpty() && !cc.isEmpty()) {// cash empty & c-card there
+                    calc = calc + Double.parseDouble(paymentList.cardAmount);
+                } else if (!cc.isEmpty() && !cam.isEmpty()) {// c-card and cash have both money
+                    calc = calc + Double.parseDouble(paymentList.cardAmount) + Double.parseDouble(paymentList1.cashAmount);
+                } else {
+                    calc = 0.0;
+                    popUp("Add Payment..!!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+
+            System.out.println("Current Total is " + calc);
+
+            if (cc.isEmpty() || cam.isEmpty()) {
+                System.out.println("Cash value empty");
+            } else {
+                CardRemarks = paymentList.cardRemarks;
+                CashRemarks = paymentList1.cashRemarks;
+            }
+            if (calc == 0.0) {
+                System.out.println("Update payment\n Paid Amount is Greater than Bill Amount..");
+            } else {
+
+            }
+            if (calc > dd) {
+                popUp("Update Payment..!!\n Paid Amount is less than Bill Amount..");
+            }else if (calc<dd){
+                popUp("Update Payment..!!\n Paid Amount is less than Bill Amount..");
+            }else {
+                if (detailList.size() > 0) {
+
+                    if (!billCash.isEmpty() || !billCard.isEmpty()) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+                        alertDialogBuilder.setMessage("Do you want to continue saving?");
+                        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                try {
+                                    listSODetailPL = detailList;
+                                    String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                                    SaveSODetail saveSODetail = new SaveSODetail();
+                                    saveSODetail.item = listSODetailPL;
+
+                                    SaveSummarySO saveSummarySO = new SaveSummarySO();
+                                    saveSummarySO.custId = CustomerId;
+                                    saveSummarySO.customer = CustomerName;
+                                    saveSummarySO.docSeries = "SOM";
+                                    saveSummarySO.docDate = date;
+                                    saveSummarySO.docComplete = 1;
+                                    saveSummarySO.docSeries = "";
+                                    saveSummarySO.remarks = billRemarks;
+                                    saveSummarySO.cceId = cceId;
+                                    saveSummarySO.docGuid = uniqueId;
+                                    saveSummarySO.machineId = "";
+                                    saveSummarySO.userId = "";
+
+
+                                    PaymentList pay = new PaymentList();
+                                    if (!cam.isEmpty() && cc.isEmpty()) {
+                                        pay.cashAmount = billCash;
+                                        pay.cashRemarks = CashRemarks;
+                                    } else if (cam.isEmpty() && !cc.isEmpty()) {
+                                        pay.cardName = paymentList.cardName;
+                                        pay.cardNo = paymentList.cardNo;
+                                        pay.auCode = paymentList.auCode;
+                                        pay.expiry = paymentList.expiry;
+                                        pay.accquringBank = paymentList.expiry;
+                                        pay.swipingMachineId = paymentList.swipingMachineId;
+                                        pay.issuingBank = paymentList.issuingBank;
+                                        pay.accquringBank = paymentList.accquringBank;
+                                        pay.cardAmount = billCard;
+                                        pay.cardRemarks = CardRemarks;
+                                        pay.expiryMonth = paymentList.expiryMonth;
+                                        pay.expiryYear = paymentList.expiryYear;
+                                    } else {
+                                        pay.cashAmount = billCash;
+                                        pay.cashRemarks = CashRemarks;
+                                        pay.cardName = paymentList.cardName;
+                                        pay.cardNo = paymentList.cardNo;
+                                        pay.auCode = paymentList.auCode;
+                                        pay.expiry = paymentList.expiry;
+                                        pay.accquringBank = paymentList.expiry;
+                                        pay.swipingMachineId = paymentList.swipingMachineId;
+                                        pay.issuingBank = paymentList.issuingBank;
+                                        pay.accquringBank = paymentList.accquringBank;
+                                        pay.cardAmount = billCard;
+                                        pay.cardRemarks = CardRemarks;
+                                    }
+
+                                    SOMemo soMemo = new SOMemo();
+                                    soMemo.detail = saveSODetail;
+                                    soMemo.summary = saveSummarySO;
+                                    soMemo.paymentList = pay;
+
+
+                                    SOSave soSave = new SOSave();
+                                    soSave.soMemo = soMemo;
+
+
+                                    gson = new Gson();
+                                    soString = gson.toJson(soSave);
+                                    System.out.println("SO Save String is ---> " + soString);
+                                    new SaveSOTask().execute();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+
+                            }
+                        });
+
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setCanceledOnTouchOutside(false);
+                        alertDialog.show();
+                    } else {
+                        popUp("No Payment Added..!!");
+                    }
+                } else {
+                    popUp("No SO to save.....!!");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(SOActivity.this, "SO Data Save Form Error", Toast.LENGTH_LONG).show();
+        }
+
+
+        //tsMessages("Function not yet implemented...");
+    }
+
+
+    private void popUp(String msg) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SOActivity.this);
+        alertDialogBuilder.setMessage(msg);
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
+    }
+
 }
+
+
+/*private void RcptPrint() {
+        if (isBluetoothEnabled()) {
+            String temp = MessageDisplay.getText().toString();
+            try {
+                Bitmap bitmap = Printama.getBitmapFromVector(this, R.drawable.techsmith);
+                Printama.with(this).connect(printama -> {
+                    printama.addNewLine(1);
+                    // printama.setNormalText();
+                    printama.setSmallText();
+                    printama.printText(temp, Printama.LEFT);
+
+                    printama.addNewLine(3);
+                    printama.close();
+                }, this::showToast);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast toast = Toast.makeText(SOActivity.this,
+                    "Please Enable Bluetooth & Try Again.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }*/
+

@@ -27,14 +27,14 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.Viewholder
 
     @NonNull
     @Override
-    public CourseAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // to inflate the layout for each item of recycler view.
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cards_layout, parent, false);
         return new Viewholder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CourseAdapter.Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         CardModel model = courseModelArrayList.get(position);
         holder.tvProfileName.setText(model.getName());
         holder.ivProfilePic.setImageResource(model.getImageName());

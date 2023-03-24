@@ -13,7 +13,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginRight="5dp"
         app:cardBackgroundColor="@color/new_blue"
-        app:cardCornerRadius="15dp"
+        app:cardCornerRadius="10dp"
         app:cardElevation="10dp"
         app:cardMaxElevation="10dp"
         app:cardPreventCornerOverlap="true"

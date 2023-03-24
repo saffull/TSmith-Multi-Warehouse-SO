@@ -15,6 +15,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -54,7 +56,7 @@ public class CustomerInformation extends AppCompatActivity {
     EditText etCustomerId, etCustomerAdrs, etCustomerMobile, etCustomerGSTNo, etReceivables;
     Button btnCreateSO;
     String loginResponse, Url, strCustomer, strErrorMsg, strReceivables, strReceivableDetails, uniqueID,
-            selectedCustomerName, multiSOStoredDevId;
+            selectedCustomerName, multiSOStoredDevId, user_name;
     int customerId, selectedCustomerId;
     ProgressDialog pDialog;
     CustomerList customerList;
@@ -89,9 +91,11 @@ public class CustomerInformation extends AppCompatActivity {
         btnCreateSO = findViewById(R.id.btnCreateSO);
         etReceivables = findViewById(R.id.etReceivables);
         loginResponse = prefs.getString("loginResponse", "");
-        Url = prefs.getString("MultiSOURL", "");
+        Url = prefs.getString("MultiSOURL", "https://tsmithy.in/somemouat/api/");
+        System.out.println("url is "+Url);
         uniqueID = UUID.randomUUID().toString();
-        System.out.println("GUID is " + uniqueID.toUpperCase());
+        user_name = prefs.getString("user_name", "");
+        System.out.println("GUID is " + user_name);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("guid", uniqueID);
         editor.apply();
@@ -140,6 +144,24 @@ public class CustomerInformation extends AppCompatActivity {
                 tsMessages("Function Not yet Implemented..");
             }
         });
+        acvCustomerName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.toString().length() == 0) {
+                    acvCustomerName.setAdapter(null);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         acvCustomerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -160,9 +182,45 @@ public class CustomerInformation extends AppCompatActivity {
                 prefs = PreferenceManager.getDefaultSharedPreferences(CustomerInformation.this);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt("CustomerId", customerList.data.get(pos).acid);
+                editor.putString("customer_id", etCustomerId.getText().toString());
+                editor.putString("customer_name", acvCustomerName.getText().toString());
                 editor.putString("CustomerName", selectedCustomerName);
                 editor.apply();
                 LockButtons();
+
+
+              /*  AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(CustomerInformation.this);
+                alertDialogBuilder.setMessage("Do you want to load Receivables for the customer..!!");
+                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.cancel();
+                        System.out.println("Customer ID is " + customerId);
+                        customerId = userPLObj.summary.customerId;
+                        if (customerId != 0) {
+                            new GetReceivablesTask().execute();
+                        } else if (selectedCustomerId != 0) {
+                            customerId = selectedCustomerId;
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("selectedCustomerName", selectedCustomerName);
+                            editor.putInt("selectedCustomerId", selectedCustomerId);
+                            editor.apply();
+                            new GetReceivablesTask().execute();
+                        } else {
+                            Toast.makeText(CustomerInformation.this, "No Customer Specified..!!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.show();*/
 
 
             }
@@ -209,7 +267,8 @@ public class CustomerInformation extends AppCompatActivity {
     }
 
     public void CreateSO(View view) {
-        if (!acvCustomerName.getText().toString().isEmpty()) {
+        if (!acvCustomerName.getText().toString().isEmpty() && !etCustomerId.getText().toString().isEmpty()
+                || !etCustomerId.getText().toString().equalsIgnoreCase("0")) {
             finish();
             startActivity(new Intent(CustomerInformation.this, SOActivity.class));
         } else {
@@ -346,7 +405,7 @@ public class CustomerInformation extends AppCompatActivity {
                     dialog.getWindow().setAttributes(lp);
 
 
-                    Button btndialog = (Button) dialog.findViewById(R.id.btndialog);
+                    Button btndialog = dialog.findViewById(R.id.btndialog);
                     TextView dialog_cust = dialog.findViewById(R.id.dialog_cust);
                     TextView total = dialog.findViewById(R.id.total);
                     total.setText("Total: " + etReceivables.getText().toString().trim());
@@ -487,7 +546,7 @@ public class CustomerInformation extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            System.out.println("came here");
             pDialog = new ProgressDialog(CustomerInformation.this);
             pDialog.setMessage("Loading customers...");
             pDialog.setCancelable(false);
@@ -577,9 +636,7 @@ public class CustomerInformation extends AppCompatActivity {
 
                         for (int i = 0; i < customerList.data.size(); i++) {
                             arrCust[i] = customerList.data.get(i).customer;
-                            System.out.println(arrCust[i]);
-                        }
-
+                            System.out.println(arrCust[i]); }
 
                         AutocompleteCustomArrayAdapter myAdapter = new AutocompleteCustomArrayAdapter(CustomerInformation.this, R.layout.autocomplete_view_row, arrCust);
                         acvCustomerName.setAdapter(myAdapter);
