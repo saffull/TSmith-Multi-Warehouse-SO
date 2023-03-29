@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.Viewholder> {
     private final Context context;
     private final ArrayList<PaymentMethodModel> courseModelArrayList;
+    private String temp = "";
 
     // Constructor
     public PaymentAdapter(Context context, ArrayList<PaymentMethodModel> courseModelArrayList) {
@@ -36,12 +37,17 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.Viewhold
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         PaymentMethodModel model = courseModelArrayList.get(position);
-      try {
-          holder.tvProfileName.setText(model.getName());
-         // holder.tv_amount.setText("\u20B9 "+ String.format("%.2f", Double.parseDouble(model.getAmount())));
-          holder.tv_amount.setText("\u20B9 "+ model.getAmount());
-          holder.ivProfilePic.setImageResource(model.getImageName());
-      }catch (Exception e){e.printStackTrace();}
+        try {
+            holder.tvProfileName.setText(model.getName());
+            holder.tv_amount.setText("\u20B9 " + model.getAmount());
+            holder.ivProfilePic.setImageResource(model.getImageName());
+            if (model.getName().equalsIgnoreCase("Card")) {
+                temp = "xxxx-xxxx-xxxx-" + model.getCardNo().trim().substring(10, 15);
+                holder.card_no.setText(temp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -51,13 +57,14 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.Viewhold
 
     public class Viewholder extends RecyclerView.ViewHolder {
         private final ImageView ivProfilePic;
-        private TextView tvProfileName,tv_amount;
+        private TextView tvProfileName, tv_amount, card_no;
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             ivProfilePic = itemView.findViewById(R.id.ivProfilePic);
             tvProfileName = itemView.findViewById(R.id.tvProfileName);
-            tv_amount=itemView.findViewById(R.id.tv_amount);
+            tv_amount = itemView.findViewById(R.id.tv_amount);
+            card_no = itemView.findViewById(R.id.card_no);
         }
     }
 }

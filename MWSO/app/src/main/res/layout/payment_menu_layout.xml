@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         card_view:cardCornerRadius="10dp"
         card_view:cardElevation="5dp"
-        card_view:cardUseCompatPadding="true"
-        android:layout_height="wrap_content" >
-
+        card_view:cardUseCompatPadding="true">
+<!--  android:background="@drawable/card_gradient"-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:background="@drawable/card_gradient"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color">
 
             <ImageView
                 android:id="@+id/ivProfilePic"
@@ -33,7 +33,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_margin="18dp"
                 android:layout_marginStart="18dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="18dp"
@@ -41,21 +40,32 @@
                 android:layout_toRightOf="@+id/ivProfilePic"
                 android:fontFamily="@font/fabrica"
                 android:hint="Card"
-                android:textStyle="bold"
                 android:paddingBottom="5dp"
                 android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/card_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/tv_amount"
+                android:layout_marginStart="18dp"
+                android:fontFamily="@font/fabrica"
+                android:textStyle="bold"
+                android:layout_toRightOf="@+id/ivProfilePic"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/tv_amount"
                 android:layout_width="wrap_content"
-                android:layout_marginStart="18dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tvProfileName"
+                android:layout_marginStart="18dp"
                 android:layout_toRightOf="@+id/ivProfilePic"
                 android:fontFamily="@font/fabrica"
-                android:text="₹ 0.0"
                 android:paddingBottom="5dp"
+                android:text="₹ 0.0"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />

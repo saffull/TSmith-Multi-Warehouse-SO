@@ -4,11 +4,13 @@ public class PaymentMethodModel {
     private String amount;
     private String name;
     private int imageName;
+    private String cardNo;
 
-    public PaymentMethodModel(String name, int imageName,String amount) {
+    public PaymentMethodModel(String name, int imageName,String amount,String cardNo) {
         this.name = name;
         this.imageName = imageName;
         this.amount=amount;
+        this.cardNo=cardNo;
     }
 
     public int getImageName() {
@@ -33,5 +35,13 @@ public class PaymentMethodModel {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
     }
 }

@@ -40,7 +40,8 @@ public class PaymentMenu extends AppCompatActivity {
     private double total, payTotal = 0.0;
     private int Image = 0;
     Gson gson;
-    private String tempTotal = "", iCash = "0.0", iCard = "0.0", iUpi = "0.0", cashSave = "", cardSave = "", cashAmount = "", cardAmount = "";
+    private String tempTotal = "", iCash = "0.0", iCard = "0.0", iUpi = "0.0", cashSave = "", cardSave = "",
+            cashAmount = "", cardAmount = "",cardNo="";
     private String[] modeNames = {"Cash", "Card", "UPI"};
 
     @Override
@@ -89,6 +90,7 @@ public class PaymentMenu extends AppCompatActivity {
                 gson = new Gson();
                 PaymentList pay = gson.fromJson(cardSave, PaymentList.class);
                 cardAmount = pay.cardAmount;
+                cardNo=pay.cardNo;
                 cardAmt.setText(cardAmount);
                 addPayment();
             } catch (Exception e) {
@@ -203,24 +205,24 @@ public class PaymentMenu extends AppCompatActivity {
             courseModelArrayList = new ArrayList<>();
             Image = R.drawable.payment_method;
             iCash=cashAmount;
-            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash));
-            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard));
-            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi));
+            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash,""));
+            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard,""));
+            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi,""));
         }else if (cashAmount.isEmpty()&& !cardAmount.isEmpty()){
             courseModelArrayList = new ArrayList<>();
             Image = R.drawable.payment_method;
             iCard=cardAmount;
-            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash));
-            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard));
-            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi));
+            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash,""));
+            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard,cardNo));
+            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi,""));
         }else  if (!cashAmount.isEmpty()){
             courseModelArrayList = new ArrayList<>();
             Image = R.drawable.payment_method;
             iCash=cashAmount;
             iCard=cardAmount;
-            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash));
-            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard));
-            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi));
+            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash,""));
+            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard,cardNo));
+            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi,""));
         }else{
             System.out.println("Do nothing..");
         }
@@ -239,30 +241,30 @@ public class PaymentMenu extends AppCompatActivity {
             } else {
                 Image = R.drawable.bhim_upi;
             }
-            courseModelArrayList.add(new PaymentMethodModel(modeNames[i], Image, iCash));
+            courseModelArrayList.add(new PaymentMethodModel(modeNames[i], Image, iCash,""));
         }
         //courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash));
         //courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard));
         // courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi));
     }
 
-    public void updateList(String cash, String what) {
+    public void updateList(String cash, String what, String cardno) {
         courseRV.setAdapter(null);
         if (what.equalsIgnoreCase("user_cash")) {
             iCash=cash;
             courseModelArrayList = new ArrayList<>();
             Image = R.drawable.payment_method;
-            courseModelArrayList.add(new PaymentMethodModel("Cash", Image,iCash));
-            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard));
-            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi));
+            courseModelArrayList.add(new PaymentMethodModel("Cash", Image,iCash,""));
+            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard,""));
+            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi,""));
 
         } else if (what.equalsIgnoreCase("user_card")) {
             iCard = cash;
             courseModelArrayList = new ArrayList<>();
             Image = R.drawable.payment_method;
-            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash));
-            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard));
-            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi));
+            courseModelArrayList.add(new PaymentMethodModel("Cash", Image, iCash,""));
+            courseModelArrayList.add(new PaymentMethodModel("Card", Image, iCard,cardno));
+            courseModelArrayList.add(new PaymentMethodModel("UPI", Image, iUpi,""));
         } else {
             courseModelArrayList = new ArrayList<>();
             Image = R.drawable.ic_list;
@@ -274,7 +276,7 @@ public class PaymentMenu extends AppCompatActivity {
                 } else {
                     Image = R.drawable.bhim_upi;
                 }
-                courseModelArrayList.add(new PaymentMethodModel(modeNames[i], Image, iCash));
+                courseModelArrayList.add(new PaymentMethodModel(modeNames[i], Image, iCash,""));
             }
         }
         courseAdapter = new PaymentAdapter(this, courseModelArrayList);
@@ -305,9 +307,11 @@ public class PaymentMenu extends AppCompatActivity {
         updatePayTotal(String.format("%.2f", Double.parseDouble(cash)));
     }
 
-    public void updateCardAmount(String cash) {
+    public void updateCardAmount( String cash,String cArdNo) {
        // cardAmt.setText(String.format("%.2f", Double.parseDouble(cash)));
         cardAmt.setText(cash);
+        System.out.println("New Card Number is "+cArdNo);
+        cardNo=cArdNo;
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("billCard", cash);
         editor.apply();

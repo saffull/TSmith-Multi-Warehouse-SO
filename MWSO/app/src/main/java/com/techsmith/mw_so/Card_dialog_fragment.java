@@ -287,8 +287,8 @@ public class Card_dialog_fragment extends DialogFragment {
                             editor.putString("cardSave", cardSave);
                             editor.apply();
                             System.out.println("Card Save is " + cardSave);
-                            ((PaymentMenu) getActivity()).updateCardAmount(cardTotal);
-                            ((PaymentMenu) getActivity()).updateList(cardTotal, "user_card");
+                            ((PaymentMenu) getActivity()).updateCardAmount(cardTotal,cardno);
+                            ((PaymentMenu) getActivity()).updateList(cardTotal, "user_card",cardno);
                             dismiss();
                         }
                     } else {

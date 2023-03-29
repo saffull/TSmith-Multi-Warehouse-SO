@@ -80,19 +80,11 @@ public class MainActivity extends AppCompatActivity {
         }).check();
         prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
         firstTime = prefs.getBoolean("firstTime", true);
-      /*  if (firstTime)
-            startActivity(new Intent(MainActivity.this, Settings.class));*/
+        if (firstTime)
+            startActivity(new Intent(MainActivity.this, Settings.class));
 
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
-        String string = "5, 15", string1 = "5002/22/WS-16, APPL/22/WS-27";
-        String[] parts = string.split(",");
-        String[] parts1 = string1.split(",");
-        //  System.out.println(parts.length+"--<>"+parts[0]+"\n"+parts[1].trim());
-        for (int i = 0; i < parts.length; i++) {
-            System.out.println(parts[i].trim() + "\n" + parts1[i].trim());
-
-        }
 
         Url = prefs.getString("MultiSOURL", "");
         multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
@@ -223,7 +215,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (strCheckLogin.equals("") || strCheckLogin == null) {
-                Toast.makeText(MainActivity.this, "No result", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, "No result", Toast.LENGTH_SHORT).show();
+                popUp("Empty Result or  Unable to resolve host");
             } else {
                 try {
                     Gson gson = new Gson();
@@ -294,5 +287,21 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private void popUp(String msg) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilder.setMessage(msg);
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
+    }
+
 
 }

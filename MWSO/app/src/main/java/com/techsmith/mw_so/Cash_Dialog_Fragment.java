@@ -7,11 +7,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +18,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
@@ -31,7 +28,7 @@ import com.techsmith.mw_so.payment_util.PaymentList;
 public class Cash_Dialog_Fragment extends DialogFragment {
     private TextInputEditText cashAmount, cashRemarks;
     private TextView cashRcd, totalBill;
-    private String remarks, cash, tempTotal, cashSave = "";
+    private String remarks, cash, tempTotal, cashSave = "",cardno="";
     private Button updateCash, cancel;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
@@ -121,7 +118,7 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                             editor.apply();
                             System.out.println("Saved amount is " + cashSave);
                             ((PaymentMenu) getActivity()).updateCashAmount(cash);
-                            ((PaymentMenu) getActivity()).updateList(cash, "user_cash");
+                            ((PaymentMenu) getActivity()).updateList(cash, "user_cash", cardno);
                             dismiss();
                         }
                     }
