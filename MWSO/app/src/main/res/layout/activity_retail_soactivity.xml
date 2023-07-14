@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".RetailSOActivity"
+    tools:ignore="HardcodedText">
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+       android:backgroundTint="@color/black"-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/add_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="106dp"
+            android:text="Menu"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/purple_500"
+            app:icon="@drawable/ic_arrow_up"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <!--Floating action button for add alarm-->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_alarm_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/app_name"
+            app:backgroundTint="@color/purple_500"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/add_fab"
+            app:layout_constraintEnd_toEndOf="@+id/add_fab"
+            app:srcCompat="@drawable/ic_print"
+            app:tint="@color/white" />
+        <!--Action name text for the add alarm button-->
+        <TextView
+            android:id="@+id/add_alarm_action_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Print"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/add_alarm_fab"
+            app:layout_constraintEnd_toStartOf="@+id/add_alarm_fab"
+            app:layout_constraintTop_toTopOf="@+id/add_alarm_fab" />
+        <!--Floating action button for print-->
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/preview_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/app_name"
+            app:backgroundTint="@color/purple_500"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/add_alarm_fab"
+            app:layout_constraintEnd_toEndOf="@+id/add_alarm_fab"
+            app:srcCompat="@drawable/ic_coupon"
+            app:tint="@color/white" />
+        <!--Action name text for the add alarm button-->
+        <TextView
+            android:id="@+id/preview_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Coupons"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/preview_fab"
+            app:layout_constraintEnd_toStartOf="@+id/preview_fab"
+            app:layout_constraintTop_toTopOf="@+id/preview_fab" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_person_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/app_name"
+            app:backgroundTint="@color/purple_500"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/preview_fab"
+            app:layout_constraintEnd_toEndOf="@+id/preview_fab"
+            app:layout_constraintStart_toStartOf="@+id/preview_fab"
+            app:srcCompat="@drawable/shopping_cart"
+            app:tint="@color/white" />
+        <!--Action name text for the add person button-->
+        <TextView
+            android:id="@+id/add_person_action_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="S.Order Pending"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="@+id/add_person_fab"
+            app:layout_constraintEnd_toStartOf="@+id/add_person_fab"
+            app:layout_constraintTop_toTopOf="@+id/add_person_fab" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".SOActivity">
+
+            <ScrollView
+                android:id="@+id/scroll"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:fillViewport="true">
+
+                <RelativeLayout
+                    android:id="@+id/container"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_above="@+id/llbottom"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/llSOToolbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/activity_bg_color"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageButton
+                                android:id="@+id/imageButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.1"
+                                android:background="@null"
+                                android:onClick="GoBack"
+                                app:srcCompat="@drawable/ic_back_arrow" />
+
+                            <TextView
+                                android:id="@+id/tvCustomerName"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.6"
+                                android:fontFamily="@font/fabrica"
+                                android:text=""
+                                android:textColor="@color/black"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvDate"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.4"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                android:text=""
+                                android:textColor="@color/black"
+                                android:textStyle="bold" />
+
+                            <ImageButton
+                                android:id="@+id/imgBtn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.1"
+                                android:background="@null"
+                                app:srcCompat="@drawable/info" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fitsSystemWindows="true"
+                                android:paddingLeft="25dp"
+                                android:paddingTop="10dp"
+                                android:paddingRight="25dp"
+                                android:paddingBottom="10dp">
+
+                                <!--                <EditText-->
+                                <!--                    android:id="@+id/etItemSearchSOActivity"-->
+                                <!--                    android:layout_width="match_parent"-->
+                                <!--                    android:layout_height="wrap_content"-->
+                                <!--                    android:background="@drawable/et_roundedbox_bg"-->
+                                <!--                    android:padding="@dimen/edittextsearch_padding"-->
+
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/acvItemSearchSOActivity"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/et_roundedbox_bg"
+                                    android:padding="10dp"
+                                    android:singleLine="true"
+                                    android:textSize="16sp" />
+
+                                <!--                    android:singleLine="true"/>-->
+                                <!--android:paddingLeft="10px"-->
+                                <!--android:layout_height="80px"-->
+
+                                <ImageButton
+                                    android:id="@+id/imgBtnSearchClose"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginRight="20dp"
+                                    android:layout_toLeftOf="@+id/imgBtnSearchItem"
+                                    android:background="@null"
+                                    android:onClick="ClearSearch"
+                                    android:paddingTop="5dp"
+                                    android:paddingBottom="5dp"
+                                    android:src="@drawable/ic_baseline_close_24px" />
+
+                                <!--                android:layout_alignBottom="@+id/acvItemSearchSOActivity"-->
+
+                                <ImageButton
+                                    android:id="@+id/imgBtnSearchItem"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignRight="@+id/acvItemSearchSOActivity"
+                                    android:layout_alignBottom="@+id/acvItemSearchSOActivity"
+                                    android:layout_marginRight="5dp"
+                                    android:background="@null"
+                                    android:onClick="SearchItem"
+                                    android:paddingTop="5dp"
+                                    android:paddingBottom="5dp"
+                                    android:src="@drawable/ic_search" />
+
+                            </RelativeLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@color/activity_bg_color"
+                                android:orientation="vertical"
+                                android:padding="10dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="3">
+
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.5"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="#"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="2"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="Description"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.5"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:text="MRP"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:orientation="horizontal">
+
+                                    <!--.2 .3 .4 .1-->
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="Rate"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="left"
+                                        android:text="Batch Code"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:paddingRight="5px"
+                                        android:text="Quantity"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp" />
+
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:paddingRight="5px"
+                                        android:text="Disc%"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:paddingRight="5px"
+                                        android:text="Total"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:visibility="gone">
+
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:paddingLeft="5dp"
+                                        android:text="1"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.3"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="Combiflam 5ml Eye drops 1s"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="9999"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:orientation="horizontal">
+
+                                    <!--.2 .3 .4 .1-->
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="APPL-12"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="left"
+                                        android:text="9999"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:paddingRight="5px"
+                                        android:text="9999"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/raleway"
+                                        android:gravity="center"
+                                        android:paddingRight="5px"
+                                        android:text="23.2%"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.1"
+                                        android:fontFamily="@font/raleway"
+                                        android:gravity="center"
+                                        android:paddingRight="5px"
+                                        android:text="10.3%"
+                                        android:textColor="@color/black"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <!--android:stackFromBottom="true"-->
+
+                            <ListView
+                                android:id="@+id/lvProductlist"
+                                android:layout_width="match_parent"
+                                android:layout_height="470dp"
+                                android:layout_below="@+id/ll1"
+                                android:layout_marginBottom="15dp"
+                                android:transcriptMode="alwaysScroll" />
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+                </RelativeLayout>
+            </ScrollView>
+
+        </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <include layout="@layout/bottom_retail_so_sheet" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

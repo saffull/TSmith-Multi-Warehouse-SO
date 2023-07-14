@@ -12,10 +12,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_bg1">
 
-
-
-
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar1"
             android:layout_width="460dp"
@@ -39,16 +35,16 @@
                     android:textSize="35sp" />
 
                 <ImageButton
-                    android:id="@+id/imgBtnSettings"
+                    android:id="@+id/imgBtninfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="30dp"
                     android:layout_marginRight="30dp"
-                    android:background="@drawable/ic_settings"
+                    android:onClick="goToControllerVariables"
+                    android:background="@drawable/info"
                     android:clickable="true"
-                    android:focusable="true"
-                    android:visibility="invisible" />
+                    android:focusable="true" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 

@@ -37,6 +37,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.techsmith.mw_so.Global.AppWide;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -52,10 +53,10 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     TextView tvDeviceId, tvVersionName;
     EditText etUrlValue;
     TextView printer;
-    String myuniqueID, URL, printerName, printer_name,url;
+    String myuniqueID, URL, printerName, printer_name, url;
     SharedPreferences prefs;
     List<String> printList;
-    Button button;
+    AppWide appWide;
     private final Locale locale = new Locale("id", "ID");
     private final DateFormat df = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss a", locale);
     private final NumberFormat nf = NumberFormat.getCurrencyInstance(locale);
@@ -74,8 +75,11 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
         etUrlValue = findViewById(R.id.etUrlValue);
         tvVersionName = findViewById(R.id.tvAppVersionValue);
         printer = findViewById(R.id.printer);
+        appWide=AppWide.getInstance();
         // button = findViewById(R.id.button_bluetooth_browse);
         prefs = PreferenceManager.getDefaultSharedPreferences(Settings.this);
+        url = prefs.getString("MultiSOURL", "");
+        etUrlValue.setText(url);
 
         if (EasyPermissions.hasPermissions(this, permission)) {
 
@@ -119,27 +123,33 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
 
     public void SaveUrl(View view) {
         String temp = printer.getText().toString();
-       // if (!temp.isEmpty()) {
-            URL = etUrlValue.getText().toString().trim();
-            printerName = printer.getText().toString().trim();
-            if (!printList.contains(printerName))
-                printList.add(printerName);
-            else
-                System.out.println("Already in list");
-            SharedPreferences.Editor editor = prefs.edit();
-            //editor.putString("MultiSOStoredDevId", myuniqueID);
-            //editor.putString("MultiSOStoredDevId", "saffull@gmail.com");
-            firstTime = false;
-            editor.putString("MultiSOStoredDevId", "salam_ka@yahoo.com");
-            editor.putString("MultiSOURL", URL);
-            editor.putString("printer", printList.toString().trim());
-            editor.putString("printer_name", temp);
-            editor.putBoolean("firstTime", firstTime);
-            editor.apply();
+        // if (!temp.isEmpty()) {
+        URL = etUrlValue.getText().toString().trim();
+        printerName = printer.getText().toString().trim();
+        if (!printList.contains(printerName))
+            printList.add(printerName);
+        else
+            System.out.println("Already in list");
+        SharedPreferences.Editor editor = prefs.edit();
+        //editor.putString("MultiSOStoredDevId", myuniqueID);
+        //editor.putString("MultiSOStoredDevId", "saffull@gmail.com");
+        firstTime = false;
+        editor.putString("MultiSOStoredDevId", "salam_ka@yahoo.com");
+        editor.putString("MultiSOURL", URL);
+        editor.putString("printer", printList.toString().trim());
+        editor.putString("printer_name", temp);
+        editor.putBoolean("firstTime", firstTime);
+        editor.apply();
+        if (isValid(URL)){
             finish();
+            appWide.setAppUrl(URL);
             startActivity(new Intent(Settings.this, MainActivity.class));
+        }else{
+            Toast.makeText(Settings.this, "Invalid URL", Toast.LENGTH_LONG).show();
+        }
+
         //} else {
-          //  Toast.makeText(Settings.this, "Select a Printer", Toast.LENGTH_LONG).show();
+        //  Toast.makeText(Settings.this, "Select a Printer", Toast.LENGTH_LONG).show();
         //}
     }
 
@@ -192,7 +202,7 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     public void testPrint(View view) {
         if (isBluetoothEnabled()) {
             try {
-                String temp = "Test";
+                String temp = "Test Print";
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
                 } else {
@@ -239,5 +249,19 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
 
     public void cancelPage(View view) {
         finish();
+    }
+
+    public static boolean isValid(String url)
+    {
+        /* Try creating a valid URL */
+        try {
+            java.net.URL obj = new java.net.URL(url);
+            obj.toURI();
+            return true;
+        }
+        // while creating URL object
+        catch (Exception e) {
+            return false;
+        }
     }
 }

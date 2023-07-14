@@ -538,7 +538,7 @@ public class SOActivity extends AppCompatActivity {
                     einvoicePL.billNo = billnoList.get(i);
                     // einvoicePL.billNo="APPL/22/WS-236";
                     invDetailPL.add(einvoicePL);
-                    System.out.println(invDetailPL);
+                    System.out.println(invDetailPL);//4055055
                 }
 
                // einvoicePL.billId = "25148";
@@ -1076,7 +1076,6 @@ public class SOActivity extends AppCompatActivity {
                                     int[] to = {R.id.itemcode, R.id.name, R.id.batchcode, R.id.batchbarcode, R.id.location, R.id.uperpack, R.id.expiry, R.id.sysstock, R.id.currentsoh};
                                     arrayAdapter = new SOActivityArrayAdapter(SOActivity.this, R.layout.list_row, listSODetailPL,
                                             listSODetailPL.size(), detailList, total);
-                                    System.out.println("test came here -1\t listso size\t"+listSODetailPL.size());
                                     lvProductlist.setAdapter(arrayAdapter);
                                     arrayAdapter.notifyDataSetChanged();
                                     tvAmountValue.setText(String.format("%.2f", total));

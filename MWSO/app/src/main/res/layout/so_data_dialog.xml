@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/llCustInfoToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/activity_bg_color"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/fabrica"
+            android:text="Information"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnExit"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_cancel" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/border"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/controlInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:textColor="@color/black"
+            android:enabled="false"
+            android:gravity="start|top"
+            android:inputType="textMultiLine" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:fontFamily="@font/fabrica"
+            android:text="Work Flow Status"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:background="@color/grey"
+            android:backgroundTint="@color/grey"
+            android:text="Nothing"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <!--
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_margin="5dp"
+          android:background="@drawable/border"
+          android:orientation="horizontal">
+
+          <TextView
+              android:id="@+id/textView5"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="0.8"
+              android:padding="5dp"
+              android:text="Work Flow Status"
+              android:textColor="@color/colorBlackAlpha"
+              android:textSize="18sp"
+              android:textStyle="bold" />
+
+          <Button
+              android:id="@+id/button3"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1.2"
+              android:background="@color/new_blue"
+              android:text="Nothing" />
+      </LinearLayout>
+
+      <androidx.cardview.widget.CardView
+          android:id="@+id/card1"
+          android:layout_width="200dp"
+          android:layout_height="200dp"
+          android:layout_below="@+id/ll"
+          android:layout_gravity="center"
+          android:layout_marginTop="10dp"
+          app:cardBackgroundColor="@color/new_blue"
+          app:cardCornerRadius="20dp"
+          app:cardElevation="10dp"
+          app:cardMaxElevation="12dp"
+          app:cardPreventCornerOverlap="true"
+          app:cardUseCompatPadding="true">
+
+          <ImageView
+              android:id="@+id/btndelivery"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:layout_margin="10dp"
+              app:srcCompat="@drawable/shopping_cart" />
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="bottom|center_horizontal"
+              android:layout_marginTop="20dp"
+              android:layout_marginBottom="20dp"
+              android:fontFamily="@font/ukt"
+              android:gravity="center"
+              android:text="S.Order Pending"
+              android:textColor="@color/white"
+              android:textSize="18sp"
+              android:textStyle="bold" />
+      </androidx.cardview.widget.CardView>
+
+      <androidx.cardview.widget.CardView
+          android:id="@+id/card2"
+          android:layout_width="200dp"
+          android:layout_height="200dp"
+          android:layout_below="@+id/ll"
+          android:layout_gravity="center"
+          android:layout_marginTop="10dp"
+          app:cardBackgroundColor="@color/new_blue"
+          app:cardCornerRadius="20dp"
+          app:cardElevation="10dp"
+          app:cardMaxElevation="12dp"
+          app:cardPreventCornerOverlap="true"
+          app:cardUseCompatPadding="true">
+
+          <ImageView
+              android:id="@+id/coupons"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:layout_margin="10dp"
+              app:srcCompat="@drawable/ic_coupon" />
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="bottom|center_horizontal"
+              android:layout_marginTop="20dp"
+              android:layout_marginBottom="20dp"
+              android:fontFamily="@font/ukt"
+              android:gravity="center"
+              android:text="Coupons"
+              android:textColor="@color/white"
+              android:textSize="18sp"
+              android:textStyle="bold" />
+      </androidx.cardview.widget.CardView>-->
+
+
+</LinearLayout>

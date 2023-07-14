@@ -28,6 +28,8 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.techsmith.mw_so.Global.AppWide;
+import com.techsmith.mw_so.Global.GlobalClass;
 import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.UserPL;
 
@@ -43,11 +45,11 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     TextInputEditText etUsername, etPassword;
-    SharedPreferences prefs, prefsD;
+    SharedPreferences prefs, prefsD, appPref;
     ProgressDialog pDialog;
     Double tsMsgDialogWindowHeight;
     Boolean firstTime;
-    String username, password, Url, multiSOStoredDevId, strCheckLogin, strErrorMsg, secret = "";
+    String username, password, Url, multiSOStoredDevId, strCheckLogin, strErrorMsg, secret = "",className="";
     String[] permissions = {Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.BLUETOOTH_CONNECT};
@@ -57,11 +59,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // getSupportActionBar().hide();
+         className = this.getClass().getSimpleName();
+        System.out.println("Class Name is "+className);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screen_height = displayMetrics.heightPixels;
         int screen_width = displayMetrics.widthPixels;
         tsMsgDialogWindowHeight = Double.valueOf((screen_height * 38) / 100);
+        // Encode data on your side using BASE64
+        // encode with padding
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String str="admin1234";
+            String encoded = Base64.getEncoder().encodeToString(str.getBytes());
+            System.out.println("encoded value is " + encoded);
+        }
+
+
 
         Dexter.withContext(this)
                 .withPermissions(
@@ -124,6 +138,25 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, Settings.class));
     }
 
+    public void getInfo(View view) {
+        try {
+            AppWide appWide = AppWide.getInstance();
+            System.out.println(appWide.getCount());
+            appWide.setCount("new Count");
+            System.out.println(appWide.getCount());
+            appWide.setClassName(className);
+            String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
+                    "\nSubStore Id: " + appWide.getSubStoreId()+"\n className: "+appWide.getClassName();
+
+           /* String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + ((GlobalClass) getApplication()).getStoreCode() +
+                    "\nSubStore Id: " + ((GlobalClass) getApplication()).getSubStoreId();*/
+            popUp(msg);
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, "Data Controller Error", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
 
     private class CheckLoginTask extends AsyncTask<String, String, String> {
 
@@ -144,15 +177,19 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("Url used is " + Url);//https://tsmithy.in/somemouat/api/
             try {
 
-                secret = "1237124122119128125111115";
+                //secret = "1237124122119128125111115";
+                //secret = "1047109119116122626466";
                 //URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=salam_ka@yahoo.com&secret=1047109119116122626466");
-                URL url = new URL("https://tsmithy.in/somemouat/api/LoginVer2?Name=" + username + "&secret=" + secret);
+    //            URL url = new URL("https://tsmithy.in/dev/sbill/api/LoginVer2?Name=" + username + "&secret=" + secret);
+                //URL url = new URL(Url+ "LoginVer2?Name=" + username + "&secret=" + secret);
+                URL url = new URL(Url+ "LoginVer2?Name=" + username + "&secret=&pwd="+secret);
                 System.out.println(Url + "LoginVer2?Name=" + username + "&pwd=" + password);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(300000);
                 connection.setConnectTimeout(300000);
-                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
+                //connection.setRequestProperty("authkey", AppConfigSettings.auth_id);//SBRL1467-8950-4215-A5DC-AC04D7620B23
+                connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
                 connection.setRequestProperty("name", "");
                 connection.setRequestProperty("password", "");
                 connection.setRequestProperty("debugkey", "");
@@ -232,6 +269,31 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("billCard", "");
                         deletePrefData();
                         editor.apply();
+
+//second method
+                        ((GlobalClass) getApplication()).setStoreName(userPLObj.detail.get(0).storeName);
+                        ((GlobalClass) getApplication()).setSubStoreId(userPLObj.summary.subStoreId);
+                        ((GlobalClass) getApplication()).setStoreId(userPLObj.detail.get(0).storeId);
+                        ((GlobalClass) getApplication()).setStoreCode(userPLObj.detail.get(0).storeCode);
+
+                        /*third method,all variables grouped under a single preference
+                        "AppWide" is filename of the shared preferences. The second parameter is the operating mode.*/
+                        //appPref = getApplicationContext().getSharedPreferences("AppWide", 0); // 0 - for private mode
+                       // SharedPreferences.Editor appEditor = appPref.edit();
+                       // appEditor.putInt("subStoreId", userPLObj.summary.subStoreId);
+                       // appEditor.putString("storeId", userPLObj.detail.get(0).storeCode);
+                       // appEditor.putInt("billCash", userPLObj.detail.get(0).storeId);
+                        //appEditor.apply();
+
+                        //First method
+                        //((GlobalClass) getApplication()).getStoreCode(userPLObj.detail.get(0).storeCode);
+                        AppWide appWide = AppWide.getInstance();
+                        appWide.setMachineId(username.trim());
+                        appWide.setStoreName(userPLObj.detail.get(0).storeName);
+                        appWide.setStoreCode(userPLObj.detail.get(0).storeCode);
+                        appWide.setSubStoreId(userPLObj.summary.subStoreId);
+                        appWide.setStoreId(userPLObj.detail.get(0).storeId);
+                        appWide.setClassName(className);
                         startActivity(new Intent(MainActivity.this, Category.class));
 
                     } else {

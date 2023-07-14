@@ -20,4 +20,5 @@ public class Summary {
     public String pwd;
     public int pwdRequired;
     public int showApiLog;
+    public int subStoreId;
 }

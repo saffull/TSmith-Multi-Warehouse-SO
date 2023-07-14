@@ -152,6 +152,7 @@
         app:layout_constraintEnd_toStartOf="@id/invoice_fab"
         app:layout_constraintTop_toTopOf="@+id/invoice_fab" />
 
+   <!-- <include layout="@layout/appbar_custom"/>-->
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -178,19 +179,18 @@
                     <LinearLayout
                         android:id="@+id/llSOToolbar"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
                         android:background="@color/activity_bg_color"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="5dp">
 
                         <ImageButton
-                            android:id="@+id/imageButton"
+                            android:id="@+id/backBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.1"
                             android:background="@null"
-                            android:onClick="GoBack"
                             app:srcCompat="@drawable/ic_back_arrow" />
 
                         <TextView
@@ -213,6 +213,14 @@
                             android:text=""
                             android:textColor="@color/black"
                             android:textStyle="bold" />
+                        <ImageButton
+                            android:id="@+id/imgBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.1"
+                            android:visibility="gone"
+                            android:background="@null"
+                            app:srcCompat="@drawable/ic_dots" />
 
                     </LinearLayout>
 
@@ -230,14 +238,6 @@
                             android:paddingRight="25dp"
                             android:paddingBottom="10dp">
 
-                            <!--                <EditText-->
-                            <!--                    android:id="@+id/etItemSearchSOActivity"-->
-                            <!--                    android:layout_width="match_parent"-->
-                            <!--                    android:layout_height="wrap_content"-->
-                            <!--                    android:background="@drawable/et_roundedbox_bg"-->
-                            <!--                    android:padding="@dimen/edittextsearch_padding"-->
-
-
                             <AutoCompleteTextView
                                 android:id="@+id/acvItemSearchSOActivity"
                                 android:layout_width="match_parent"
@@ -247,9 +247,6 @@
                                 android:singleLine="true"
                                 android:textSize="16sp" />
 
-                            <!--                    android:singleLine="true"/>-->
-                            <!--android:paddingLeft="10px"-->
-                            <!--android:layout_height="80px"-->
 
                             <ImageButton
                                 android:id="@+id/imgBtnSearchClose"

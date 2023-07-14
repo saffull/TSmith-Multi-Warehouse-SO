@@ -142,7 +142,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.7"
-                android:hint="https://tsmithy.in/somemouat/api/"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
         </LinearLayout>
