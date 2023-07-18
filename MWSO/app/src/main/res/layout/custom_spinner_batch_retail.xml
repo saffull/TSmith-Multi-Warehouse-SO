@@ -8,34 +8,37 @@
         android:layout_height="wrap_content"
         android:background="@drawable/border"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="2"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="2">
+
             <TextView
                 android:id="@+id/pBatchCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
-                android:fontFamily="@font/fabrica"
-                android:padding="10dp"
                 android:layout_weight="1"
+                android:fontFamily="@font/ukt"
+                android:padding="10dp"
                 android:text="@string/app_name"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/pBatchExpiry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
+                android:fontFamily="@font/ukt"
                 android:gravity="end"
-                android:fontFamily="@font/fabrica"
                 android:padding="10dp"
                 android:text="@string/app_name"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
@@ -43,36 +46,14 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
         <LinearLayout
+            android:id="@+id/mainLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="3"
-            android:id="@+id/mainLL"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/pSOH"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/fabrica"
-                android:padding="10dp"
-                android:textAppearance="?attr/textAppearanceSubtitle2"
-                android:textColor="@color/black"
-                android:textSize="11sp" />
-            <TextView
-                android:id="@+id/pRate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/fabrica"
-                android:padding="10dp"
-                android:textAppearance="?attr/textAppearanceSubtitle2"
-                android:textColor="@color/black"
-                android:textSize="11sp" />
+            android:orientation="horizontal"
+            android:weightSum="3">
+
             <TextView
                 android:id="@+id/pMRP"
                 android:layout_width="wrap_content"
@@ -80,11 +61,38 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="2dp"
                 android:layout_weight="1"
-                android:fontFamily="@font/fabrica"
+                android:fontFamily="@font/ukt"
                 android:padding="10dp"
                 android:textAppearance="?attr/textAppearanceSubtitle2"
                 android:textColor="@color/black"
                 android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/pRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/ukt"
+                android:padding="10dp"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textColor="@color/black"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/pSOH"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/ukt"
+                android:padding="10dp"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textColor="@color/black"
+                android:textSize="11sp" />
+
 
         </LinearLayout>
     </LinearLayout>

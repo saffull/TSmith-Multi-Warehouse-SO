@@ -35,7 +35,6 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_truck"
         android:label="@string/app_name"
-        android:name=".Global.GlobalClass"
         android:largeHeap="true"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_truck_round"

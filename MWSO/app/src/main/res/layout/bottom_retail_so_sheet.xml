@@ -124,7 +124,7 @@
                 android:textSize="12sp" />
 
             <Button
-                android:id="@+id/btnSave"
+                android:id="@+id/btnSaveSO"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_margin="2dp"
@@ -133,7 +133,6 @@
                 android:drawableLeft="@drawable/ic_save"
                 android:drawablePadding="5dp"
                 android:fontFamily="@font/fabrica"
-                android:onClick="SaveSO"
                 android:paddingLeft="15dp"
                 android:text="SAVE"
                 android:textColor="@color/white"

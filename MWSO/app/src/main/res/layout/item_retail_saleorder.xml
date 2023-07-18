@@ -69,7 +69,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
-            android:gravity="center"
+            android:gravity="start"
             android:textColor="@color/black"
             app:drawableStartCompat="@drawable/ic_edit" />
 
@@ -89,8 +89,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
-            android:gravity="right"
-            android:paddingRight="30px"
+            android:gravity="end"
+            android:paddingRight="5dp"
             android:text="QTY"
             android:textColor="#152E61" />
 

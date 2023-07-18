@@ -29,8 +29,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.techsmith.mw_so.Global.AppWide;
-import com.techsmith.mw_so.Global.GlobalClass;
-import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.UserPL;
 
 import java.io.BufferedReader;
@@ -38,10 +36,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     TextInputEditText etUsername, etPassword;
@@ -141,15 +137,14 @@ public class MainActivity extends AppCompatActivity {
     public void getInfo(View view) {
         try {
             AppWide appWide = AppWide.getInstance();
-            System.out.println(appWide.getCount());
-            appWide.setCount("new Count");
-            System.out.println(appWide.getCount());
-            appWide.setClassName(className);
-            String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
-                    "\nSubStore Id: " + appWide.getSubStoreId()+"\n className: "+appWide.getClassName();
 
-           /* String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + ((GlobalClass) getApplication()).getStoreCode() +
+            /* String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
+                    "\nSubStore Id: " + appWide.getSubStoreId();
+
+           String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + ((GlobalClass) getApplication()).getStoreCode() +
                     "\nSubStore Id: " + ((GlobalClass) getApplication()).getSubStoreId();*/
+            String msg = "Store Name:" +  appWide.getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
+                    "\nSubStore Id: " + appWide.getSubStoreId();
             popUp(msg);
         } catch (Exception e) {
             Toast.makeText(MainActivity.this, "Data Controller Error", Toast.LENGTH_SHORT).show();
@@ -270,11 +265,7 @@ public class MainActivity extends AppCompatActivity {
                         deletePrefData();
                         editor.apply();
 
-//second method
-                        ((GlobalClass) getApplication()).setStoreName(userPLObj.detail.get(0).storeName);
-                        ((GlobalClass) getApplication()).setSubStoreId(userPLObj.summary.subStoreId);
-                        ((GlobalClass) getApplication()).setStoreId(userPLObj.detail.get(0).storeId);
-                        ((GlobalClass) getApplication()).setStoreCode(userPLObj.detail.get(0).storeCode);
+//second meth
 
                         /*third method,all variables grouped under a single preference
                         "AppWide" is filename of the shared preferences. The second parameter is the operating mode.*/
@@ -293,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
                         appWide.setStoreCode(userPLObj.detail.get(0).storeCode);
                         appWide.setSubStoreId(userPLObj.summary.subStoreId);
                         appWide.setStoreId(userPLObj.detail.get(0).storeId);
-                        appWide.setClassName(className);
                         startActivity(new Intent(MainActivity.this, Category.class));
 
                     } else {

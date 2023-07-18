@@ -46,9 +46,10 @@ import java.util.Locale;
 
 public class RetailSOActivityArrayAdapter extends ArrayAdapter {
     Context context, appContext;
-    Double productTotal, pRate, total = 0.0;
+    Double productTotal, pRate, total = 0.0, prevTotal = 0.0;
     int selectedPos, prevBCodepPOS;
     public ArrayList<SaveProductSOPL> sList;
+    RetailSOActivityArrayAdapter arrayAdapter;
     ArrayList<AllocateQtyPL> itemArraylist;
     AllocateQtyPL itemDetail;
     List<AllocateQtyPL> listSODetailPL;
@@ -81,6 +82,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         this.batchSOH = batchSOH;
         this.selectedPos = selectedPos;
         this.pID = itemCode;
+
     }
 
     @NonNull
@@ -115,11 +117,11 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                 tvmrp.setText(String.valueOf(sList.get(position).batchMrp));
                 tvMrp.setText(String.valueOf(sList.get(position).Rate));
                 tvQty.setText(String.valueOf(sList.get(position).qty));
-                tvQty.setText(String.valueOf(sList.get(position).batchCode));
+                editQty.setText(String.valueOf(sList.get(position).batchCode));
                 tvRate.setText(String.valueOf(sList.get(position).SOH));
                 double d = Double.parseDouble(sList.get(position).pTotal);
-                tvTotal.setText(sList.get(position).pTotal);
-                //tvTotal.setText( decfor.format(d));
+                //tvTotal.setText(sList.get(position).pTotal);
+                tvTotal.setText(decfor.format(d));
                 tvFreeQty.setText(String.valueOf(sList.get(position).Disc) + "%");
 
             } catch (Exception e) {
@@ -137,11 +139,22 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                             @Override
                             public void onClick(DialogInterface dialog, int arg1) {
                                 productTotal = productTotal - Double.parseDouble(sList.get(position).pTotal);
+                                //((RetailSOActivity) context).productTotal = productTotal;
                                 sList.remove(position);
                                 ((RetailSOActivity) context).sList = sList;
+                                // callItemTotal();
+                                ((RetailSOActivity) context).productTotal = productTotal;
+                                System.out.println("save list size is " + ((RetailSOActivity) context).sList.size());
+                                gson = new Gson();
+                                ((RetailSOActivity) context).formedSO = gson.toJson(((RetailSOActivity) context).sList);
+                                System.out.println("Formed json in Adapter class is  " +  ((RetailSOActivity) context).formedSO);
                                 RetailSOActivityArrayAdapter arrayAdapter = new RetailSOActivityArrayAdapter(context,
                                         R.layout.list_row, productTotal, listSODetailPL, itemArraylist, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext, selectedPos, pID);
                                 ((RetailSOActivity) context).lvProductlist.setAdapter(arrayAdapter);
+                                if (sList.size() == 0) {
+                                    productTotal = 0.00;
+                                    ((RetailSOActivity) context).productTotal = 0.0;
+                                }
                                 ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
                                 arrayAdapter.notifyDataSetChanged();
 
@@ -166,8 +179,8 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
             editQty.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // new GetItemDetailsTask().execute();
-                    System.out.println("Clicked position is " + position);
+                    prevTotal = Double.parseDouble(sList.get(position).pTotal);
+                    System.out.println("Current total is " + position);
                     callDialog(position);
                 }
             });
@@ -182,11 +195,6 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
     }
 
     private void callDialog(int position) {
-        tempbatchList = new ArrayList<>();
-        for (int j = 0; j < sList.size(); j++) {
-            System.out.println(sList.size() + " <--------------------> " + sList.get(j).batchCode);
-            tempbatchList.add(sList.get(j).batchCode);
-        }
 
         qtydialog = new Dialog(context);
         qtydialog.setContentView(R.layout.quantity_retail_selection_dialogwindow);
@@ -204,7 +212,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         pTotal.setText(sList.get(position).pTotal);
         tvSelectedItemName.setText(sList.get(position).pName);
         TextView tvSelectedItemCode = qtydialog.findViewById(R.id.tvSelectedItemCode);
-        tvSelectedItemCode.setText("Product Code: "+ sList.get(position).pCode);
+        tvSelectedItemCode.setText("Product Code: " + sList.get(position).pCode);
         temppCode = sList.get(position).pCode;
         TextView tvItemSOH = qtydialog.findViewById(R.id.tvItemSOH);
         tvItemSOH.setText("SOH: " + sList.get(position).SOH);
@@ -286,7 +294,6 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 tempBCode = batchCode.get(i);
-                System.out.println(tempBCode);
 
                 for (int j = 0; j < sList.size(); j++) {
                     if (sList.get(j).pID.equalsIgnoreCase(pID)) {
@@ -332,10 +339,10 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                 btnAddItem_qtySelection.setEnabled(true);
                 double d = 0.0, disc = 0.0, temp;
                 if (!etQty.getText().toString().isEmpty()) {
-                    sList.get(prevBCodepPOS).qty=etQty.getText().toString();
+                    sList.get(position).qty = etQty.getText().toString();
                     if (!discPer.getText().toString().isEmpty()) {
+                        sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
                         if (Double.parseDouble(discPer.getText().toString()) > 0) {
-                            System.out.println("Came here 2");
                             disc = Double.parseDouble(discPer.getText().toString()) / 100;
                             d = pRate * Double.parseDouble(etQty.getText().toString());
                             temp = disc * d;
@@ -347,7 +354,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                             //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
                             pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
                         } else {
-                            System.out.println("Came here 1");
+
                             d = d + (pRate * Double.parseDouble(etQty.getText().toString()));
                             tempTotal = String.valueOf(round(d, 2));
                             ptotal = tempTotal;
@@ -356,7 +363,6 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                             pTotal.setText(decfor.format(d));
                         }
                     } else {
-                        System.out.println("Came here 3");
                         d = pRate * Double.parseDouble(etQty.getText().toString());
 
                         tempTotal = String.valueOf(round(d, 2));
@@ -376,35 +382,30 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
             }
         });
 
+
         btnAddItem_qtySelection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(discPer.getText().toString());
+
+                sList.get(position).pTotal = tempTotal;
+                productTotal = productTotal - prevTotal;
+                System.out.println("Value 1 " + productTotal);
                 productTotal = productTotal + Double.parseDouble(tempTotal);
-                System.out.println("Total Product Total 1 is " + productTotal);
-                ((RetailSOActivity) context).tvAmountValue.setText(String.valueOf(productTotal));
+                System.out.println("Value 2 " + productTotal);
+                ((RetailSOActivity) context).productTotal = productTotal;
+                System.out.println("Total Product Total after Edit is  " + productTotal);
+                ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
                 try {
 
                     gson = new Gson();
                     String temp = gson.toJson(sList.toString());
                     System.out.println("New SList is " + temp);
 
-                 /*   if (tempbatchList.contains(tempBCode))
-                        System.out.println("Duplicate batch code");
-                    else {
-                        System.out.println("No duplicates.. Adding New Batch mCode");
-                        RetailSOActivityArrayAdapter arrayAdapter = new RetailSOActivityArrayAdapter(context,
-                                R.layout.list_row, productTotal, listSODetailPL, itemArraylist, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext, selectedPos, pID);
-                        ((RetailSOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                        ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
-                        arrayAdapter.notifyDataSetChanged();
-                        qtydialog.cancel();
-                    }*/
 
-                    RetailSOActivityArrayAdapter arrayAdapter = new RetailSOActivityArrayAdapter(context,
+                    arrayAdapter = new RetailSOActivityArrayAdapter(context,
                             R.layout.list_row, productTotal, listSODetailPL, itemArraylist, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext, selectedPos, pID);
                     ((RetailSOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                    ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
+                    // ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
                     arrayAdapter.notifyDataSetChanged();
                     qtydialog.cancel();
                 } catch (Exception e) {
@@ -434,15 +435,29 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         return bd.doubleValue();
     }
 
-    private void callItemList(int position) {
+    private void callItemTotal() {
+        double CurrentproductTotal = 0.0;
         try {
-            itemArraylist.remove(itemArraylist.size() - 1);
-            itemDetail = itemArraylist.get(position);
+            for (int i = 0; i < sList.size(); i++) {
+                CurrentproductTotal = CurrentproductTotal + (Double.parseDouble(sList.get(i).qty) * sList.get(i).Rate);
+            }
+            System.out.println("Current Total value is " + CurrentproductTotal);
+            productTotal = CurrentproductTotal;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("SOActivityAdapter)");
         }
 
     }
 
 }
+    /*   if (tempbatchList.contains(tempBCode))
+                        System.out.println("Duplicate batch code");
+                    else {
+                        System.out.println("No duplicates.. Adding New Batch mCode");
+                        RetailSOActivityArrayAdapter arrayAdapter = new RetailSOActivityArrayAdapter(context,
+                                R.layout.list_row, productTotal, listSODetailPL, itemArraylist, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext, selectedPos, pID);
+                        ((RetailSOActivity) context).lvProductlist.setAdapter(arrayAdapter);
+                        ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
+                        arrayAdapter.notifyDataSetChanged();
+                        qtydialog.cancel();
+                    }*/

@@ -20,6 +20,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,7 +54,7 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     TextView tvDeviceId, tvVersionName;
     EditText etUrlValue;
     TextView printer;
-    String myuniqueID, URL, printerName, printer_name, url;
+    String myuniqueID, URL, printerName, printer_name, url, roundingPermsn = "No";
     SharedPreferences prefs;
     List<String> printList;
     AppWide appWide;
@@ -65,6 +66,7 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     public static final String ACTION_APPLICATION_DETAILS_SETTINGS = "android.settings.APPLICATION_DETAILS_SETTINGS";
     public static final String[] BLUETOOTH_PERMISSIONS_S = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
     String permission = Manifest.permission.BLUETOOTH_CONNECT;
+    private CheckBox roundingBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +77,17 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
         etUrlValue = findViewById(R.id.etUrlValue);
         tvVersionName = findViewById(R.id.tvAppVersionValue);
         printer = findViewById(R.id.printer);
-        appWide=AppWide.getInstance();
+        roundingBox = findViewById(R.id.roundingBox);
+        appWide = AppWide.getInstance();
         // button = findViewById(R.id.button_bluetooth_browse);
         prefs = PreferenceManager.getDefaultSharedPreferences(Settings.this);
         url = prefs.getString("MultiSOURL", "");
         etUrlValue.setText(url);
+        roundingPermsn = prefs.getString("roundingPermsn", "No");
+        if (roundingPermsn.equalsIgnoreCase("Yes"))
+            roundingBox.setChecked(true);
+        else
+            roundingBox.setChecked(false);
 
         if (EasyPermissions.hasPermissions(this, permission)) {
 
@@ -134,17 +142,23 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
         //editor.putString("MultiSOStoredDevId", myuniqueID);
         //editor.putString("MultiSOStoredDevId", "saffull@gmail.com");
         firstTime = false;
+
         editor.putString("MultiSOStoredDevId", "salam_ka@yahoo.com");
         editor.putString("MultiSOURL", URL);
         editor.putString("printer", printList.toString().trim());
         editor.putString("printer_name", temp);
         editor.putBoolean("firstTime", firstTime);
+        if (roundingPermsn.equalsIgnoreCase("Yes"))
+            editor.putString("roundingPermsn", "Yes");
+        else
+            editor.putString("roundingPermsn", "No");
+
         editor.apply();
-        if (isValid(URL)){
+        if (isValid(URL)) {
             finish();
             appWide.setAppUrl(URL);
             startActivity(new Intent(Settings.this, MainActivity.class));
-        }else{
+        } else {
             Toast.makeText(Settings.this, "Invalid URL", Toast.LENGTH_LONG).show();
         }
 
@@ -251,8 +265,7 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
         finish();
     }
 
-    public static boolean isValid(String url)
-    {
+    public static boolean isValid(String url) {
         /* Try creating a valid URL */
         try {
             java.net.URL obj = new java.net.URL(url);

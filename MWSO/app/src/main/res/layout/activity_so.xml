@@ -134,7 +134,6 @@
         android:contentDescription="@string/app_name"
         app:backgroundTint="@color/purple_500"
         app:fabSize="mini"
-        android:onClick="takeInvoice"
         app:layout_constraintBottom_toTopOf="@+id/email_fab"
         app:layout_constraintEnd_toEndOf="@+id/email_fab"
         app:layout_constraintStart_toStartOf="@+id/email_fab"

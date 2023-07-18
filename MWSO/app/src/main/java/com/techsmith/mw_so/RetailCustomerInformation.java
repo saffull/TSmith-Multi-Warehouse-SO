@@ -26,13 +26,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,16 +38,11 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.Global.AppWide;
-import com.techsmith.mw_so.Global.GlobalClass;
-import com.techsmith.mw_so.e_invoice.InvResponse;
 import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.RetailCustomerData;
 import com.techsmith.mw_so.retail_utils.RetailCustomerResponse;
 import com.techsmith.mw_so.retail_utils.RetailReplyData;
-import com.techsmith.mw_so.utils.AppConfigSettings;
-import com.techsmith.mw_so.utils.AutocompleteCustomArrayAdapter;
 import com.techsmith.mw_so.utils.AutocompleteRetailCustomArrayAdapter;
-import com.techsmith.mw_so.utils.CustomerList;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -64,17 +57,18 @@ import java.util.UUID;
 
 public class RetailCustomerInformation extends AppCompatActivity {
     AutoCompleteTextView acvLcardNo, acvmobileNo, acvCustomerName;
+    List<AutoCompleteTextView> autoCompleteTextViewList;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+    List<EditText> editTextList;
     EditText etCustomerAdrs, place, pincode, gstno, cardType, etCustomerGoogleAdrs, cEmail, latLong;
-    Button btnCreateSO;
     ImageView btnSOReport;
     AlertDialog.Builder builder;
     AlertDialog alertDialog;
     Gson gson;
     String Url, strCustomer, strErrorMsg, editData = "", LoyaltyCardType = "", uniqueID, sendTestData = "",
             selectedCustomerName, LoyaltyCode = "", LoyaltyId = "", LoyaltyCardTypeDesc = "", cLatitude = "",
-            cLongitude = "", strfromweb = "", strerrormsg = "",className="";
+            cLongitude = "", strfromweb = "", strerrormsg = "", className = "";
     ProgressDialog pDialog;
     ImageButton imgBtnCustSearchbyName, imgBtnCustSearchbyCardNo;
     List<RetailCustomerData> retailCustomerData;
@@ -83,7 +77,7 @@ public class RetailCustomerInformation extends AppCompatActivity {
     RetailCustomerResponse customerResponse;
     FloatingActionButton mAddAlarmFab, mAddPersonFab, email_fab, invoice_fab, preview_fab;
     ExtendedFloatingActionButton mAddFab;
-    Boolean isAllFabsVisible, isPrint;
+    Boolean isAllFabsVisible;
     RetailReplyData rcData;
     AppWide appWide;
 
@@ -93,10 +87,9 @@ public class RetailCustomerInformation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retail_customer_information);
         prefs = PreferenceManager.getDefaultSharedPreferences(RetailCustomerInformation.this);
-         appWide = AppWide.getInstance();
-        className = this.getClass().getSimpleName();
-        appWide.setClassName(className);
-        System.out.println("Class Name is "+className);
+        appWide = AppWide.getInstance();
+        editTextList = new ArrayList<>();
+        autoCompleteTextViewList = new ArrayList<>();
         etCustomerAdrs = findViewById(R.id.etCustomerAdrs);
         place = findViewById(R.id.place);
         pincode = findViewById(R.id.pincode);
@@ -117,10 +110,8 @@ public class RetailCustomerInformation extends AppCompatActivity {
         initializeFab();
 
 
-       Url = prefs.getString("MultiSOURL", "");
+        Url = prefs.getString("MultiSOURL", "");
         reInitialize();
-
-
         uniqueID = UUID.randomUUID().toString();
 
         btnSOReport.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +120,7 @@ public class RetailCustomerInformation extends AppCompatActivity {
                 try {
                     AppWide appWide = AppWide.getInstance();
                     String msg = "Store Name:" + appWide.getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
-                            "\nSubStore Id: " + appWide.getSubStoreId()+"\n Class Name: "+appWide.getClassName();
+                            "\nSubStore Id: " + appWide.getSubStoreId();
                     popUp(msg);
                 } catch (Exception e) {
                     Toast.makeText(RetailCustomerInformation.this, "Data Controller Error", Toast.LENGTH_SHORT).show();
@@ -227,12 +218,10 @@ public class RetailCustomerInformation extends AppCompatActivity {
                     String selectedCustomer = (String) parent.getItemAtPosition(pos);
                     selectedCustomerName = customerResponse.data.get(pos).cName;
                     //etCustomerAdrs.setText(customerResponse.data.get(pos).cGoogleAddress);
-                    //appWide.setName(selectedCustomerName);
-                    ((GlobalClass) getApplication()).setName(selectedCustomerName);
+                    appWide.setName(selectedCustomerName);
                     System.out.println("RcData is " + selectedCustomerName);
                     LoyaltyCode = customerResponse.data.get(pos).cLoyaltyCode;
-                    //appWide.setLoyaltyCode(LoyaltyCode);
-                    ((GlobalClass) getApplication()).setLoyaltyCode(LoyaltyCode);
+                    appWide.setLoyaltyCode(LoyaltyCode);
                     LoyaltyCardTypeDesc = customerResponse.data.get(pos).cLoyaltyCardTypeDesc;
                     LoyaltyId = String.valueOf(customerResponse.data.get(pos).cLoyaltyId);
                     acvLcardNo.setText(customerResponse.data.get(pos).cLoyaltyCode);
@@ -345,6 +334,15 @@ public class RetailCustomerInformation extends AppCompatActivity {
     }
 
     private void initializeFab() {
+        editTextList.add(etCustomerAdrs);
+        editTextList.add(place);
+        editTextList.add(pincode);
+        editTextList.add(gstno);
+        editTextList.add(cardType);
+        editTextList.add(etCustomerGoogleAdrs);
+        autoCompleteTextViewList.add(acvLcardNo);
+        autoCompleteTextViewList.add(acvmobileNo);
+        autoCompleteTextViewList.add(acvCustomerName);
         mAddAlarmFab.setVisibility(View.GONE);
         addAlarmActionText.setVisibility(View.GONE);
         // make the boolean variable as false, as all the
@@ -383,14 +381,19 @@ public class RetailCustomerInformation extends AppCompatActivity {
     }
 
     public void ClearAll(View view) {
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
+        for (int i = 0; i < editTextList.size(); i++) {
+            editTextList.get(i).setText("");
+        }
+        for (int i = 0; i < autoCompleteTextViewList.size(); i++) {
+            autoCompleteTextViewList.get(i).setText("");
+            autoCompleteTextViewList.get(i).setAdapter(null);
+        }
     }
 
     public void CreateSO(View view) {
         if (!acvCustomerName.getText().toString().isEmpty())
-            startActivity(new Intent(RetailCustomerInformation.this, RetailSOActivity.class));
+            //startActivity(new Intent(RetailCustomerInformation.this, RetailSOActivity.class));
+            startSave();
         else
             Toast.makeText(RetailCustomerInformation.this, "Select a Customer", Toast.LENGTH_LONG).show();
     }
@@ -459,7 +462,6 @@ public class RetailCustomerInformation extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            System.out.println("came here");
             pDialog = new ProgressDialog(RetailCustomerInformation.this);
             pDialog.setMessage("Loading Retail Customers...");
             pDialog.setCancelable(false);
@@ -468,17 +470,16 @@ public class RetailCustomerInformation extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            //https://tsmithy.in/somemouat/api/GetCustomer?name=m%20g%20medic
-            //https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=salam
+
             editData = acvCustomerName.getText().toString().trim();
             if (editData.isEmpty())
                 editData = acvLcardNo.getText().toString().trim();
             System.out.println("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
-            System.out.println(Url+"getcustomerlookup?name=" + editData);
+            System.out.println(Url + "getcustomerlookup?name=" + editData);
             try {
                 //URL url = new URL(Url + "GetCustomer?name=" + acvCustomerName.getText().toString().trim());
                 //URL url = new URL("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
-                URL url = new URL(Url+"getcustomerlookup?name=" + editData);
+                URL url = new URL(Url + "getcustomerlookup?name=" + editData);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setReadTimeout(300000);
@@ -576,7 +577,6 @@ public class RetailCustomerInformation extends AppCompatActivity {
     }
 
     private String getAddress(double latitude, double longitude) {
-        System.out.println(latitude + "\n" + longitude);
         Geocoder geocoder;
         List<Address> addresses;
         String address = "";
@@ -659,7 +659,7 @@ public class RetailCustomerInformation extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             try {
 
-                URL url = new URL("https://tsmithy.in/dev/sbill/api/SaveDevCustInfo");
+                URL url = new URL(Url +"SaveDevCustInfo");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setReadTimeout(15000);
@@ -717,7 +717,8 @@ public class RetailCustomerInformation extends AppCompatActivity {
                 //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
                 APIResponse apiResponse = gson.fromJson(s, APIResponse.class);
                 if (apiResponse.statusFlag == 0) {
-                    tsMessages("Saved Sucessfully");
+                    //tsMessages("Saved Sucessfully");
+                    startActivity(new Intent(RetailCustomerInformation.this, RetailSOActivity.class));
                 } else {
                     tsMessages(apiResponse.errorMessage);
                 }

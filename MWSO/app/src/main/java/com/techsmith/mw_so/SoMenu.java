@@ -1,9 +1,6 @@
 package com.techsmith.mw_so;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,33 +9,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
-import com.dantsu.escposprinter.EscPosPrinter;
-import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
-import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.techsmith.mw_so.Expandable.CourseAdapter;
-import com.techsmith.mw_so.Expandable.MyExpandableListAdapter;
 import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
 import com.techsmith.mw_so.Global.AppWide;
-import com.techsmith.mw_so.Global.GlobalClass;
 import com.techsmith.mw_so.Model.CardModel;
 
 
@@ -50,7 +36,7 @@ public class SoMenu extends AppCompatActivity {
     ExpandableListAdapter expandableListAdapter;
     SharedPreferences myPrefs;
     SharedPreferences.Editor editor;
-    String storeName="Test NAme",className="";
+    String storeName = "Test NAme", className = "";
 
 
     private RecyclerView courseRV;
@@ -70,14 +56,13 @@ public class SoMenu extends AppCompatActivity {
         setContentView(R.layout.activity_so_menu);
         courseRV = findViewById(R.id.my_recycler_view);
         myPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        System.out.println(((GlobalClass) getApplication()).getStoreCode()+"<------------ global name \n----------->Local Name"+storeName);
         editor = myPrefs.edit();
         editor.remove("cardSave");
         editor.remove("cashSave");
         editor.apply();
         startData();
         className = this.getClass().getSimpleName();
-        System.out.println("Class Name is "+className);
+        System.out.println("Class Name is " + className);
         courseAdapter = new CourseAdapter(this, courseModelArrayList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
@@ -206,10 +191,8 @@ public class SoMenu extends AppCompatActivity {
     public void goToControllerVariables(View view) {
         try {
             AppWide appWide = AppWide.getInstance();
-            appWide.setClassName(className);
-            System.out.println(appWide.getCount());
-            String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
-                    "\nSubStore Id: " + appWide.getSubStoreId()+"\n className: "+appWide.getClassName();
+            String msg = "Store Name:" + appWide.getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
+                    "\nSubStore Id: " + appWide.getSubStoreId();
            /* String msg = "Store Name:" +   ((GlobalClass) getApplication()).getStoreName() + "\n Store Code:" + ((GlobalClass) getApplication()).getStoreCode() +
                     "\nSubStore Id: " + ((GlobalClass) getApplication()).getSubStoreId();*/
             popUp(msg);
