@@ -262,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("billTotal", "0.0");
                         editor.putString("billCash", "");
                         editor.putString("billCard", "");
+                        editor.putString("cceId", String.valueOf(userPLObj.summary.cceId));
                         deletePrefData();
                         editor.apply();
 

@@ -18,6 +18,10 @@ public class AppWide {
     private String authID="SBRL1467-8950-4215-A5DC-AC04D7620B23";
     private String appUrl="";
     private String Rounding;
+    private String MOBILENO;
+    private String AREA;
+    private String STATE;
+    private  String ADDRESS;
 
 
     public int getStoreId() {
@@ -113,5 +117,37 @@ public class AppWide {
 
     public void setRounding(String rounding) {
         Rounding = rounding;
+    }
+
+    public String getMOBILENO() {
+        return MOBILENO;
+    }
+
+    public void setMOBILENO(String MOBILENO) {
+        this.MOBILENO = MOBILENO;
+    }
+
+    public String getAREA() {
+        return AREA;
+    }
+
+    public void setAREA(String AREA) {
+        this.AREA = AREA;
+    }
+
+    public String getSTATE() {
+        return STATE;
+    }
+
+    public void setSTATE(String STATE) {
+        this.STATE = STATE;
+    }
+
+    public String getADDRESS() {
+        return ADDRESS;
+    }
+
+    public void setADDRESS(String ADDRESS) {
+        this.ADDRESS = ADDRESS;
     }
 }

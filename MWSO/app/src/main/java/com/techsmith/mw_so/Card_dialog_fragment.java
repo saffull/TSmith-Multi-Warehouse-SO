@@ -241,6 +241,7 @@ public class Card_dialog_fragment extends DialogFragment {
                 cardname = cName.getText().toString().trim();
                 cardno = cardNo.getText().toString();
                 cardTotal = crdAmount.getText().toString().trim();
+                System.out.println("Current Amount is "+cardTotal);
                 issuingbank = iB.getText().toString().trim();
                 swipingid = smID.getText().toString().trim();
                 remarks_card = remarks.getText().toString();

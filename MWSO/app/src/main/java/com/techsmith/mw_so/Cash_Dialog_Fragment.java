@@ -105,9 +105,9 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                         popUp("cash field empty");
                     } else {
                         dd = Double.parseDouble(cash);
-                        if (dd > total) {
-                            popUp("Please Check the amount again..!!");
-                        } else {
+                      //  if (dd > total) {
+                        //    popUp("Please Check the amount again..!!");
+                      //  } else {
                             paymentList = new PaymentList();
                             paymentList.cashAmount = cash;
                             paymentList.cashRemarks = remarks;
@@ -120,7 +120,7 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                             ((PaymentMenu) getActivity()).updateCashAmount(cash);
                             ((PaymentMenu) getActivity()).updateList(cash, "user_cash", cardno);
                             dismiss();
-                        }
+                       // }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -153,12 +153,20 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                 double temp = 0.0;
                 temp = Double.parseDouble(((PaymentMenu) getActivity()).cardAmt.getText().toString());
                 if (temp == 0.0) {
-                    cashAmount.setText(tempTotal);
+                    String string = tempTotal;
+                    String[] parts = string.split("\\.");
+                    String part1 = parts[0]; // 004
+                    String part2 = parts[1]; // 034556
+                    cashAmount.setText(part1);
 
                 } else {
                     double bal = 0.0;
                     bal = Double.parseDouble(tempTotal) - Double.parseDouble(((PaymentMenu) getActivity()).cardAmt.getText().toString());
-                    cashAmount.setText(String.format("%.2f", bal));
+                    String string = String.valueOf(bal);
+                    String[] parts = string.split("\\.");
+                    String part1 = parts[0]; // 004
+                    String part2 = parts[1]; // 034556
+                    cashAmount.setText(part1);
                 }
             }
         });

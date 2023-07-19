@@ -19,4 +19,31 @@ public class SaveProductSOPL {
     public String qty;
     public String pTotal;
     public double Disc;
+
+    //Main Json
+
+    public int ITEMID;
+
+    public int ITEMCODE;
+
+    public String ITEMNAME;
+
+    public String HSNCODE;
+
+    public String BATCHCODE;
+
+    public int BATCHID;
+
+    public String BATCHEXPIRY;
+
+    public double MRP;
+
+    public double RATE;
+
+    public int PACKQTY;
+
+    public int DISCPER;
+
+    public String DISCCODE;
+
 }

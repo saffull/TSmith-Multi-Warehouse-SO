@@ -339,9 +339,9 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                 btnAddItem_qtySelection.setEnabled(true);
                 double d = 0.0, disc = 0.0, temp;
                 if (!etQty.getText().toString().isEmpty()) {
-                    sList.get(position).qty = etQty.getText().toString();
+                    ((RetailSOActivity) context).sList.get(position).qty = etQty.getText().toString();
                     if (!discPer.getText().toString().isEmpty()) {
-                        sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
+                        ((RetailSOActivity) context).sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
                         if (Double.parseDouble(discPer.getText().toString()) > 0) {
                             disc = Double.parseDouble(discPer.getText().toString()) / 100;
                             d = pRate * Double.parseDouble(etQty.getText().toString());
@@ -387,7 +387,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
             @Override
             public void onClick(View view) {
 
-                sList.get(position).pTotal = tempTotal;
+                ((RetailSOActivity) context).sList.get(position).pTotal = tempTotal;
                 productTotal = productTotal - prevTotal;
                 System.out.println("Value 1 " + productTotal);
                 productTotal = productTotal + Double.parseDouble(tempTotal);
@@ -397,8 +397,10 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                 ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
                 try {
 
+
                     gson = new Gson();
-                    String temp = gson.toJson(sList.toString());
+                    String temp = gson.toJson(sList);
+                    ((RetailSOActivity) context).formedSO=temp;
                     System.out.println("New SList is " + temp);
 
 

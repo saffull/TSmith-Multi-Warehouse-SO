@@ -51,13 +51,22 @@ import com.techsmith.mw_so.e_invoice.EinvoicePL;
 import com.techsmith.mw_so.e_invoice.IRNAdapter;
 import com.techsmith.mw_so.e_invoice.InvResponse;
 import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
+import com.techsmith.mw_so.payment_util.PaymentList;
+import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.AutoCompleteRetailProductCustomAdapter;
 import com.techsmith.mw_so.retail_utils.BatchRetailResponse;
+import com.techsmith.mw_so.retail_utils.CUSTOMERDETAIL;
+import com.techsmith.mw_so.retail_utils.DETAIL;
+import com.techsmith.mw_so.retail_utils.ITEM;
+import com.techsmith.mw_so.retail_utils.PAYDETAIL;
+import com.techsmith.mw_so.retail_utils.PAYMENT;
+import com.techsmith.mw_so.retail_utils.PAYSUMMARY;
 import com.techsmith.mw_so.retail_utils.ProductRetailResponse;
 import com.techsmith.mw_so.retail_utils.RetailReplyData;
 import com.techsmith.mw_so.retail_utils.RetailSOActivityArrayAdapter;
 import com.techsmith.mw_so.retail_utils.SaveProductSO;
 import com.techsmith.mw_so.retail_utils.SaveProductSOPL;
+import com.techsmith.mw_so.retail_utils.Summary;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
 import com.techsmith.mw_so.utils.AppConfigSettings;
@@ -75,6 +84,7 @@ import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -86,6 +96,7 @@ public class RetailSOActivity extends AppCompatActivity {
     RetailSOActivityArrayAdapter arrayAdapter;
     private static final DecimalFormat decfor = new DecimalFormat("0.00");
     List<String> storeidList;
+    DETAIL detail;
     BatchRetailResponse pd;
     Context appContext;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "", itemExpiry,
@@ -93,7 +104,7 @@ public class RetailSOActivity extends AppCompatActivity {
             multiSOStoredDevId = "", uniqueId, strfromweb, strerrormsg, strstocktake, customer_Details;
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "",
-            customer_name = "", customer_id = "", roundingTotal = "No";// item made public so that to access in its adapter class
+            cceId= "", sendTestData = "", roundingTotal = "No";// item made public so that to access in its adapter class
     int CustomerId, itemId, itemQty, selectedQty, soResponseCount = 0;
     public int selectedPos;
     ImageButton ic_search, imgBtn;
@@ -109,12 +120,14 @@ public class RetailSOActivity extends AppCompatActivity {
     public TextView tvAmountValue; // item made public so that to access in its adapter class
     public ArrayList<AllocateQtyPL> detailProductList;
     public ArrayList<SaveProductSOPL> sList;
+    public ArrayList<ITEM> itemArrayList;
     SaveProductSO saveProductSO;
     Boolean batchFlag = false;
     EditText etAddRemarks;
     public Button caculate, btnAdd, btnAllClear, btnSave;
     List<String> offerList, houseList, sohList, batchCode, batchExpiry;
     List<Double> batchMrp, batchRate, batchSOH;
+    List<Integer> batchID;
     TextView tvCustomerName, tvDate, Freeqty, etReceivables;
     AutoCompleteTextView acvItemSearchSOActivity;
     ProgressDialog pDialog;
@@ -163,6 +176,7 @@ public class RetailSOActivity extends AppCompatActivity {
         detailProductList = new ArrayList<>();
         appWide = AppWide.getInstance();
         sList = new ArrayList<>();
+        itemArrayList = new ArrayList<>();
         tvCustomerName = findViewById(R.id.tvCustomerName);
         ic_search = findViewById(R.id.imgBtnSearchItem);
         lvProductlist = findViewById(R.id.lvProductlist);
@@ -181,13 +195,14 @@ public class RetailSOActivity extends AppCompatActivity {
         roundingTotal = prefs.getString("roundingPermsn", "No");
 
         customer_Details = prefs.getString("customer_Details", "");
-        System.out.println("Rounding total value " + roundingTotal);
+        cceId=prefs.getString("cceId","");
+        System.out.println("Customer Details " + customer_Details);
         try {
             Gson gson = new Gson();
             //gson.fromJson(loginResponse, UserPL.class);
             RetailReplyData rcData = new RetailReplyData();
             rcData = gson.fromJson(customer_Details, RetailReplyData.class);
-//            System.out.println(rcData.Name);
+            System.out.println(rcData.GoogleAddress);
             tvCustomerName.setText(rcData.Name);
             // tvDate.setText(String.valueOf(customer_id));
 
@@ -344,10 +359,114 @@ public class RetailSOActivity extends AppCompatActivity {
     }
 
     private void SaveRetailSo() {
-        if (sList.size() > 0)
+        System.out.println("Formed json is " + formedSO);
+      /*  if (sList.size() > 0)
             tsMessages(formedSO);
         else
-            tsMessages("List Empty");
+            tsMessages("List Empty");*/
+        System.out.println("Total Value is " + tvAmountValue.getText().toString());
+        String string = tvAmountValue.getText().toString();
+        String[] parts = string.split("\\.");
+        String part1 = parts[0]; // 004
+        String part2 = parts[1]; // 034556
+
+
+        try {
+            PAYMENT payment = new PAYMENT();
+            ArrayList<PAYDETAIL> paydetailList = new ArrayList<>();
+            prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+            String t1 = prefsD.getString("cashSave", "");
+            String t2 = prefsD.getString("cardSave", "");
+
+            PaymentList paymentList = new PaymentList();
+            PaymentList paymentCardList = new PaymentList();
+            paymentList = gson.fromJson(t1, PaymentList.class);
+            paymentCardList = gson.fromJson(t2, PaymentList.class);
+            System.out.println(paymentList.cashAmount);
+            PAYDETAIL pd = new PAYDETAIL();
+            pd.PAYTYPE = "CASH";
+            pd.AMOUNT = Integer.parseInt(part1);
+            paydetailList.add(pd);
+
+            PAYDETAIL pdd = new PAYDETAIL();
+            pdd.PAYTYPE = "CARD";
+            pdd.AMOUNT = Integer.parseInt(part1);
+            pdd.CARDAMOUNT = Double.parseDouble(paymentCardList.cardAmount);
+            pdd.CARDNAME = paymentCardList.cardName;
+            pdd.CARDNO = paymentCardList.cardNo;
+            pdd.AUTHORISATIONNO = "";
+            pdd.CARDOWNER = "";
+            pdd.CARDISSUEDBANK = paymentCardList.accquringBank;
+            pdd.SWIPINGMACHINEID = paymentCardList.swipingMachineId;
+            pdd.CARDEXPIRY = paymentCardList.expiry;
+            paydetailList.add(pdd);
+
+
+            PAYSUMMARY paysummary = new PAYSUMMARY();
+            //paysummary.BILLAMOUNT = Integer.parseInt(tvAmountValue.getText().toString());
+            paysummary.BILLAMOUNT = Integer.parseInt(part1);
+
+            // paysummary.PAIDAMOUNT = Integer.parseInt(tvAmountValue.getText().toString());
+            String string1 = String.valueOf(Double.parseDouble(paymentList.cashAmount) + Double.parseDouble(paymentCardList.cardAmount));
+            String[] partss = string1.split("\\.");
+            String part11 = partss[0]; // 004
+            paysummary.PAIDAMOUNT = Integer.parseInt(part11);
+
+
+            payment.paysummary = paysummary;
+            payment.PAYDETAIL = paydetailList;
+
+
+            RetailReplyData rcData = new RetailReplyData();
+            rcData = gson.fromJson(customer_Details, RetailReplyData.class);
+            Summary summary = new Summary();
+            CUSTOMERDETAIL customerdetail = new CUSTOMERDETAIL();
+
+            summary.BILLDATE = "20/07/2023";
+            summary.BILLNO = "NEW";
+            summary.REFNO="";
+            summary.BILLTYPE="CASH";
+            summary.CUSTOMER = rcData.Name;
+            summary.CCEID=cceId;
+            summary.SUMMARYDISC=0;
+            summary.NETAMOUNT = Integer.parseInt(part1);
+            summary.NOOFITEMS = sList.size();
+            summary.DOCGUID = "90be9640-a9b1-1234-ba52-f557123351245";
+            //summary.NETAMOUNT = Integer.parseInt(tvAmountValue.getText().toString());
+
+
+
+            customerdetail.CUSTOMER = rcData.Name;
+            customerdetail.ADDRESS = (String) rcData.GoogleAddress;
+            if (rcData.Phone1.isEmpty())
+                customerdetail.MOBILENO = Long.parseLong(rcData.Phone2);
+            else
+                customerdetail.MOBILENO = Long.parseLong(rcData.Phone1);
+            customerdetail.AREA = "New Delhi";
+            customerdetail.PINCODE = 110054;
+            customerdetail.STATE = "Delhi";
+
+
+
+            SaveProductSO sap = new SaveProductSO();
+            sap.summary = summary;
+            sap.customerdetail = customerdetail;
+            sap.payment = payment;
+            sap.detail = detail;
+            sendTestData = gson.toJson(sap);
+            System.out.println("Final Save json is " + sendTestData);
+            if (sap.payment.PAYDETAIL.size() > 0) {
+                new SaveData().execute();
+            } else {
+                Toast.makeText(RetailSOActivity.this, "Payment Not Added", Toast.LENGTH_LONG).show();
+            }
+
+
+        } catch (Exception e) {
+            Toast.makeText(RetailSOActivity.this, "Data Forming Error..", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -571,6 +690,7 @@ public class RetailSOActivity extends AppCompatActivity {
                         batchMrp = new ArrayList<>();
                         batchRate = new ArrayList<>();
                         batchSOH = new ArrayList<>();
+                        batchID = new ArrayList<>();
 
                         for (int i = 0; i < pd.data.size(); i++) {
                             batchCode.add(pd.data.get(i).batchCode);
@@ -578,6 +698,7 @@ public class RetailSOActivity extends AppCompatActivity {
                             batchMrp.add(pd.data.get(i).batchMrp);
                             batchRate.add(pd.data.get(i).Rate);
                             batchSOH.add(pd.data.get(i).sohInPacks);
+                            batchID.add(pd.data.get(i).batchId);
                         }
                         System.out.println("Batch Rate List is " + batchRate);
                     } else {
@@ -591,12 +712,15 @@ public class RetailSOActivity extends AppCompatActivity {
                         batchRate.add(0.0);
                         batchSOH = new ArrayList<>();
                         batchSOH.add(0.0);
+                        batchID = new ArrayList<>();
+                        batchID.add(0);
                         for (int i = 0; i < pd.data.size(); i++) {
                             batchCode.add(pd.data.get(i).batchCode);
                             batchExpiry.add(pd.data.get(i).batchExpiry);
                             batchMrp.add(pd.data.get(i).batchMrp);
                             batchRate.add(pd.data.get(i).Rate);
                             batchSOH.add(pd.data.get(i).sohInPacks);
+                            batchID.add(pd.data.get(i).batchId);
                         }
                     }
 
@@ -613,6 +737,7 @@ public class RetailSOActivity extends AppCompatActivity {
                     alertDialog = builder.create();
                     TextView tvSelectedItemName = dialogView.findViewById(R.id.tvSelectedItemName);
                     TextView tvSelectedBatchcode = dialogView.findViewById(R.id.tvSelectedBatchcode);
+                    TextView tvSelectedBatchID = dialogView.findViewById(R.id.tvSelectedBatchID);
                     TextView tvSelectedItemCode = dialogView.findViewById(R.id.tvSelectedItemCode);
                     TextView tvItemSOH = dialogView.findViewById(R.id.tvItemSOH);
                     TextView tvSelectedItemExp = dialogView.findViewById(R.id.tvSelectedItemExp);
@@ -644,6 +769,7 @@ public class RetailSOActivity extends AppCompatActivity {
                                     tvItemSOH.setText("SOH: " + batchSOH.get(i));
                                     tvbMRP.setText("MRP: " + batchMrp.get(i));
                                     tvSelectedBatchcode.setText(batchCode.get(i));
+                                    tvSelectedBatchID.setText(String.valueOf(batchID.get(i)));
                                     tvItemMRP.setText("Rate: " + batchRate.get(i));
                                     selectedPos = i;
                                 }
@@ -657,6 +783,7 @@ public class RetailSOActivity extends AppCompatActivity {
                                 tvItemSOH.setText("SOH: " + batchSOH.get(i));
                                 tvbMRP.setText("MRP: " + batchMrp.get(i));
                                 tvItemMRP.setText("Rate: " + batchRate.get(i));
+                                tvSelectedBatchID.setText(String.valueOf(batchID.get(i)));
 
                             }
                             if (batchCode.get(i).equalsIgnoreCase("Select"))
@@ -772,9 +899,31 @@ public class RetailSOActivity extends AppCompatActivity {
 
                             }
                             try {
+                                detail = new DETAIL();
                                 SaveProductSOPL so = new SaveProductSOPL();
+                                ITEM item = new ITEM();
+                                item.ITEMID = itemId;
+                                item.ITEMCODE = Integer.parseInt(itemCode);
+                                item.ITEMNAME = itemName;
+                                item.HSNCODE="";
+                                item.BATCHCODE = tvSelectedBatchcode.getText().toString();
+                                item.BATCHID = Integer.parseInt(tvSelectedBatchID.getText().toString());
+                                item.BATCHEXPIRY = itemExpiry;
+                                item.MRP = pd.data.get(0).batchMrp;
+                                item.RATE = pd.data.get(0).Rate;
+                                item.PACKQTY = Integer.parseInt(etQty.getText().toString());
+                                if (!discPer.getText().toString().isEmpty()) {
+                                    if (Double.parseDouble(discPer.getText().toString()) > 0)
+                                        item.DISCPER = Integer.parseInt(discPer.getText().toString());
+                                    else
+                                        item.DISCPER = 0;
+                                }
+                                item.DISCCODE = "ZART";
+                                item.LINETOTAL=Double.parseDouble(tvAmountValue.getText().toString());
+
+
                                 so.pName = itemName;
-                                so.pID = itemCode;
+                                so.pID = String.valueOf(itemId);
                                 so.pCode = itemCode;
                                 so.batchExpiry = itemExpiry;
                                 so.batchMrp = pd.data.get(0).batchMrp;
@@ -792,7 +941,10 @@ public class RetailSOActivity extends AppCompatActivity {
 
                                 sList.add(so);
                                 formedSO = gson.toJson(sList);
-                                System.out.println("Formed json is " + formedSO);
+                                itemArrayList.add(item);
+                                detail.ITEM = itemArrayList;
+                                String temp = gson.toJson(detail);
+                                System.out.println("New Formed JSon is " + temp);
 
                                 arrayAdapter = new RetailSOActivityArrayAdapter(RetailSOActivity.this, R.layout.list_row,
                                         productTotal, listSODetailPL, detailList, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext,
@@ -828,43 +980,43 @@ public class RetailSOActivity extends AppCompatActivity {
                             btnAddItem_qtySelection.setEnabled(true);
                             double d = 0.0, disc = 0.0, temp;
                             try {
-                                    if (!etQty.getText().toString().isEmpty()) {
-                                        if (!discPer.getText().toString().isEmpty()) {
-                                            if (Double.parseDouble(discPer.getText().toString()) > 0) {
-                                                System.out.println("Came here 2");
-                                                disc = Double.parseDouble(discPer.getText().toString()) / 100;
-                                                d = Double.parseDouble(pRate) * Double.parseDouble(etQty.getText().toString());
-                                                temp = disc * d;
-                                                tempTotal = String.valueOf(round(d, 2) - temp);
-                                                //ptotal = tempTotal;
-                                                ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
-                                                System.out.println("After Discount " + total);
-                                                //pTotal.setText("Total: " + tempTotal);
-                                                //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
-                                                pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
-                                            } else {
-                                                System.out.println("Ca,e here 1");
-                                                d = d + (Double.parseDouble(pRate) * Double.parseDouble(etQty.getText().toString()));
-                                                tempTotal = String.valueOf(round(d, 2));
-                                                ptotal = tempTotal;
-                                                // pTotal.setText("Total: " + tempTotal);
-                                                //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
-                                                // pTotal.setText(decfor.format(d));
-                                                pTotal.setText(String.format("%.2f", d));
-                                            }
-                                        } else {
-                                            System.out.println("Came here 3");
+                                if (!etQty.getText().toString().isEmpty()) {
+                                    if (!discPer.getText().toString().isEmpty()) {
+                                        if (Double.parseDouble(discPer.getText().toString()) > 0) {
+                                            System.out.println("Came here 2");
+                                            disc = Double.parseDouble(discPer.getText().toString()) / 100;
                                             d = Double.parseDouble(pRate) * Double.parseDouble(etQty.getText().toString());
+                                            temp = disc * d;
+                                            tempTotal = String.valueOf(round(d, 2) - temp);
+                                            //ptotal = tempTotal;
+                                            ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
+                                            System.out.println("After Discount " + total);
+                                            //pTotal.setText("Total: " + tempTotal);
+                                            //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
+                                            pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
+                                        } else {
+                                            System.out.println("Ca,e here 1");
+                                            d = d + (Double.parseDouble(pRate) * Double.parseDouble(etQty.getText().toString()));
                                             tempTotal = String.valueOf(round(d, 2));
                                             ptotal = tempTotal;
                                             // pTotal.setText("Total: " + tempTotal);
-                                            pTotal.setText(decfor.format(d));
-                                            //String.format("%.2f", sList.get(position).pTotal)
+                                            //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
+                                            // pTotal.setText(decfor.format(d));
+                                            pTotal.setText(String.format("%.2f", d));
                                         }
-                                        System.out.println("Product Total is " + tempTotal);
                                     } else {
-                                        Toast.makeText(RetailSOActivity.this, "Empty Quantity", Toast.LENGTH_SHORT).show();
+                                        System.out.println("Came here 3");
+                                        d = Double.parseDouble(pRate) * Double.parseDouble(etQty.getText().toString());
+                                        tempTotal = String.valueOf(round(d, 2));
+                                        ptotal = tempTotal;
+                                        // pTotal.setText("Total: " + tempTotal);
+                                        pTotal.setText(decfor.format(d));
+                                        //String.format("%.2f", sList.get(position).pTotal)
                                     }
+                                    System.out.println("Product Total is " + tempTotal);
+                                } else {
+                                    Toast.makeText(RetailSOActivity.this, "Empty Quantity", Toast.LENGTH_SHORT).show();
+                                }
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -989,138 +1141,6 @@ public class RetailSOActivity extends AppCompatActivity {
                 }
             }
 
-        }
-    }
-
-    private class AllocateQtyTask extends AsyncTask<String, String, String> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(RetailSOActivity.this);
-            pDialog.setMessage("Updating details...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                JSONObject appUserPlJsnStr = new JSONObject();
-                appUserPlJsnStr.put("qty", selectedQty);
-                appUserPlJsnStr.put("itemid", itemId);
-                appUserPlJsnStr.put("customer", CustomerId);
-
-                //https://tsmithy.in1/somemouat/api/AllocateQty
-                URL url = new URL(Url + "AllocateQty");
-
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setReadTimeout(120000);
-                connection.setConnectTimeout(120000);
-                connection.setRequestProperty("authkey", AppConfigSettings.auth_id);
-                connection.setRequestProperty("name", "");
-                connection.setRequestProperty("password", "");
-                connection.setRequestProperty("debugkey", "");
-                connection.setRequestProperty("remarks", "");
-                connection.setRequestProperty("docguid", uniqueId);
-                connection.setRequestProperty("machineid", "salam_ka@yahoo.com");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setDoOutput(true);
-                OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
-                wr.write(String.valueOf(appUserPlJsnStr));
-                wr.flush();
-                connection.connect();
-                int responsecode = connection.getResponseCode();
-                String responseMsg = connection.getResponseMessage();
-
-
-                try {
-
-                    if (responsecode == 200) {
-                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-                        BufferedReader reader = new BufferedReader(streamReader);
-                        StringBuilder sb = new StringBuilder();
-                        String inputLine = "";
-
-                        while ((inputLine = reader.readLine()) != null) {
-                            sb.append(inputLine);
-                            break;
-                        }
-
-                        reader.close();
-                        String str = "";
-                        strGetTotal = sb.toString();
-                        System.out.println("Response of AllocateQty is --->" + sb);
-                    } else {
-//                        strErrorMsg = connection.getResponseMessage();
-                        strErrorMsg = responseMsg;
-                        strGetTotal = "httperror";
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    connection.disconnect();
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return strGetTotal;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-
-            try {
-
-                gson = new Gson();
-                allocateQty = gson.fromJson(strGetTotal, AllocateQty.class);
-                if (allocateQty.statusFlag == 0) {
-
-                    try {
-                        caculate.setEnabled(true);
-                        cashDisc.setText("Cash Disc: " + allocateQty.data.cashDiscPer + "%");
-                        volDisc.setText("Vol Disc: " + allocateQty.data.volDiscPer + "%");
-                        tvRate.setText("Rate: " + String.format("%.2f", allocateQty.data.rate));
-                        allocStore.setText("Allocated Warehouse: " + allocateQty.data.allocStoreCode);
-                        Freeqty.setText("Free Quantity: " + allocateQty.data.freeQty);
-                        tvSelectedItemName.setText("" + itemName);
-                        tvMrp.setText("MRP: " + itemMrp);
-                        totalSOH = allocateQty.data.soh;
-
-                        StringBuilder builder = new StringBuilder();
-                        for (String details : houseList) {
-                            builder.append(details.subSequence(0, 9) + "\n\n");
-                        }
-                        StringBuilder sbuilder = new StringBuilder();
-                        for (String soh : sohList) {
-                            sbuilder.append(soh + "\n\n");
-                        }
-                        whText.setText(builder.toString());
-                        whSoh.setText(sbuilder
-                                .toString());
-
-
-                        offers.setText(offerList.toString().replace("[", "").replace("]", ""));
-                        offerMap.put(String.valueOf(itemId), offerList.toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    qtydialog.dismiss();
-                    acvItemSearchSOActivity.setText("");
-                    acvItemSearchSOActivity.setAdapter(null);
-                    tsMessages(allocateQty.errorMessage);
-
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -1371,6 +1391,87 @@ public class RetailSOActivity extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCanceledOnTouchOutside(true);
         alertDialog.show();
+    }
+
+    private class SaveData extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(RetailSOActivity.this);
+            pDialog.setMessage("Saving Pre Data....");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            try {
+                URL url = new URL(Url + "Save_RetailBill");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(180000);
+                connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(sendTestData);
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strfromweb = sb.toString();
+                        System.out.println("SO Save Response is " + strfromweb);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strfromweb = "httperror";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return strfromweb;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            System.out.println("Save Data Response is " + s);
+            try {
+                gson = new Gson();
+                //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
+                APIResponse apiResponse = gson.fromJson(s, APIResponse.class);
+                if (apiResponse.statusFlag == 0) {
+                    String msg = apiResponse.data.rESPONSE.mSG + "\n" + apiResponse.data.rESPONSE.bILLNO;
+                    tsMessages(msg);
+                } else {
+                    tsMessages(apiResponse.errorMessage);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
