@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    app:behavior_peekHeight="?actionBarSize"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <LinearLayout
+        android:id="@+id/llbottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/activity_bg_color"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal">
+
+            <ToggleButton
+                android:id="@+id/toggleButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/tb_up_down"
+                android:text=""
+                android:textOff=""
+                android:textOn="" />
+
+            <RelativeLayout
+                android:id="@+id/rl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/toggleButton"
+                android:layout_weight="2"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
+                <!--android:background="#00FF00"-->
+
+
+                <TextView
+                    android:id="@+id/tvAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="@font/ukt"
+                    android:text="Total:₹ "
+                    android:textStyle="bold" />
+                <!--   android:text="Approx.Amount:₹ "-->
+                <TextView
+                    android:id="@+id/tvAmountValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_toRightOf="@+id/tvAmount"
+                    android:background="#4A7BCB"
+                    android:hint="00.00"
+                    android:inputType="numberDecimal"
+                    android:padding="15dp"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/paymentBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone"
+                    android:drawableLeft="@drawable/ic_payment_method"
+                    android:text="Pay"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/btnSaveSO"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/corners_round_btn"
+                    android:drawableLeft="@drawable/ic_save"
+                    android:drawablePadding="5dp"
+                    android:fontFamily="@font/fabrica"
+                    android:paddingLeft="15dp"
+                    android:text="SAVE"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+
+
+                <!--android:layout_alignParentRight="true"-->
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnAllClear"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/corners_round_btn"
+                android:drawableLeft="@drawable/ic_list_clear"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/fabrica"
+                android:onClick="ClearList"
+                android:paddingStart="10dp"
+                android:text="Clear"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btnNew"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/corners_round_btn"
+                android:drawableLeft="@drawable/ic_file_new"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/fabrica"
+                android:onClick="Restart"
+                android:paddingLeft="15px"
+                android:text="NEW"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+           <!-- <Button
+                android:id="@+id/btnSaveSO"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/corners_round_btn"
+                android:drawableLeft="@drawable/ic_save"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/fabrica"
+                android:paddingLeft="15dp"
+                android:text="SAVE"
+                android:textColor="@color/white"
+                android:textSize="12sp" />-->
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

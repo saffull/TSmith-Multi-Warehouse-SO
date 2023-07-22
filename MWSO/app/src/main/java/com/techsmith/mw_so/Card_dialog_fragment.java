@@ -54,10 +54,6 @@ public class Card_dialog_fragment extends DialogFragment {
     ImageButton autoFill;
     private List<String> bList;
     Spinner accBank;
-    String[] bankNames = {"HDFC BANK", "AXIS BANK",
-            "SBI BANK", "CANARA BANK",
-            "IOB BANK", "ESAF BANK"};
-
 
     public Card_dialog_fragment() {
         // Required empty public constructor
@@ -66,11 +62,11 @@ public class Card_dialog_fragment extends DialogFragment {
     private void addBankList() {
         bList = new ArrayList<>();
         bList.add("Select Bank");
-        bList.add("HDFC BANK");
-        bList.add("AXIS BANK");
-        bList.add("SBI BANK");
-        bList.add("CANARA BANK");
-        bList.add("IOB BANK");
+        bList.add("Master");
+        bList.add("YES Bank");
+        bList.add("AXIS Bank");
+        bList.add("SBI CARD");
+        bList.add("YES BANK  CARD");
     }
 
 
@@ -86,7 +82,7 @@ public class Card_dialog_fragment extends DialogFragment {
         prefs = this.getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         prefsD = getActivity().getSharedPreferences("pref", Context.MODE_PRIVATE);
         addBankList();
-        tempTotal = prefs.getString("billTotal", "200");
+        tempTotal = prefs.getString("billTotal", "");
         CardSave = prefsD.getString("cardSave", "");
 
         System.out.println("Saved Data is  " + CardSave);
@@ -240,8 +236,12 @@ public class Card_dialog_fragment extends DialogFragment {
                 AuCode = auCode.getText().toString().trim();
                 cardname = cName.getText().toString().trim();
                 cardno = cardNo.getText().toString();
-                cardTotal = crdAmount.getText().toString().trim();
-                System.out.println("Current Amount is "+cardTotal);
+                if (!crdAmount.getText().toString().trim().isEmpty())
+                    cardTotal = crdAmount.getText().toString().trim();
+                else
+                    cardTotal = "0.0";
+
+                System.out.println("Current Amount is " + cardTotal);
                 issuingbank = iB.getText().toString().trim();
                 swipingid = smID.getText().toString().trim();
                 remarks_card = remarks.getText().toString();
@@ -267,9 +267,10 @@ public class Card_dialog_fragment extends DialogFragment {
                             popUp("Empty Fields, check the form again..!!!");
                         } else if (expiry_year.getText().toString().isEmpty() || expiry_month.getText().toString().isEmpty()) {
                             popUp("Expiry Month/Year Empty..!!!");
-                        }*/if (cardTotal.isEmpty()){
+                        }*/
+                        if (cardTotal.isEmpty()) {
                             popUp("Amount field empty..!!");
-                        }else {
+                        } else {
                             gson = new Gson();
                             paymentList = new PaymentList();
                             paymentList.cardNo = cardno.replace("\t", "");
@@ -279,7 +280,11 @@ public class Card_dialog_fragment extends DialogFragment {
                             paymentList.swipingMachineId = swipingid;
                             paymentList.cardRemarks = remarks_card;
                             paymentList.expiryYear = yer;
-                            paymentList.accquringBank = accquringbank;
+                            if (!accquringbank.equalsIgnoreCase("Select Bank"))
+                                paymentList.accquringBank = accquringbank;
+                            else
+                                paymentList.accquringBank = "";
+
                             paymentList.auCode = AuCode;
                             paymentList.expiryMonth = mnth;
 
@@ -288,8 +293,8 @@ public class Card_dialog_fragment extends DialogFragment {
                             editor.putString("cardSave", cardSave);
                             editor.apply();
                             System.out.println("Card Save is " + cardSave);
-                            ((PaymentMenu) getActivity()).updateCardAmount(cardTotal,cardno);
-                            ((PaymentMenu) getActivity()).updateList(cardTotal, "user_card",cardno);
+                            ((PaymentMenu) getActivity()).updateCardAmount(cardTotal, cardno);
+                            ((PaymentMenu) getActivity()).updateList(cardTotal, "user_card", cardno);
                             dismiss();
                         }
                     } else {

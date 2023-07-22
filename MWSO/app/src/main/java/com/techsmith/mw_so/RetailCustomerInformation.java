@@ -193,6 +193,9 @@ public class RetailCustomerInformation extends AppCompatActivity {
                 rcData.DateOfBirth = customerResponse.data.get(pos).cDateOfBirth;
                 rcData.Email = customerResponse.data.get(pos).aiEmail;
                 rcData.AlternateCode = customerResponse.data.get(pos).cLoyaltyCode;
+                rcData.Area=customerResponse.data.get(pos).Area;
+               // rcData.Pincode=Integer.parseInt(customerResponse.data.get(pos).aiPinCode);
+                rcData.State=customerResponse.data.get(pos).aiState;
 
 
                 sendTestData = gson.toJson(rcData);
@@ -252,6 +255,9 @@ public class RetailCustomerInformation extends AppCompatActivity {
                     rcData.DateOfBirth = customerResponse.data.get(pos).cDateOfBirth;
                     rcData.Email = customerResponse.data.get(pos).aiEmail;
                     rcData.AlternateCode = customerResponse.data.get(pos).cLoyaltyCode;
+                    rcData.Area=customerResponse.data.get(pos).Area;
+                   // rcData.Pincode=Integer.parseInt(customerResponse.data.get(pos).aiPinCode);
+                    rcData.State=customerResponse.data.get(pos).aiState;
                     sendTestData = gson.toJson(rcData);
                     System.out.println("RC data is " + sendTestData);
 

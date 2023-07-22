@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RetailSalesReturnActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".RetailSalesReturnActivity">
+
+            <ScrollView
+                android:id="@+id/scroll"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:fillViewport="true">
+
+                <RelativeLayout
+                    android:id="@+id/container"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/llSOToolbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/activity_bg_color"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageButton
+                                android:id="@+id/imageButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.1"
+                                android:background="@null"
+                                android:onClick="GoBack"
+                                app:srcCompat="@drawable/ic_back_arrow" />
+
+                            <TextView
+                                android:id="@+id/tvCustomerName"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.6"
+                                android:fontFamily="@font/fabrica"
+                                android:text="Retail Sales Return"
+                                android:textColor="@color/black"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvDate"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.4"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                android:text=""
+                                android:textColor="@color/black"
+                                android:textStyle="bold" />
+
+                            <ImageButton
+                                android:id="@+id/imgBtn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.1"
+                                android:background="@null"
+                                app:srcCompat="@drawable/ic_expand" />
+
+                        </LinearLayout>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:background="#FFFFFF" />
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:visibility="gone"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp">
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/acvCustomerName"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Customer Name"
+                                    android:textColor="@color/custinfo_edittext_color" />
+
+                                <ImageButton
+                                    android:id="@+id/imgBtnSearchClose"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    android:layout_marginEnd="20dp"
+                                    android:layout_toLeftOf="@+id/imgBtnCustSearchbyName"
+                                    android:background="@null"
+                                    android:onClick="showInfo"
+                                    android:paddingTop="5dp"
+                                    android:paddingBottom="5dp"
+                                    android:src="@drawable/ic_expand" />
+
+                                <ImageButton
+                                    android:id="@+id/imgBtnCustSearchbyName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignRight="@+id/acvCustomerName"
+                                    android:layout_centerVertical="true"
+                                    android:background="@null"
+                                    android:src="@drawable/ic_search" />
+                            </RelativeLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                android:orientation="horizontal">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1">
+
+                                    <AutoCompleteTextView
+                                        android:id="@+id/acvmobileNo"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:hint="Mobile No"
+                                        android:inputType="number"
+                                        android:textColor="@color/custinfo_edittext_color" />
+
+                                    <ImageButton
+                                        android:id="@+id/imgBtnCustSearchbyMobile"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignRight="@+id/acvmobileNo"
+                                        android:layout_centerVertical="true"
+                                        android:background="@null"
+                                        android:src="@drawable/ic_search"
+                                        android:visibility="invisible" />
+                                </RelativeLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1">
+
+                                    <EditText
+                                        android:id="@+id/etCustomerGoogleAdrs"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:editable="false"
+                                        android:hint="Address"
+                                        android:inputType="none"
+                                        android:textColor="@color/custinfo_edittext_color" />
+
+                                    <ImageButton
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignRight="@+id/etCustomerGoogleAdrs"
+                                        android:layout_centerVertical="true"
+                                        android:background="@null"
+                                        android:layout_marginRight="10dp"
+                                        android:onClick="getAddress"
+                                        android:src="@drawable/ic_expand" />
+                                </RelativeLayout>
+
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/activity_bg_color"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:weightSum="3">
+
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.5"
+                                    android:fontFamily="@font/fabrica"
+                                    android:text="#"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="2"
+                                    android:fontFamily="@font/fabrica"
+                                    android:text="Description"
+                                    android:textColor="@color/black" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.5"
+                                    android:fontFamily="@font/fabrica"
+                                    android:gravity="center"
+                                    android:text="MRP"
+                                    android:textColor="@color/black" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:orientation="horizontal">
+
+                                <!--.2 .3 .4 .1-->
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.1"
+                                    android:fontFamily="@font/fabrica"
+                                    android:text="Rate"
+                                    android:textColor="@color/black"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.1"
+                                    android:fontFamily="@font/fabrica"
+                                    android:gravity="left"
+                                    android:text="Batch Code"
+                                    android:textColor="@color/black"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.1"
+                                    android:fontFamily="@font/fabrica"
+                                    android:gravity="center"
+                                    android:paddingRight="5px"
+                                    android:text="Quantity"
+                                    android:textColor="@color/black"
+                                    android:textSize="12sp" />
+
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.1"
+                                    android:fontFamily="@font/fabrica"
+                                    android:gravity="center"
+                                    android:paddingRight="5px"
+                                    android:text="Disc%"
+                                    android:textColor="@color/black"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="0.1"
+                                    android:fontFamily="@font/fabrica"
+                                    android:gravity="center"
+                                    android:paddingRight="5px"
+                                    android:text="Total"
+                                    android:textColor="@color/black"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <ListView
+                            android:id="@+id/lvProductlist"
+                            android:layout_width="match_parent"
+                            android:layout_height="470dp"
+                            android:layout_marginBottom="15dp"
+                            android:transcriptMode="alwaysScroll" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+            </ScrollView>
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include layout="@layout/bottom_retail_sr_sheet" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

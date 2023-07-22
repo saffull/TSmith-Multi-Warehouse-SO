@@ -17,6 +17,9 @@ public class RetailReplyData {
     public String AlternateCode;
 
     public String LoyaltyCardTypeDesc;
+    public String Area;
+    public int Pincode;
+    public String State;
 
     public int LoyaltyCardType;
 

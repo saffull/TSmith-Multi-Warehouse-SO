@@ -4,8 +4,11 @@ public class RetailCustomerData {
     public int cLoyaltyId;
     public String cLoyaltyCode;
     public String cName;
+    public String Area;
+    public String aiState;
     public String aiPhone2;
     public String aiPhone1;
+    public String aiPinCode;
     public String aiEmail;
     public String cAlternateCode;
     public String cLoyaltyCardTypeDesc;

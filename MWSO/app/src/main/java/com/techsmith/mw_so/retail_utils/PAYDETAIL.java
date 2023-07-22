@@ -4,7 +4,7 @@ public class PAYDETAIL {
 
     public String PAYTYPE;
 
-    public int AMOUNT;
+    public float AMOUNT;
     public Double CARDAMOUNT;
 
     public String CARDNAME;

@@ -176,9 +176,11 @@ public class PaymentMenu extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                System.out.println("Bill amount is "+billAmt.getText().toString());
+                System.out.println("Bill amount is "+billAmt.getText().toString()+"\n"+cashAmt.getText().toString()
+                +"\n"+Double.parseDouble(cardAmt.getText().toString()));
                 double dd=0.0;
                 dd=dd+Double.parseDouble(cashAmt.getText().toString())+Double.parseDouble(cardAmt.getText().toString());
+                //finish();
 
                 if (dd > Double.parseDouble(billAmt.getText().toString())) {
                     Toast.makeText(PaymentMenu.this, "Total Amount Greater Than Bill Amount", Toast.LENGTH_LONG).show();

@@ -28,7 +28,7 @@ import com.techsmith.mw_so.payment_util.PaymentList;
 public class Cash_Dialog_Fragment extends DialogFragment {
     private TextInputEditText cashAmount, cashRemarks;
     private TextView cashRcd, totalBill;
-    private String remarks, cash, tempTotal, cashSave = "",cardno="";
+    private String remarks, cash, tempTotal, cashSave = "", cardno = "";
     private Button updateCash, cancel;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
@@ -67,7 +67,7 @@ public class Cash_Dialog_Fragment extends DialogFragment {
         cancel = view.findViewById(R.id.cancel);
         autoFill = view.findViewById(R.id.autoFill);
         try {
-            totalBill.setText("Bill Amount is \u20B9"+((PaymentMenu) getActivity()).billAmt.getText().toString());
+            totalBill.setText("Bill Amount is \u20B9" + ((PaymentMenu) getActivity()).billAmt.getText().toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,29 +98,32 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                     tempTotal = ((PaymentMenu) getActivity()).billAmt.getText().toString();
                     total = Double.parseDouble(tempTotal);
                     remarks = cashRemarks.getText().toString().trim();
-                    cash = cashAmount.getText().toString();
+                    if (!cashAmount.getText().toString().isEmpty())
+                        cash = cashAmount.getText().toString();
+                    else
+                        cash = "0.0";
                     double dd = 0.0;
 
                     if (cash.isEmpty()) {
                         popUp("cash field empty");
                     } else {
                         dd = Double.parseDouble(cash);
-                      //  if (dd > total) {
+                        //  if (dd > total) {
                         //    popUp("Please Check the amount again..!!");
-                      //  } else {
-                            paymentList = new PaymentList();
-                            paymentList.cashAmount = cash;
-                            paymentList.cashRemarks = remarks;
-                            gson = new Gson();
-                            String cashSave = gson.toJson(paymentList);
-                            editor = prefs.edit();
-                            editor.putString("cashSave", cashSave);
-                            editor.apply();
-                            System.out.println("Saved amount is " + cashSave);
-                            ((PaymentMenu) getActivity()).updateCashAmount(cash);
-                            ((PaymentMenu) getActivity()).updateList(cash, "user_cash", cardno);
-                            dismiss();
-                       // }
+                        //  } else {
+                        paymentList = new PaymentList();
+                        paymentList.cashAmount = cash;
+                        paymentList.cashRemarks = remarks;
+                        gson = new Gson();
+                        String cashSave = gson.toJson(paymentList);
+                        editor = prefs.edit();
+                        editor.putString("cashSave", cashSave);
+                        editor.apply();
+                        System.out.println("Saved amount is " + cashSave);
+                        ((PaymentMenu) getActivity()).updateCashAmount(cash);
+                        ((PaymentMenu) getActivity()).updateList(cash, "user_cash", cardno);
+                        dismiss();
+                        // }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -157,7 +160,7 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                     String[] parts = string.split("\\.");
                     String part1 = parts[0]; // 004
                     String part2 = parts[1]; // 034556
-                    cashAmount.setText(part1);
+                    cashAmount.setText(tempTotal);
 
                 } else {
                     double bal = 0.0;
@@ -166,7 +169,7 @@ public class Cash_Dialog_Fragment extends DialogFragment {
                     String[] parts = string.split("\\.");
                     String part1 = parts[0]; // 004
                     String part2 = parts[1]; // 034556
-                    cashAmount.setText(part1);
+                    cashAmount.setText(String.valueOf(bal));
                 }
             }
         });

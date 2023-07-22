@@ -56,7 +56,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
     ImageButton btnDelete;
     List<String> batchCode, batchExpiry, tempBatchCode, tempbatchList;
     List<Double> batchMrp, batchRate, batchSOH;
-    String tempTotal = "", ptotal = "", tempBCode = "", temppCode = "", pID = "", prevBCode;
+    String tempTotal = "", ptotal = "", tempBCode = "", temppCode = "", pID = "", prevBCode,currentBcode="";
     Dialog qtydialog;
     Gson gson;
     RetailCustomAdapter ad;
@@ -205,12 +205,14 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         lp.copyFrom(qtydialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        System.out.println(sList.get(position).batchCode);
+        System.out.println("currentBatchCode:--------------->"+sList.get(position).batchCode);
+        currentBcode=sList.get(position).batchCode;
         TextView tvSelectedItemName = qtydialog.findViewById(R.id.tvSelectedItemName);
         TextInputEditText discPer = qtydialog.findViewById(R.id.discField);
         TextView pTotal = qtydialog.findViewById(R.id.pTotal);
         pTotal.setText(sList.get(position).pTotal);
         tvSelectedItemName.setText(sList.get(position).pName);
+        discPer.setText(String.valueOf(sList.get(position).Disc));
         TextView tvSelectedItemCode = qtydialog.findViewById(R.id.tvSelectedItemCode);
         tvSelectedItemCode.setText("Product Code: " + sList.get(position).pCode);
         temppCode = sList.get(position).pCode;
@@ -280,13 +282,9 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         ad = new RetailCustomAdapter(appContext, batchCode, batchExpiry, batchMrp, batchRate, batchSOH);
         bSpinner.setAdapter(ad);
         for (int i = 0; i < sList.size(); i++) {
-            if (sList.get(i).pID.equalsIgnoreCase(pID)) {
-                for (int j = 0; j < batchCode.size(); j++) {
-                    if (sList.get(i).batchCode.equalsIgnoreCase(batchCode.get(j))) {
-                        bSpinner.setSelection(j);
-                    }
-                }
-
+            if (sList.get(i).batchCode.equalsIgnoreCase(currentBcode)){
+                bSpinner.setSelection(i+1);
+                System.out.println("Selected batch code");
             }
         }
         // bSpinner.setSelection(selectedPos);
@@ -342,6 +340,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                     ((RetailSOActivity) context).sList.get(position).qty = etQty.getText().toString();
                     if (!discPer.getText().toString().isEmpty()) {
                         ((RetailSOActivity) context).sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
+                        sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
                         if (Double.parseDouble(discPer.getText().toString()) > 0) {
                             disc = Double.parseDouble(discPer.getText().toString()) / 100;
                             d = pRate * Double.parseDouble(etQty.getText().toString());

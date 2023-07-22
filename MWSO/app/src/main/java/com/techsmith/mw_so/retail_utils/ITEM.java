@@ -25,11 +25,11 @@ public class ITEM {
 
     public String DISCCODE;
 
-    public int CGST;
+   // public int CGST;
 
-    public int SGST;
+  //  public int SGST;
 
-    public int IGST;
+   // public int IGST;
 
     public double LINETOTAL;
 }

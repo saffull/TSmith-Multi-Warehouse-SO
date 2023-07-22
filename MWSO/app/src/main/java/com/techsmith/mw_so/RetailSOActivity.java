@@ -90,6 +90,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class RetailSOActivity extends AppCompatActivity {
     SharedPreferences prefs, prefsD;
@@ -99,12 +100,12 @@ public class RetailSOActivity extends AppCompatActivity {
     DETAIL detail;
     BatchRetailResponse pd;
     Context appContext;
-    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strSaveMiniSO, billRemarks = "", itemExpiry,
+    String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, customer_Name = "", billRemarks = "", itemExpiry,
             strGetItemDetail, strProductBatch, itemName, strGetTotal, itemCode, soString = "", strCheckLogin, printData, s1 = "", s2 = "",
             multiSOStoredDevId = "", uniqueId, strfromweb, strerrormsg, strstocktake, customer_Details;
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
-    public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "",
-            cceId= "", sendTestData = "", roundingTotal = "No";// item made public so that to access in its adapter class
+    public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "", cardAmount = "0.0", cashAmount = "0.0",
+            cceId = "", sendTestData = "", roundingTotal = "No";// item made public so that to access in its adapter class
     int CustomerId, itemId, itemQty, selectedQty, soResponseCount = 0;
     public int selectedPos;
     ImageButton ic_search, imgBtn;
@@ -116,7 +117,6 @@ public class RetailSOActivity extends AppCompatActivity {
     ItemDetails itemDetails;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet;
-    TextView cashDisc, volDisc, allocStore, tvRate, whText, tvSelectedItemName, tvMrp, whSoh, offers;
     public TextView tvAmountValue; // item made public so that to access in its adapter class
     public ArrayList<AllocateQtyPL> detailProductList;
     public ArrayList<SaveProductSOPL> sList;
@@ -124,11 +124,13 @@ public class RetailSOActivity extends AppCompatActivity {
     SaveProductSO saveProductSO;
     Boolean batchFlag = false;
     EditText etAddRemarks;
-    public Button caculate, btnAdd, btnAllClear, btnSave;
+    public Button btnAllClear, btnSave;
+    PaymentList paymentList;
+    PaymentList paymentCardList;
     List<String> offerList, houseList, sohList, batchCode, batchExpiry;
     List<Double> batchMrp, batchRate, batchSOH;
     List<Integer> batchID;
-    TextView tvCustomerName, tvDate, Freeqty, etReceivables;
+    TextView tvCustomerName, tvDate, etReceivables;
     AutoCompleteTextView acvItemSearchSOActivity;
     ProgressDialog pDialog;
     ImageButton imgBtnRemarksPrescrptn, backBtn;
@@ -180,13 +182,11 @@ public class RetailSOActivity extends AppCompatActivity {
         tvCustomerName = findViewById(R.id.tvCustomerName);
         ic_search = findViewById(R.id.imgBtnSearchItem);
         lvProductlist = findViewById(R.id.lvProductlist);
-        btnAllClear = findViewById(R.id.btnAllClear);
         etReceivables = findViewById(R.id.etReceivables);
         imgBtnRemarksPrescrptn = findViewById(R.id.imgBtnRemarksPrescrptn);
         tvDate = findViewById(R.id.tvDate);
         detailList = new ArrayList<>();
         //  loginResponse = prefs.getString("loginResponse", "");
-
         gson = new Gson();
         userPLObj = gson.fromJson(loginResponse, UserPL.class);
         Url = prefs.getString("MultiSOURL", "");
@@ -195,7 +195,7 @@ public class RetailSOActivity extends AppCompatActivity {
         roundingTotal = prefs.getString("roundingPermsn", "No");
 
         customer_Details = prefs.getString("customer_Details", "");
-        cceId=prefs.getString("cceId","");
+        cceId = prefs.getString("cceId", "");
         System.out.println("Customer Details " + customer_Details);
         try {
             Gson gson = new Gson();
@@ -378,39 +378,61 @@ public class RetailSOActivity extends AppCompatActivity {
             String t1 = prefsD.getString("cashSave", "");
             String t2 = prefsD.getString("cardSave", "");
 
-            PaymentList paymentList = new PaymentList();
-            PaymentList paymentCardList = new PaymentList();
-            paymentList = gson.fromJson(t1, PaymentList.class);
-            paymentCardList = gson.fromJson(t2, PaymentList.class);
-            System.out.println(paymentList.cashAmount);
-            PAYDETAIL pd = new PAYDETAIL();
-            pd.PAYTYPE = "CASH";
-            pd.AMOUNT = Integer.parseInt(part1);
-            paydetailList.add(pd);
+            gson = new Gson();
+            if (!t1.isEmpty()) {
+                paymentList = gson.fromJson(t1, PaymentList.class);
+                cashAmount = paymentList.cashAmount;
+            }
+            if (!t2.isEmpty()) {
+                paymentCardList = gson.fromJson(t2, PaymentList.class);
+                cardAmount = paymentCardList.cardAmount;
+            }
 
-            PAYDETAIL pdd = new PAYDETAIL();
-            pdd.PAYTYPE = "CARD";
-            pdd.AMOUNT = Integer.parseInt(part1);
-            pdd.CARDAMOUNT = Double.parseDouble(paymentCardList.cardAmount);
-            pdd.CARDNAME = paymentCardList.cardName;
-            pdd.CARDNO = paymentCardList.cardNo;
-            pdd.AUTHORISATIONNO = "";
-            pdd.CARDOWNER = "";
-            pdd.CARDISSUEDBANK = paymentCardList.accquringBank;
-            pdd.SWIPINGMACHINEID = paymentCardList.swipingMachineId;
-            pdd.CARDEXPIRY = paymentCardList.expiry;
-            paydetailList.add(pdd);
+
+            System.out.println(cashAmount + "\t<------------->\t" + cardAmount);
+            if (cashAmount.equalsIgnoreCase("0.0") && cardAmount.equalsIgnoreCase("0.0")) {
+                tsMessages("Add Payment");
+            } else {
+                PAYDETAIL pd = new PAYDETAIL();
+                if (!t1.isEmpty()) {
+                    pd.PAYTYPE = "CASH";
+                    pd.AMOUNT = Float.parseFloat(paymentList.cashAmount);
+                } else {
+                    pd.PAYTYPE = "CASH";
+                    pd.AMOUNT = 0;
+                }
+
+                paydetailList.add(pd);
+
+                PAYDETAIL pdd = new PAYDETAIL();
+                if (!t2.isEmpty()) {
+                    pdd.PAYTYPE = "CARD";
+                    pdd.AMOUNT = Float.parseFloat(paymentCardList.cardAmount);
+                    pdd.CARDNAME = paymentCardList.accquringBank;
+                    pdd.CARDNO = paymentCardList.cardNo;
+                    pdd.AUTHORISATIONNO = paymentCardList.auCode;
+                    pdd.CARDOWNER = paymentCardList.cardName;
+                    pdd.CARDISSUEDBANK = paymentCardList.issuingBank;// paymentCardList.issuingBank
+                    pdd.SWIPINGMACHINEID = paymentCardList.swipingMachineId;
+                    pdd.CARDEXPIRY = paymentCardList.expiryMonth + "/" + paymentCardList.expiryYear;
+                    paydetailList.add(pdd);
+                } else {
+                    pdd.AMOUNT = 0;
+                    pdd.CARDNAME = "";
+                    pdd.CARDNO = "";
+                    pdd.AUTHORISATIONNO = "";
+                    pdd.CARDOWNER = "";
+                    pdd.CARDISSUEDBANK = "";// paymentCardList.issuingBank
+                    pdd.SWIPINGMACHINEID = "";
+                    pdd.CARDEXPIRY = "";
+                }
+
+            }
 
 
             PAYSUMMARY paysummary = new PAYSUMMARY();
-            //paysummary.BILLAMOUNT = Integer.parseInt(tvAmountValue.getText().toString());
-            paysummary.BILLAMOUNT = Integer.parseInt(part1);
-
-            // paysummary.PAIDAMOUNT = Integer.parseInt(tvAmountValue.getText().toString());
-            String string1 = String.valueOf(Double.parseDouble(paymentList.cashAmount) + Double.parseDouble(paymentCardList.cardAmount));
-            String[] partss = string1.split("\\.");
-            String part11 = partss[0]; // 004
-            paysummary.PAIDAMOUNT = Integer.parseInt(part11);
+            paysummary.BILLAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+            paysummary.PAIDAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
 
 
             payment.paysummary = paysummary;
@@ -421,19 +443,18 @@ public class RetailSOActivity extends AppCompatActivity {
             rcData = gson.fromJson(customer_Details, RetailReplyData.class);
             Summary summary = new Summary();
             CUSTOMERDETAIL customerdetail = new CUSTOMERDETAIL();
+            String uniqueID = UUID.randomUUID().toString();
 
-            summary.BILLDATE = "20/07/2023";
+            summary.BILLDATE = "19/07/2023";
             summary.BILLNO = "NEW";
-            summary.REFNO="";
-            summary.BILLTYPE="CASH";
+            summary.REFNO = "";
+            summary.BILLTYPE = "CASH";
             summary.CUSTOMER = rcData.Name;
-            summary.CCEID=cceId;
-            summary.SUMMARYDISC=0;
-            summary.NETAMOUNT = Integer.parseInt(part1);
+            summary.CCEID = cceId;
+            summary.SUMMARYDISC = 0;
+            summary.NETAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
             summary.NOOFITEMS = sList.size();
-            summary.DOCGUID = "90be9640-a9b1-1234-ba52-f557123351245";
-            //summary.NETAMOUNT = Integer.parseInt(tvAmountValue.getText().toString());
-
+            summary.DOCGUID = uniqueID;
 
 
             customerdetail.CUSTOMER = rcData.Name;
@@ -442,25 +463,39 @@ public class RetailSOActivity extends AppCompatActivity {
                 customerdetail.MOBILENO = Long.parseLong(rcData.Phone2);
             else
                 customerdetail.MOBILENO = Long.parseLong(rcData.Phone1);
-            customerdetail.AREA = "New Delhi";
-            customerdetail.PINCODE = 110054;
-            customerdetail.STATE = "Delhi";
-
+            customerdetail.AREA = rcData.Area;
+            customerdetail.PINCODE = rcData.Pincode;
+            customerdetail.STATE = rcData.State;
 
 
             SaveProductSO sap = new SaveProductSO();
             sap.summary = summary;
             sap.customerdetail = customerdetail;
-            sap.payment = payment;
             sap.detail = detail;
+            sap.payment = payment;
             sendTestData = gson.toJson(sap);
             System.out.println("Final Save json is " + sendTestData);
             if (sap.payment.PAYDETAIL.size() > 0) {
-                new SaveData().execute();
+
+                android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
+                alertDialogBuilder.setMessage("Do you want to Save Retail SO..?");
+                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        new SaveData().execute();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
             } else {
                 Toast.makeText(RetailSOActivity.this, "Payment Not Added", Toast.LENGTH_LONG).show();
             }
-
 
         } catch (Exception e) {
             Toast.makeText(RetailSOActivity.this, "Data Forming Error..", Toast.LENGTH_LONG).show();
@@ -475,6 +510,7 @@ public class RetailSOActivity extends AppCompatActivity {
         this.bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBSheet);
         this.tbUpDown = findViewById(R.id.toggleButton);
         this.tvAmountValue = findViewById(R.id.tvAmountValue);
+        this.btnAllClear = findViewById(R.id.btnAllClear);
         this.btnSave = findViewById(R.id.btnSaveSO);
     }
 
@@ -684,6 +720,7 @@ public class RetailSOActivity extends AppCompatActivity {
                 pd = gson.fromJson(strProductBatch, BatchRetailResponse.class);
 
                 if (pd.statusFlag == 0) {
+                    decfor.setRoundingMode(RoundingMode.DOWN);
                     if (pd.data.size() == 1) {
                         batchCode = new ArrayList<>();
                         batchExpiry = new ArrayList<>();
@@ -697,7 +734,8 @@ public class RetailSOActivity extends AppCompatActivity {
                             batchExpiry.add(pd.data.get(i).batchExpiry);
                             batchMrp.add(pd.data.get(i).batchMrp);
                             batchRate.add(pd.data.get(i).Rate);
-                            batchSOH.add(pd.data.get(i).sohInPacks);
+                            //batchSOH.add(pd.data.get(i).sohInPacks);
+                            batchSOH.add(Double.valueOf(decfor.format(pd.data.get(i).sohInPacks)));
                             batchID.add(pd.data.get(i).batchId);
                         }
                         System.out.println("Batch Rate List is " + batchRate);
@@ -719,7 +757,8 @@ public class RetailSOActivity extends AppCompatActivity {
                             batchExpiry.add(pd.data.get(i).batchExpiry);
                             batchMrp.add(pd.data.get(i).batchMrp);
                             batchRate.add(pd.data.get(i).Rate);
-                            batchSOH.add(pd.data.get(i).sohInPacks);
+                            //batchSOH.add(pd.data.get(i).sohInPacks);
+                            batchSOH.add(Double.valueOf(decfor.format(pd.data.get(i).sohInPacks)));
                             batchID.add(pd.data.get(i).batchId);
                         }
                     }
@@ -905,7 +944,7 @@ public class RetailSOActivity extends AppCompatActivity {
                                 item.ITEMID = itemId;
                                 item.ITEMCODE = Integer.parseInt(itemCode);
                                 item.ITEMNAME = itemName;
-                                item.HSNCODE="";
+                                item.HSNCODE = "";
                                 item.BATCHCODE = tvSelectedBatchcode.getText().toString();
                                 item.BATCHID = Integer.parseInt(tvSelectedBatchID.getText().toString());
                                 item.BATCHEXPIRY = itemExpiry;
@@ -919,7 +958,7 @@ public class RetailSOActivity extends AppCompatActivity {
                                         item.DISCPER = 0;
                                 }
                                 item.DISCCODE = "ZART";
-                                item.LINETOTAL=Double.parseDouble(tvAmountValue.getText().toString());
+                                item.LINETOTAL = Double.parseDouble(tvAmountValue.getText().toString());
 
 
                                 so.pName = itemName;
@@ -1234,7 +1273,9 @@ public class RetailSOActivity extends AppCompatActivity {
                         for (int i = 0; i < itemList.data.size(); i++) {
                             arrProducts[i] = itemList.data.get(i).pName;
                             arrpCode[i] = String.valueOf(itemList.data.get(i).pCode);
-                            arrSoh[i] = String.valueOf(round(itemList.data.get(i).SOH, 2));
+                            // arrSoh[i] = String.valueOf(round(itemList.data.get(i).SOH, 2));
+                            decfor.setRoundingMode(RoundingMode.DOWN);
+                            arrSoh[i] = String.valueOf(decfor.format(itemList.data.get(i).SOH));
                             arrpId[i] = String.valueOf(itemList.data.get(i).pId);
                         }
                         AutoCompleteRetailProductCustomAdapter myAdapter = new AutoCompleteRetailProductCustomAdapter(RetailSOActivity.this, R.layout.autocomplete_retail_row, arrProducts, arrpCode, arrSoh, arrpId);
@@ -1299,10 +1340,14 @@ public class RetailSOActivity extends AppCompatActivity {
     }
 
     private void disableButtons() {
-        //btnSave.setEnabled(false);
-        //btnAllClear.setEnabled(false);
-        //acvItemSearchSOActivity.setEnabled(false);
-        //ic_search.setEnabled(false);
+        btnSave.setEnabled(false);
+        btnSave.setAlpha(0.5f);
+        btnAllClear.setEnabled(false);
+        btnAllClear.setAlpha(0.5f);
+        paymentBtn.setEnabled(false);
+        paymentBtn.setAlpha(0.5f);
+        acvItemSearchSOActivity.setEnabled(false);
+        ic_search.setEnabled(false);
     }
 
     public void ClearList(View view) {
@@ -1318,6 +1363,12 @@ public class RetailSOActivity extends AppCompatActivity {
                         acvItemSearchSOActivity.setAdapter(null);
                         sList.clear();
                         lvProductlist.setAdapter(null);
+                        tvAmountValue.setText("00.00");
+                        prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefsD.edit();
+                        editor.putString("cashSave", "");
+                        editor.putString("cardSave", "");
+                        editor.apply();
                     }
                 });
                 alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1341,6 +1392,14 @@ public class RetailSOActivity extends AppCompatActivity {
     }
 
     public void Restart(View view) {
+        prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefsD.edit();
+        editor.putString("cashSave", "");
+        editor.putString("cardSave", "");
+        editor.apply();
+        Intent i = new Intent(RetailSOActivity.this, RetailCustomerInformation.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
     }
 
     private void tsMessages(String msg) {
@@ -1407,6 +1466,14 @@ public class RetailSOActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
 
             try {
+                JSONObject object = new JSONObject();
+                object.put("StoreCode", "2021-DLF-PH1");
+                object.put("SubStoreCode", "MAIN");
+                object.put("UserId", "1");
+                object.put("CounterId", "1");
+                object.put("CustType", "1");
+
+
                 URL url = new URL(Url + "Save_RetailBill");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
@@ -1414,6 +1481,12 @@ public class RetailSOActivity extends AppCompatActivity {
                 connection.setConnectTimeout(180000);
                 connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
                 connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("StoreCode", "2021-DLF-PH1");
+                connection.setRequestProperty("SubStoreCode", "MAIN");
+                connection.setRequestProperty("UserId", "1");
+                connection.setRequestProperty("CounterId", "1");
+                connection.setRequestProperty("CustType", "1");
+                connection.setRequestProperty("inputxmlstd", object.toString());
                 connection.connect();
 
                 DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
@@ -1463,8 +1536,10 @@ public class RetailSOActivity extends AppCompatActivity {
                 //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
                 APIResponse apiResponse = gson.fromJson(s, APIResponse.class);
                 if (apiResponse.statusFlag == 0) {
-                    String msg = apiResponse.data.rESPONSE.mSG + "\n" + apiResponse.data.rESPONSE.bILLNO;
+                    String msg = apiResponse.data.RESPONSE.MSG + "\nBill No: " + apiResponse.data.RESPONSE.BILLNO;
                     tsMessages(msg);
+                    disableButtons();
+                    //
                 } else {
                     tsMessages(apiResponse.errorMessage);
                 }

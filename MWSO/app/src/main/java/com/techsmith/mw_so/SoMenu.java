@@ -61,8 +61,6 @@ public class SoMenu extends AppCompatActivity {
         editor.remove("cashSave");
         editor.apply();
         startData();
-        className = this.getClass().getSimpleName();
-        System.out.println("Class Name is " + className);
         courseAdapter = new CourseAdapter(this, courseModelArrayList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
@@ -79,8 +77,10 @@ public class SoMenu extends AppCompatActivity {
                     startActivity(new Intent(SoMenu.this, CustomerInformation.class));
                 } else if (movie.getName().equalsIgnoreCase("New Payment")) {
                     startActivity(new Intent(SoMenu.this, PaymentMenu.class));
-                } else if (movie.getName().equalsIgnoreCase("Retail SO")) {
+                } else if (movie.getName().equalsIgnoreCase("Retail Sales")) {
                     startActivity(new Intent(SoMenu.this, RetailCustomerInformation.class));
+                }else if(movie.getName().equalsIgnoreCase("Retail Sales Return")){
+                    startActivity(new Intent(SoMenu.this, RetailSRBillActivity.class));
                 } else {
                     Toast.makeText(SoMenu.this, "Function not yet Implemented..", Toast.LENGTH_SHORT).show();
                 }
@@ -122,8 +122,8 @@ public class SoMenu extends AppCompatActivity {
         courseModelArrayList = new ArrayList<>();
         int i = R.drawable.ic_list;
         courseModelArrayList.add(new CardModel("Create New SO", i));
-        courseModelArrayList.add(new CardModel("Retail SO", i));
-        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
+        courseModelArrayList.add(new CardModel("Retail Sales", i));
+        courseModelArrayList.add(new CardModel("Retail Sales Return", R.drawable.ic_report));
         // courseModelArrayList.add(new CardModel("View Invoices", R.drawable.ic_report));
         //courseModelArrayList.add(new CardModel("Party Ledger", R.drawable.ic_report));
         courseModelArrayList.add(new CardModel("Test Print", R.drawable.ic_report));

@@ -1,9 +1,9 @@
 package com.techsmith.mw_so.payment_util;
 
 public class PaymentList {
-    public String cashAmount;
+    public String cashAmount="0.0";
     public String cashRemarks;
-    public String cardAmount;
+    public String cardAmount="0.0";
     public String auCode;
     public String cardNo;
     public String cardName;
