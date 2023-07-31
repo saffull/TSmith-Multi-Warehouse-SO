@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Print"
+            android:text="Revert Scheme"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/add_alarm_fab"
             app:layout_constraintEnd_toStartOf="@+id/add_alarm_fab"
@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="Coupons"
+            android:text="Apply Schemes"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/preview_fab"
             app:layout_constraintEnd_toStartOf="@+id/preview_fab"
@@ -322,6 +322,7 @@
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="0.1"
+                                        android:id="@+id/discText"
                                         android:fontFamily="@font/fabrica"
                                         android:gravity="center"
                                         android:paddingRight="5px"
@@ -481,7 +482,6 @@
 
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <include layout="@layout/bottom_retail_so_sheet" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

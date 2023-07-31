@@ -56,7 +56,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
     ImageButton btnDelete;
     List<String> batchCode, batchExpiry, tempBatchCode, tempbatchList;
     List<Double> batchMrp, batchRate, batchSOH;
-    String tempTotal = "", ptotal = "", tempBCode = "", temppCode = "", pID = "", prevBCode,currentBcode="";
+    String tempTotal = "", ptotal = "", tempBCode = "", temppCode = "", pID = "", prevBCode, currentBcode = "";
     Dialog qtydialog;
     Gson gson;
     RetailCustomAdapter ad;
@@ -147,7 +147,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                                 System.out.println("save list size is " + ((RetailSOActivity) context).sList.size());
                                 gson = new Gson();
                                 ((RetailSOActivity) context).formedSO = gson.toJson(((RetailSOActivity) context).sList);
-                                System.out.println("Formed json in Adapter class is  " +  ((RetailSOActivity) context).formedSO);
+                                System.out.println("Formed json in Adapter class is  " + ((RetailSOActivity) context).formedSO);
                                 RetailSOActivityArrayAdapter arrayAdapter = new RetailSOActivityArrayAdapter(context,
                                         R.layout.list_row, productTotal, listSODetailPL, itemArraylist, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext, selectedPos, pID);
                                 ((RetailSOActivity) context).lvProductlist.setAdapter(arrayAdapter);
@@ -205,8 +205,8 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         lp.copyFrom(qtydialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        System.out.println("currentBatchCode:--------------->"+sList.get(position).batchCode);
-        currentBcode=sList.get(position).batchCode;
+        System.out.println("currentBatchCode:--------------->" + sList.get(position).batchCode+"\n"+sList.get(position).ItemId);
+        currentBcode = sList.get(position).batchCode;
         TextView tvSelectedItemName = qtydialog.findViewById(R.id.tvSelectedItemName);
         TextInputEditText discPer = qtydialog.findViewById(R.id.discField);
         TextView pTotal = qtydialog.findViewById(R.id.pTotal);
@@ -281,9 +281,10 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         Spinner bSpinner = qtydialog.findViewById(R.id.batchSpinner);
         ad = new RetailCustomAdapter(appContext, batchCode, batchExpiry, batchMrp, batchRate, batchSOH);
         bSpinner.setAdapter(ad);
-        for (int i = 0; i < sList.size(); i++) {
-            if (sList.get(i).batchCode.equalsIgnoreCase(currentBcode)){
-                bSpinner.setSelection(i+1);
+        for (int i = 0; i < batchCode.size(); i++) {
+            System.out.println(batchCode.get(i) + "<------" + i + "----->" + sList.get(position).batchCode);
+            if (batchCode.get(i).equalsIgnoreCase(sList.get(position).batchCode)) {
+                bSpinner.setSelection(i);
                 System.out.println("Selected batch code");
             }
         }
@@ -291,29 +292,45 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
         bSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                tempBCode = batchCode.get(i);
+                try {
+                    tempBCode = batchCode.get(i);
+                    System.out.println("Selected BCODE"+tempBCode + "\t" + batchExpiry.get(i) + "\t" + batchMrp.get(i) + "\t" + batchRate.get(i));
+                    ((RetailSOActivity) context).sList.get(position).batchCode = tempBCode;
+                    ((RetailSOActivity) context).sList.get(position).batchExpiry=batchExpiry.get(i);
+                    ((RetailSOActivity) context).sList.get(position).batchMrp=batchMrp.get(i);
+                    ((RetailSOActivity) context).sList.get(position).MRP=batchMrp.get(i);
+                    sList.get(position).batchCode = tempBCode;
+                    sList.get(position).batchExpiry=batchExpiry.get(i);
+                    sList.get(position).batchMrp=batchMrp.get(i);
+                    sList.get(position).MRP=batchMrp.get(i);
+                    ((RetailSOActivity) context).sList = sList;
 
-                for (int j = 0; j < sList.size(); j++) {
-                    if (sList.get(j).pID.equalsIgnoreCase(pID)) {
-                        if (!tempBCode.equalsIgnoreCase("Select")) {
-                            for (int k = 0; k < sList.size(); k++) {
-                                if (sList.get(k).batchCode.equalsIgnoreCase(tempBCode)) {
-                                } else {
-                                    prevBCode = sList.get(j).batchCode;
-                                    prevBCodepPOS = j;
-                                    sList.get(j).batchCode = tempBCode;
+
+                  /*  for (int j = 0; j < sList.size(); j++) {
+                        if (sList.get(j).pID.equalsIgnoreCase(pID)) {
+                            if (!tempBCode.equalsIgnoreCase("Select")) {
+                                for (int k = 0; k < sList.size(); k++) {
+                                    if (sList.get(k).batchCode.equalsIgnoreCase(tempBCode)) {
+                                    } else {
+                                        prevBCode = sList.get(j).batchCode;
+                                        prevBCodepPOS = j;
+                                        sList.get(j).batchCode = tempBCode;
+                                        System.out.println( "Inside Spinner Batchcode is "+sList.get(j).batchCode);
+                                        ((RetailSOActivity) context).sList.get(j).batchCode = tempBCode;
+                                    }
                                 }
+                            } else {
+                                Toast.makeText(context, "Invalid Selection", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(context, "Invalid Selection", Toast.LENGTH_SHORT).show();
+
                         }
+                    }*/
 
-                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-
-                ((RetailSOActivity) context).sList = sList;
-                ((RetailSOActivity) context).selectedPos = i;
 
             }
 
@@ -336,47 +353,52 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
             public void onClick(View view) {
                 btnAddItem_qtySelection.setEnabled(true);
                 double d = 0.0, disc = 0.0, temp;
-                if (!etQty.getText().toString().isEmpty()) {
-                    ((RetailSOActivity) context).sList.get(position).qty = etQty.getText().toString();
-                    if (!discPer.getText().toString().isEmpty()) {
-                        ((RetailSOActivity) context).sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
-                        sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
-                        if (Double.parseDouble(discPer.getText().toString()) > 0) {
-                            disc = Double.parseDouble(discPer.getText().toString()) / 100;
-                            d = pRate * Double.parseDouble(etQty.getText().toString());
-                            temp = disc * d;
-                            tempTotal = String.valueOf(round(d, 2) - temp);
-                            //ptotal = tempTotal;
-                            ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
-                            System.out.println("After Discount " + total);
-                            //pTotal.setText("Total: " + tempTotal);
-                            //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
-                            pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
-                        } else {
+                if (Double.parseDouble(discPer.getText().toString()) > 100) {
 
-                            d = d + (pRate * Double.parseDouble(etQty.getText().toString()));
+                } else {
+                    if (!etQty.getText().toString().isEmpty()) {
+                        ((RetailSOActivity) context).sList.get(position).qty = etQty.getText().toString();
+                        if (!discPer.getText().toString().isEmpty()) {
+                            ((RetailSOActivity) context).sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
+                            sList.get(position).Disc = Double.parseDouble(discPer.getText().toString());
+                            if (Double.parseDouble(discPer.getText().toString()) > 0) {
+                                disc = Double.parseDouble(discPer.getText().toString()) / 100;
+                                d = pRate * Double.parseDouble(etQty.getText().toString());
+                                temp = disc * d;
+                                tempTotal = String.valueOf(round(d, 2) - temp);
+                                //ptotal = tempTotal;
+                                ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
+                                System.out.println("After Discount " + total);
+                                //pTotal.setText("Total: " + tempTotal);
+                                //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
+                                pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
+                            } else {
+
+                                d = d + (pRate * Double.parseDouble(etQty.getText().toString()));
+                                tempTotal = String.valueOf(round(d, 2));
+                                ptotal = tempTotal;
+                                // pTotal.setText("Total: " + tempTotal);
+                                //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
+                                pTotal.setText(decfor.format(d));
+                            }
+                        } else {
+                            d = pRate * Double.parseDouble(etQty.getText().toString());
+
                             tempTotal = String.valueOf(round(d, 2));
                             ptotal = tempTotal;
                             // pTotal.setText("Total: " + tempTotal);
-                            //pTotal.setText("Total: " + String.format("%.2f", tempTotal));
                             pTotal.setText(decfor.format(d));
+                            //String.format("%.2f", sList.get(position).pTotal)
+
                         }
+                        System.out.println("Product Total is " + tempTotal);
+                        ((RetailSOActivity) context).setItemList(sList);
+
                     } else {
-                        d = pRate * Double.parseDouble(etQty.getText().toString());
-
-                        tempTotal = String.valueOf(round(d, 2));
-                        ptotal = tempTotal;
-                        // pTotal.setText("Total: " + tempTotal);
-                        pTotal.setText(decfor.format(d));
-                        //String.format("%.2f", sList.get(position).pTotal)
-
+                        Toast.makeText(context, "Empty Quantity", Toast.LENGTH_SHORT).show();
                     }
-                    System.out.println("Product Total is " + tempTotal);
-
-
-                } else {
-                    Toast.makeText(context, "Empty Quantity", Toast.LENGTH_SHORT).show();
                 }
+
 
             }
         });
@@ -399,7 +421,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
 
                     gson = new Gson();
                     String temp = gson.toJson(sList);
-                    ((RetailSOActivity) context).formedSO=temp;
+                    ((RetailSOActivity) context).formedSO = temp;
                     System.out.println("New SList is " + temp);
 
 

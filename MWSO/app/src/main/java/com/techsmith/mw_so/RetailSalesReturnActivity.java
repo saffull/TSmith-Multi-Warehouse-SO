@@ -9,30 +9,35 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.Global.AppWide;
+import com.techsmith.mw_so.retailSRReturns.ITEM;
+import com.techsmith.mw_so.retailSRReturns.RetailSRActivityAdapter;
+import com.techsmith.mw_so.retailSRReturns.RetrieveProductSO;
 import com.techsmith.mw_so.retail_utils.AutoCompleteRetailSalesReturnAdapter;
-import com.techsmith.mw_so.retail_utils.RetailCustomerResponse;
+import com.techsmith.mw_so.Retail_Customer_utils.RetailCustomerResponse;
 import com.techsmith.mw_so.retail_utils.RetailReplyData;
-import com.techsmith.mw_so.utils.AutocompleteRetailCustomArrayAdapter;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -46,137 +51,114 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
     List<AutoCompleteTextView> autoCompleteTextViewList;
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private LinearLayout linearLayoutBSheet;
+    private ToggleButton tbUpDown;
+    RetrieveProductSO sop;
+    Button btnSaveSR;
     EditText place, pincode, gstno, cardType, etCustomerGoogleAdrs, cEmail, latLong;
-    String Url, strCustomer, strErrorMsg, editData = "", LoyaltyCardType = "", customerAddress = "", sendTestData = "",
-            selectedCustomerName, LoyaltyCode = "", LoyaltyId = "", LoyaltyCardTypeDesc = "", cLatitude = "",
-            cLongitude = "", strfromweb = "", strerrormsg = "", className = "";
+    String Url, strCustomer, strErrorMsg, billNo = "", LoyaltyCardType = "", customerAddress = "";
     ProgressDialog pDialog;
     RetailCustomerResponse customerResponse;
     AppWide appWide;
     AutoCompleteRetailSalesReturnAdapter myAdapter;
     RetailReplyData rcData;
     Gson gson;
-    int currenPos;
-    Dialog dialog;
+    public ArrayList<ITEM> sList;
+    public ListView lvProductlist;
+    public Double productTotal;
+    public TextView tvAmountValue,tvCustomerName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retail_sales_return);
         prefs = PreferenceManager.getDefaultSharedPreferences(RetailSalesReturnActivity.this);
+        init();
         appWide = AppWide.getInstance();
         imgBtnCustSearchbyName = findViewById(R.id.imgBtnCustSearchbyName);
         acvCustomerName = findViewById(R.id.acvCustomerName);
         acvmobileNo = findViewById(R.id.acvmobileNo);
+        lvProductlist = findViewById(R.id.lvProductlist);
         etCustomerGoogleAdrs = findViewById(R.id.etCustomerGoogleAdrs);
+        tvCustomerName=findViewById(R.id.tvCustomerName);
         Url = prefs.getString("MultiSOURL", "");
-
-
-        imgBtnCustSearchbyName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (acvCustomerName.getText().toString().equalsIgnoreCase("") || acvCustomerName.getText().toString().length() < 3) {
-
-                    Toast.makeText(RetailSalesReturnActivity.this, "Please input minimum 3 characters", Toast.LENGTH_SHORT).show();
-
-                } else {
-                    hideKeyboard();
-                    new GetCustomerListTask().execute();
-                }
-            }
-        });
-        acvCustomerName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View arg1, int pos,
-                                    long id) {
-
-
-                try {
-                    String selectedCustomer = (String) parent.getItemAtPosition(pos);
-                    selectedCustomerName = customerResponse.data.get(pos).cName;
-                    ;
-                    appWide.setName(selectedCustomerName);
-                    LoyaltyCode = customerResponse.data.get(pos).cLoyaltyCode;
-                    appWide.setLoyaltyCode(LoyaltyCode);
-                    LoyaltyCardTypeDesc = customerResponse.data.get(pos).cLoyaltyCardTypeDesc;
-                    LoyaltyId = String.valueOf(customerResponse.data.get(pos).cLoyaltyId);
-                    // acvLcardNo.setText(customerResponse.data.get(pos).cLoyaltyCode);
-                    LoyaltyCardType = String.valueOf(customerResponse.data.get(pos).cLoyaltyCardType);
-                    acvmobileNo.setText(customerResponse.data.get(pos).aiPhone2);
-                    //cardType.setText(customerResponse.data.get(pos).aiEmail);
-
-                    String gender = customerResponse.data.get(pos).cGender;
-                    cLatitude = String.valueOf(customerResponse.data.get(pos).cLatitude);
-                    cLongitude = String.valueOf(customerResponse.data.get(pos).cLongitude);
-                    customerAddress = customerResponse.data.get(pos).cGoogleAddress;
-                    etCustomerGoogleAdrs.setText(customerResponse.data.get(pos).cGoogleAddress.substring(0, 15) + "...");
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        acvCustomerName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().length() == 0) {
-                    acvCustomerName.setAdapter(null);
-                    clearFields();
-
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-    }
-
-    public void GoBack(View view) {
-    }
-
-    private void clearFields() {
-        // acvCustomerName.setText("");
-        // acvmobileNo.setText("");
-        // acvLcardNo.setText("");
-        // etCustomerGoogleAdrs.setText("");
-        // etCustomerAdrs.setText("");
-        //cardType.setText("");
-    }
-
-    private void hideKeyboard() {
-        try {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
+        billNo = prefs.getString("billNo", "");
+        System.out.println(billNo);
+        if (!billNo.isEmpty()) {
+            new TakeBillDetails().execute();
         }
 
+        tbUpDown.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(View view, int newState) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    tbUpDown.setChecked(true);
+                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    tbUpDown.setChecked(false);
+                }
+            }
+
+            @Override
+            public void onSlide(View view, float v) {
+
+            }
+        });
+        btnSaveSR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveSR();
+            }
+        });
+
+
     }
 
-    public void getAddress(View view) {
-        String msg = "Address: " + customerAddress;
-        tsMessages(msg);
+    private void saveSR() {// Repace
+        String[] parts = tvAmountValue.getText().toString().split("\\.");
+        String part1 = parts[0]; // 004
+        String part2 = parts[1]; // 034556
+
+        sop.DATA.SALESBILL.DETAIL.Item = sList;
+        System.out.println(sop);
+
+
     }
 
+    private void init() {
+        this.linearLayoutBSheet = findViewById(R.id.bottomSheetSalesReturn);
+        this.bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBSheet);
+        this.tbUpDown = findViewById(R.id.toggleButton);
+        this.tvAmountValue = findViewById(R.id.tvAmountValue);
+        this.btnSaveSR = findViewById(R.id.btnSaveSR);
+    }
 
-    private class GetCustomerListTask extends AsyncTask<String, String, String> {
+    public void showInfo(View view) {
+    }
+
+    public void ResetList(View view) {
+        lvProductlist.setAdapter(null);
+        new TakeBillDetails().execute();
+    }
+
+    private class TakeBillDetails extends AsyncTask<String, String, String> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(RetailSalesReturnActivity.this);
-            pDialog.setMessage("Loading Retail Customers...");
+            pDialog.setMessage("Fetching Bill Data....");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -184,19 +166,32 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
 
-            editData = acvCustomerName.getText().toString().trim();
             try {
-                //URL url = new URL(Url + "GetCustomer?name=" + acvCustomerName.getText().toString().trim());
-                //URL url = new URL("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
-                URL url = new URL(Url + "getcustomerlookup?name=" + editData);
+                JSONObject object = new JSONObject();
+                object.put("StoreCode", "2021-DLF-PH1");
+                object.put("SubStoreCode", "MAIN");
+                object.put("UserId", "1");
+                object.put("CounterId", "1");
+                object.put("CustType", "1");
+
+                JSONObject object1 = new JSONObject();
+                object1.put("BILLNO", billNo);
+
+
+                URL url = new URL(Url + "GetSBillDetailsForSR");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+                connection.setRequestMethod("POST");
                 connection.setReadTimeout(300000);
                 connection.setConnectTimeout(300000);
                 connection.setRequestProperty("authkey", appWide.getAuthID());
                 connection.setRequestProperty("machineid", appWide.getMachineId());
                 connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("inputxmlstd", object.toString());
                 connection.connect();
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(object1.toString());
+                wr.flush();
+                wr.close();
 
                 int responsecode = connection.getResponseCode();
                 String responseMsg = connection.getResponseMessage();
@@ -217,7 +212,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
                         reader.close();
                         strCustomer = sb.toString();
 
-                        System.out.println("Response of Customer--->" + strCustomer);
+                        // System.out.println("Response of Customer--->" + strCustomer);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -241,82 +236,58 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-
-            if (pDialog.isShowing()) {
+            if (pDialog.isShowing())
                 pDialog.dismiss();
-            }
-
+            System.out.println("Bill Fetch Response is " + s);
             if (strCustomer == null || strCustomer.equals("")) {
-
                 Toast.makeText(RetailSalesReturnActivity.this, "No result from web", Toast.LENGTH_SHORT).show();
 
             } else {
                 try {
-                    Gson gson = new Gson();
-                    customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
-                    if (customerResponse.statusFlag == 0) {
-                        String[] arrCust = new String[customerResponse.data.size()];
-                        String[] arrMob = new String[customerResponse.data.size()];
-
-                        for (int i = 0; i < customerResponse.data.size(); i++) {
-                            arrCust[i] = customerResponse.data.get(i).cName;
-                            arrMob[i] = String.valueOf(customerResponse.data.get(i).aiPhone2);
-                        }
-                        myAdapter = new AutoCompleteRetailSalesReturnAdapter(RetailSalesReturnActivity.this, R.layout.custom_spinner_retail, arrCust, arrMob);
-                        acvCustomerName.setAdapter(myAdapter);
-                        acvCustomerName.showDropDown();
-
-
+                    gson = new Gson();
+                    sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
+                    if (sop.statusFlag == 0) {
+                        tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
+                        sList = sop.DATA.SALESBILL.DETAIL.Item;
+                        RetailSRActivityAdapter arrayAdapter = new RetailSRActivityAdapter(RetailSalesReturnActivity.this, R.layout.list_row, sList);
+                        lvProductlist.setAdapter(arrayAdapter);
+                        arrayAdapter.notifyDataSetChanged();
+                        double d = Double.parseDouble(sop.DATA.SALESBILL.SUMMARY.NETAMOUNT) + Double.parseDouble(sop.DATA.SALESBILL.SUMMARY.ROUNDOFF);
+                        tvAmountValue.setText(String.valueOf(d));
                     } else {
-                        tsMessages(customerResponse.errorMessage);
+
                     }
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
             }
-
         }
     }
 
-    public void showInfo(View view) {
+
+    public void GoBack(View view) {
+        finish();
+    }
+
+
+    private void hideKeyboard() {
         try {
-            dialog = new Dialog(RetailSalesReturnActivity.this);
-            dialog.setContentView(R.layout.customer_details_dialog);
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            dialog.setCancelable(false);
-            // dialog.getWindow().getAttributes().windowAnimations = R.style.animation;
-            place = dialog.findViewById(R.id.place);
-            pincode = dialog.findViewById(R.id.pincode);
-            gstno = dialog.findViewById(R.id.gstno);
-            acvLcardNo = dialog.findViewById(R.id.acvLcardNo);
-            acvmobileNo = dialog.findViewById(R.id.acvmobileNo);
-            EditText etCustomerGoogleAdrss = dialog.findViewById(R.id.etCustomerGoogleAdrs);
-            acvCustomerName = dialog.findViewById(R.id.acvCustomerName);
-            cardType = dialog.findViewById(R.id.cEmail);
-            acvCustomerName.setText(selectedCustomerName);
-            cardType.setText(customerResponse.data.get(currenPos).aiEmail);
-            acvCustomerName.setText(customerResponse.data.get(currenPos).cName);
-            etCustomerGoogleAdrss.setText(customerAddress);
-            acvLcardNo.setText(customerResponse.data.get(currenPos).cLoyaltyCode);
-            if (!customerResponse.data.get(currenPos).aiPhone2.isEmpty())
-                acvmobileNo.setText(customerResponse.data.get(currenPos).aiPhone2);
-            else
-                acvmobileNo.setText(customerResponse.data.get(currenPos).aiPhone1);
-            ImageView btnOk = dialog.findViewById(R.id.btnSOReport1);
-            btnOk.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dialog.cancel();
-                }
-            });
-
-
-            dialog.show();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
+
+    public void getAddress(View view) {
+        String msg = "Address: " + customerAddress;
+        tsMessages(msg);
+    }
+
 
     private void tsMessages(String msg) {
 

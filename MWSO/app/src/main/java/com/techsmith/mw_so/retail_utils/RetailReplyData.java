@@ -20,6 +20,8 @@ public class RetailReplyData {
     public String Area;
     public int Pincode;
     public String State;
+    public String DocGuid;
+    public String CurrentGuid;
 
     public int LoyaltyCardType;
 

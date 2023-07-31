@@ -80,7 +80,7 @@ public class SoMenu extends AppCompatActivity {
                 } else if (movie.getName().equalsIgnoreCase("Retail Sales")) {
                     startActivity(new Intent(SoMenu.this, RetailCustomerInformation.class));
                 }else if(movie.getName().equalsIgnoreCase("Retail Sales Return")){
-                    startActivity(new Intent(SoMenu.this, RetailSRBillActivity.class));
+                    startActivity(new Intent(SoMenu.this, RetailSRBillCustomerInfoActivity.class));
                 } else {
                     Toast.makeText(SoMenu.this, "Function not yet Implemented..", Toast.LENGTH_SHORT).show();
                 }

@@ -10,7 +10,8 @@ public class Summary {
     public String CCEID;
     public int SUMMARYDISC;
     public double ROUNDOFF;
-    public Float NETAMOUNT;
+    public Double NETAMOUNT;
     public int NOOFITEMS;
     public String DOCGUID;
+    public String CURRENTGUID;
 }

@@ -207,11 +207,11 @@ public class Collections extends AppCompatActivity {
                 stores = new String[5000];
             userPLObj = gson.fromJson(loginResponse, UserPL.class);
 
-            acvCustomerName.setText(userPLObj.summary.customerName);
+            acvCustomerName.setText(userPLObj.summary.CUSTOMERNAME);
             stores[0] = "Select Store";
             for (int i = 0; i < userPLObj.detail.size(); i++) {
-                stores[i + 1] = userPLObj.detail.get(i).storeName;
-                storeMap.put(userPLObj.detail.get(i).storeName, String.valueOf(userPLObj.detail.get(i).storeId));
+                stores[i + 1] = userPLObj.detail.get(i).STORENAME;
+                storeMap.put(userPLObj.detail.get(i).STORENAME, String.valueOf(userPLObj.detail.get(i).STOREID));
             }
             storeSelect.setEnabled(!acvCustomerName.getText().toString().isEmpty());
 
@@ -251,8 +251,8 @@ public class Collections extends AppCompatActivity {
                 }
             });
 
-            if (userPLObj.summary.customerId != 0)
-                etCustomerId = String.valueOf(userPLObj.summary.customerId);
+            if (userPLObj.summary.CUSTOMERID != 0)
+                etCustomerId = String.valueOf(userPLObj.summary.CUSTOMERID);
             else
                 etCustomerId = "";
         } catch (Exception e) {

@@ -82,12 +82,12 @@ public class SOActivityArrayAdapter extends ArrayAdapter {
             Url = prefs.getString("MultiSOURL", "");
             multiSOStoredDevId=prefs.getString("MultiSOStoredDevId","");
 
-            if (userPLObj.summary.customerName == null) {
+            if (userPLObj.summary.CUSTOMERNAME == null) {
                 CustomerName = prefs.getString("selectedCustomerName", "");
                 CustomerId = prefs.getInt("selectedCustomerId", 0);
             } else {
-                CustomerName = userPLObj.summary.customerName;
-                CustomerId = userPLObj.summary.customerId;
+                CustomerName = userPLObj.summary.CUSTOMERNAME;
+                CustomerId = userPLObj.summary.CUSTOMERID;
             }
         }catch (Exception e){e.printStackTrace();}
 

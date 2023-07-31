@@ -6,6 +6,8 @@ public class SaveProductSOPL {
     public String pID;
     public String pName;
     public double SOH;
+    public int ItemId;
+    public String ItemCode;
     public String packName;
     public String unitName;
     public double uperPack;
@@ -23,27 +25,25 @@ public class SaveProductSOPL {
     //Main Json
 
     public int ITEMID;
-
     public int ITEMCODE;
-
     public String ITEMNAME;
-
     public String HSNCODE;
-
     public String BATCHCODE;
-
     public int BATCHID;
-
     public String BATCHEXPIRY;
-
     public double MRP;
-
     public double RATE;
-
     public int PACKQTY;
-
     public int DISCPER;
-
     public String DISCCODE;
+    public String SCHEMEDISCPER;
+    public String EFFSCHEMEDISCPERC;
+    public String SCHEMEOFFAMOUNT;
+    public String LCARDDISCID;
+    public String LCARDDISCPER;
+    public String EFFLCARDDISCPERC;
+    public String TOTALDISCPERC;
+    public String TOTALDISCAMOUNT;
+    public String LINETOTAL;
 
 }

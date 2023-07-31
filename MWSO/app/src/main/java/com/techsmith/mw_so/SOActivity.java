@@ -195,12 +195,12 @@ public class SOActivity extends AppCompatActivity {
         uniqueId = prefs.getString("guid", "");
         System.out.println("Unique Id is " + uniqueId);
         try {
-            if (userPLObj.summary.customerName == null) {
+            if (userPLObj.summary.CUSTOMERNAME == null) {
                 CustomerName = prefs.getString("selectedCustomerName", "");
                 CustomerId = prefs.getInt("selectedCustomerId", 0);
             } else {
-                CustomerName = userPLObj.summary.customerName;
-                CustomerId = userPLObj.summary.customerId;
+                CustomerName = userPLObj.summary.CUSTOMERNAME;
+                CustomerId = userPLObj.summary.CUSTOMERID;
             }
             System.out.println("CustomerId is " + CustomerId);
             if (CustomerId != 0) {
@@ -218,7 +218,7 @@ public class SOActivity extends AppCompatActivity {
             } else {
                 System.out.println("Customer name already there...");
             }
-            cceId = String.valueOf(userPLObj.summary.cceId);
+            cceId = String.valueOf(userPLObj.summary.CCEID);
             listSODetailPL = new ArrayList<>();
             detailList = new ArrayList<>();
 
@@ -377,12 +377,12 @@ public class SOActivity extends AppCompatActivity {
                     String SelectedText = acvItemSearchSOActivity.getText().toString();
 
                     if (SelectedText.length() >= 3) {
-                        itemId = itemList.data.get(pos).pmid;
-                        itemName = itemList.data.get(pos).product;
-                        itemCode = itemList.data.get(pos).code;
+                        itemId = itemList.DATA.get(pos).PMID;
+                        itemName = itemList.DATA.get(pos).PRODUCT;
+                        itemCode = itemList.DATA.get(pos).CODE;
 
-                        itemMrp = String.valueOf(itemList.data.get(pos).mrp);
-                        itemSoh = itemList.data.get(pos).sohInPacks;
+                        itemMrp = String.valueOf(itemList.DATA.get(pos).MRP);
+                        itemSoh = itemList.DATA.get(pos).SOHINPACKS;
                         for (int i = 0; i < detailList.size(); i++) {
                             if (detailList.get(i).itemId == itemId) {
                                 Toast.makeText(SOActivity.this, "item already added..", Toast.LENGTH_LONG).show();
@@ -1319,20 +1319,20 @@ public class SOActivity extends AppCompatActivity {
                 } else {
                     gson = new Gson();
                     itemList = gson.fromJson(strGetItems, ItemList.class);
-                    if (itemList.statusFlag == 0) {
-                        String[] arrProducts = new String[itemList.data.size()];
-                        String[] arrMrp = new String[itemList.data.size()];
-                        String[] arrSoh = new String[itemList.data.size()];
-                        for (int i = 0; i < itemList.data.size(); i++) {
-                            arrProducts[i] = itemList.data.get(i).product;
-                            arrMrp[i] = String.valueOf(itemList.data.get(i).mrp);
-                            arrSoh[i] = String.valueOf(itemList.data.get(i).sohInPacks);
+                    if (itemList.STATUSFLAG == 0) {
+                        String[] arrProducts = new String[itemList.DATA.size()];
+                        String[] arrMrp = new String[itemList.DATA.size()];
+                        String[] arrSoh = new String[itemList.DATA.size()];
+                        for (int i = 0; i < itemList.DATA.size(); i++) {
+                            arrProducts[i] = itemList.DATA.get(i).PRODUCT;
+                            arrMrp[i] = String.valueOf(itemList.DATA.get(i).MRP);
+                            arrSoh[i] = String.valueOf(itemList.DATA.get(i).SOHINPACKS);
                         }
                         AutoCompleteProductListCustomAdapter myAdapter = new AutoCompleteProductListCustomAdapter(SOActivity.this, R.layout.autocomplete_view_row, arrProducts, arrMrp, arrSoh);
                         acvItemSearchSOActivity.setAdapter(myAdapter);
                         acvItemSearchSOActivity.showDropDown();
                     } else {
-                        tsMessages(itemList.errorMessage);
+                        tsMessages(itemList.ERRORMESSAGE);
                         acvItemSearchSOActivity.setText("");
                         acvItemSearchSOActivity.setAdapter(null);
 

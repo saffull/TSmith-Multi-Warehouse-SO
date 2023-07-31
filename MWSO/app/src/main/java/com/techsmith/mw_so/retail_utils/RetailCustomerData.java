@@ -1,24 +1,24 @@
 package com.techsmith.mw_so.retail_utils;
 
 public class RetailCustomerData {
-    public int cLoyaltyId;
-    public String cLoyaltyCode;
-    public String cName;
-    public String Area;
-    public String aiState;
-    public String aiPhone2;
-    public String aiPhone1;
-    public String aiPinCode;
-    public String aiEmail;
+    public int CLOYALTYID;
+    public String CLOYALTYCODE;
+    public String CNAME;
+    public String AREA;
+    public String AISTATE;
+    public String AIPHONE2;
+    public String AIPHONE1;
+    public String AIPINCODE;
+    public String AIEMAIL;
     public String cAlternateCode;
-    public String cLoyaltyCardTypeDesc;
-    public int cLoyaltyCardType;
-    public Object cUHId;
-    public String cGender;
-    public String cDateOfBirth;
-    public Object cAgeSlab;
-    public String cGoogleAddress;
-    public double cLatitude;
-    public double cLongitude;
+    public String CLOYALTYCARDTYPEDESC;
+    public int CLOYALTYCARDTYPE;
+    public Object CUHID;
+    public String CGENDER;
+    public String CDATEOFBIRTH;
+    public Object CAGESLAB;
+    public String CGOOGLEADDRESS;
+    public double CLATITUDE;
+    public double CLONGITUDE;
 
 }

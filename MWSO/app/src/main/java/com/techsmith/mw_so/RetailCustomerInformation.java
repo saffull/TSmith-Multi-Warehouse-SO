@@ -40,9 +40,11 @@ import com.google.gson.Gson;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.RetailCustomerData;
-import com.techsmith.mw_so.retail_utils.RetailCustomerResponse;
+import com.techsmith.mw_so.Retail_Customer_utils.RetailCustomerResponse;
 import com.techsmith.mw_so.retail_utils.RetailReplyData;
 import com.techsmith.mw_so.utils.AutocompleteRetailCustomArrayAdapter;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -66,6 +68,8 @@ public class RetailCustomerInformation extends AppCompatActivity {
     AlertDialog.Builder builder;
     AlertDialog alertDialog;
     Gson gson;
+    RetailCustomerResponse customerResponse;
+    JSONObject mObject;
     String Url, strCustomer, strErrorMsg, editData = "", LoyaltyCardType = "", uniqueID, sendTestData = "",
             selectedCustomerName, LoyaltyCode = "", LoyaltyId = "", LoyaltyCardTypeDesc = "", cLatitude = "",
             cLongitude = "", strfromweb = "", strerrormsg = "", className = "";
@@ -74,7 +78,7 @@ public class RetailCustomerInformation extends AppCompatActivity {
     List<RetailCustomerData> retailCustomerData;
     TextView addAlarmActionText, addPersonActionText, MessageDisplay, invoice_text, preview_text;
     int checkFlag = 0;
-    RetailCustomerResponse customerResponse;
+
     FloatingActionButton mAddAlarmFab, mAddPersonFab, email_fab, invoice_fab, preview_fab;
     ExtendedFloatingActionButton mAddFab;
     Boolean isAllFabsVisible;
@@ -113,6 +117,21 @@ public class RetailCustomerInformation extends AppCompatActivity {
         Url = prefs.getString("MultiSOURL", "");
         reInitialize();
         uniqueID = UUID.randomUUID().toString();
+
+        editor = prefs.edit();
+        editor.putString("DOCGUID", uniqueID);
+        editor.putString("CURRENTGUID", uniqueID);
+        editor.apply();
+        try {
+            mObject = new JSONObject();
+            mObject.put("StoreCode", "2021-DLF-PH1");
+            mObject.put("SubStoreCode", "MAIN");
+            mObject.put("UserId", "1");
+            mObject.put("CounterId", "1");
+            mObject.put("CustType", "1");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         btnSOReport.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,41 +180,41 @@ public class RetailCustomerInformation extends AppCompatActivity {
         acvLcardNo.setOnItemClickListener((parent, view, pos, id) -> {
             try {
                 String selectedCustomer = (String) parent.getItemAtPosition(pos);
-                selectedCustomerName = customerResponse.data.get(pos).cName;
-                // etCustomerAdrs.setText(customerResponse.data.get(pos).cGoogleAddress);
-                etCustomerGoogleAdrs.setText(customerResponse.data.get(pos).cGoogleAddress);
-                LoyaltyCode = customerResponse.data.get(pos).cLoyaltyCode;
-                LoyaltyCardTypeDesc = customerResponse.data.get(pos).cLoyaltyCardTypeDesc;
-                LoyaltyId = String.valueOf(customerResponse.data.get(pos).cLoyaltyId);
-                acvLcardNo.setText(customerResponse.data.get(pos).cLoyaltyCode);
-                LoyaltyCardType = String.valueOf(customerResponse.data.get(pos).cLoyaltyCardType);
-                acvmobileNo.setText(customerResponse.data.get(pos).aiPhone2);
-                cardType.setText(customerResponse.data.get(pos).aiEmail);
-                acvCustomerName.setText(customerResponse.data.get(pos).cName);
-                cLatitude = String.valueOf(customerResponse.data.get(pos).cLatitude);
-                cLongitude = String.valueOf(customerResponse.data.get(pos).cLongitude);
+                selectedCustomerName = customerResponse.DATA.get(pos).NAME;
+                // etCustomerAdrs.setText(customerResponse.DATA.get(pos).cGoogleAddress);
+                etCustomerGoogleAdrs.setText(customerResponse.DATA.get(pos).GOOGLEADDRESS);
+                LoyaltyCode = customerResponse.DATA.get(pos).LOYALTYCODE;
+                LoyaltyCardTypeDesc = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
+                LoyaltyId = String.valueOf(customerResponse.DATA.get(pos).LOYALTYID);
+                acvLcardNo.setText(customerResponse.DATA.get(pos).LOYALTYCODE);
+                LoyaltyCardType = String.valueOf(customerResponse.DATA.get(pos).LOYALTYCARDTYPE);
+                acvmobileNo.setText(customerResponse.DATA.get(pos).PHONE2);
+                cardType.setText(customerResponse.DATA.get(pos).EMAIL);
+                acvCustomerName.setText(customerResponse.DATA.get(pos).NAME);
+                cLatitude = String.valueOf(customerResponse.DATA.get(pos).LATITUDE);
+                cLongitude = String.valueOf(customerResponse.DATA.get(pos).LONGITUDE);
 
                 rcData = new RetailReplyData();
                 Gson gson = new Gson();
                 rcData.Name = selectedCustomerName;
-                rcData.Latitude = customerResponse.data.get(pos).cLongitude;
-                rcData.Longitude = customerResponse.data.get(pos).cLongitude;
-                rcData.GoogleAddress = customerResponse.data.get(pos).cGoogleAddress;
-                rcData.UHId = customerResponse.data.get(pos).cUHId;
-                rcData.Gender = customerResponse.data.get(pos).cGender;
-                rcData.Phone2 = customerResponse.data.get(pos).aiPhone2;
-                rcData.Phone1 = customerResponse.data.get(pos).aiPhone1;
-                rcData.LoyaltyId = customerResponse.data.get(pos).cLoyaltyId;
-                rcData.LoyaltyCode = customerResponse.data.get(pos).cLoyaltyCode;
-                rcData.LoyaltyCardType = customerResponse.data.get(pos).cLoyaltyCardType;
-                rcData.LoyaltyCardTypeDesc = customerResponse.data.get(pos).cLoyaltyCardTypeDesc;
-                rcData.AgeSlab = customerResponse.data.get(pos).cAgeSlab;
-                rcData.DateOfBirth = customerResponse.data.get(pos).cDateOfBirth;
-                rcData.Email = customerResponse.data.get(pos).aiEmail;
-                rcData.AlternateCode = customerResponse.data.get(pos).cLoyaltyCode;
-                rcData.Area=customerResponse.data.get(pos).Area;
-               // rcData.Pincode=Integer.parseInt(customerResponse.data.get(pos).aiPinCode);
-                rcData.State=customerResponse.data.get(pos).aiState;
+                rcData.Latitude = customerResponse.DATA.get(pos).LONGITUDE;
+                rcData.Longitude = customerResponse.DATA.get(pos).LONGITUDE;
+                rcData.GoogleAddress = customerResponse.DATA.get(pos).GOOGLEADDRESS;
+                rcData.UHId = customerResponse.DATA.get(pos).UHID;
+                rcData.Gender = customerResponse.DATA.get(pos).GENDER;
+                rcData.Phone2 = customerResponse.DATA.get(pos).PHONE2;
+                rcData.Phone1 = customerResponse.DATA.get(pos).PHONE1;
+                rcData.LoyaltyId = customerResponse.DATA.get(pos).LOYALTYID;
+                rcData.LoyaltyCode = customerResponse.DATA.get(pos).LOYALTYCODE;
+                rcData.LoyaltyCardType = customerResponse.DATA.get(pos).LOYALTYCARDTYPE;
+                rcData.LoyaltyCardTypeDesc = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
+                rcData.AgeSlab = customerResponse.DATA.get(pos).AGESLAB;
+                rcData.DateOfBirth = customerResponse.DATA.get(pos).DATEOFBIRTH;
+                rcData.Email = customerResponse.DATA.get(pos).EMAIL;
+                rcData.AlternateCode = customerResponse.DATA.get(pos).LOYALTYCODE;
+                rcData.Area = customerResponse.DATA.get(pos).AREA;
+                // rcData.Pincode=Integer.parseInt(customerResponse.DATA.get(pos).aiPinCode);
+                rcData.State = customerResponse.DATA.get(pos).STATE;
 
 
                 sendTestData = gson.toJson(rcData);
@@ -219,45 +238,47 @@ public class RetailCustomerInformation extends AppCompatActivity {
 
                 try {
                     String selectedCustomer = (String) parent.getItemAtPosition(pos);
-                    selectedCustomerName = customerResponse.data.get(pos).cName;
-                    //etCustomerAdrs.setText(customerResponse.data.get(pos).cGoogleAddress);
+                    selectedCustomerName = customerResponse.DATA.get(pos).NAME;
+                    //etCustomerAdrs.setText(customerResponse.DATA.get(pos).cGoogleAddress);
                     appWide.setName(selectedCustomerName);
                     System.out.println("RcData is " + selectedCustomerName);
-                    LoyaltyCode = customerResponse.data.get(pos).cLoyaltyCode;
+                    LoyaltyCode = customerResponse.DATA.get(pos).LOYALTYCODE;
                     appWide.setLoyaltyCode(LoyaltyCode);
-                    LoyaltyCardTypeDesc = customerResponse.data.get(pos).cLoyaltyCardTypeDesc;
-                    LoyaltyId = String.valueOf(customerResponse.data.get(pos).cLoyaltyId);
-                    acvLcardNo.setText(customerResponse.data.get(pos).cLoyaltyCode);
-                    LoyaltyCardType = String.valueOf(customerResponse.data.get(pos).cLoyaltyCardType);
-                    acvmobileNo.setText(customerResponse.data.get(pos).aiPhone2);
-                    cardType.setText(customerResponse.data.get(pos).aiEmail);
+                    LoyaltyCardTypeDesc = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
+                    LoyaltyId = String.valueOf(customerResponse.DATA.get(pos).LOYALTYID);
+                    acvLcardNo.setText(customerResponse.DATA.get(pos).LOYALTYCODE);
+                    LoyaltyCardType = String.valueOf(customerResponse.DATA.get(pos).LOYALTYCARDTYPE);
+                    acvmobileNo.setText(customerResponse.DATA.get(pos).PHONE2);
+                    cardType.setText(customerResponse.DATA.get(pos).EMAIL);
 
-                    String gender = customerResponse.data.get(pos).cGender;
-                    cLatitude = String.valueOf(customerResponse.data.get(pos).cLatitude);
-                    cLongitude = String.valueOf(customerResponse.data.get(pos).cLongitude);
-                    etCustomerGoogleAdrs.setText(customerResponse.data.get(pos).cGoogleAddress);
+                    String gender = customerResponse.DATA.get(pos).GENDER;
+                    cLatitude = String.valueOf(customerResponse.DATA.get(pos).LATITUDE);
+                    cLongitude = String.valueOf(customerResponse.DATA.get(pos).LONGITUDE);
+                    etCustomerGoogleAdrs.setText(customerResponse.DATA.get(pos).GOOGLEADDRESS);
 
                     rcData = new RetailReplyData();
                     gson = new Gson();
                     rcData.Name = selectedCustomerName;
-                    rcData.Latitude = customerResponse.data.get(pos).cLongitude;
-                    rcData.Longitude = customerResponse.data.get(pos).cLongitude;
-                    rcData.GoogleAddress = customerResponse.data.get(pos).cGoogleAddress;
-                    rcData.UHId = customerResponse.data.get(pos).cUHId;
-                    rcData.Gender = customerResponse.data.get(pos).cGender;
-                    rcData.Phone2 = customerResponse.data.get(pos).aiPhone2;
-                    rcData.Phone1 = customerResponse.data.get(pos).aiPhone1;
-                    rcData.LoyaltyId = customerResponse.data.get(pos).cLoyaltyId;
-                    rcData.LoyaltyCode = customerResponse.data.get(pos).cLoyaltyCode;
-                    rcData.LoyaltyCardType = customerResponse.data.get(pos).cLoyaltyCardType;
-                    rcData.LoyaltyCardTypeDesc = customerResponse.data.get(pos).cLoyaltyCardTypeDesc;
-                    rcData.AgeSlab = customerResponse.data.get(pos).cAgeSlab;
-                    rcData.DateOfBirth = customerResponse.data.get(pos).cDateOfBirth;
-                    rcData.Email = customerResponse.data.get(pos).aiEmail;
-                    rcData.AlternateCode = customerResponse.data.get(pos).cLoyaltyCode;
-                    rcData.Area=customerResponse.data.get(pos).Area;
-                   // rcData.Pincode=Integer.parseInt(customerResponse.data.get(pos).aiPinCode);
-                    rcData.State=customerResponse.data.get(pos).aiState;
+                    rcData.Latitude = customerResponse.DATA.get(pos).LONGITUDE;
+                    rcData.Longitude = customerResponse.DATA.get(pos).LONGITUDE;
+                    rcData.GoogleAddress = customerResponse.DATA.get(pos).GOOGLEADDRESS;
+                    rcData.UHId = customerResponse.DATA.get(pos).UHID;
+                    rcData.Gender = customerResponse.DATA.get(pos).GENDER;
+                    rcData.Phone2 = customerResponse.DATA.get(pos).PHONE2;
+                    rcData.Phone1 = customerResponse.DATA.get(pos).PHONE1;
+                    rcData.LoyaltyId = customerResponse.DATA.get(pos).LOYALTYID;
+                    rcData.LoyaltyCode = customerResponse.DATA.get(pos).LOYALTYCODE;
+                    rcData.LoyaltyCardType = customerResponse.DATA.get(pos).LOYALTYCARDTYPE;
+                    rcData.LoyaltyCardTypeDesc = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
+                    rcData.AgeSlab = customerResponse.DATA.get(pos).AGESLAB;
+                    rcData.DateOfBirth = customerResponse.DATA.get(pos).DATEOFBIRTH;
+                    rcData.Email = customerResponse.DATA.get(pos).EMAIL;
+                    rcData.AlternateCode = customerResponse.DATA.get(pos).LOYALTYCODE;
+                    rcData.Area = customerResponse.DATA.get(pos).AREA;
+                    // rcData.Pincode=Integer.parseInt(customerResponse.DATA.get(pos).aiPinCode);
+                    rcData.State = customerResponse.DATA.get(pos).STATE;
+                    rcData.CurrentGuid = prefs.getString("DOCGUID", "");
+                    rcData.DocGuid = prefs.getString("CURRENTGUID", "");
                     sendTestData = gson.toJson(rcData);
                     System.out.println("RC data is " + sendTestData);
 
@@ -480,20 +501,33 @@ public class RetailCustomerInformation extends AppCompatActivity {
             editData = acvCustomerName.getText().toString().trim();
             if (editData.isEmpty())
                 editData = acvLcardNo.getText().toString().trim();
-            System.out.println("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
-            System.out.println(Url + "getcustomerlookup?name=" + editData);
+
+
+            // System.out.println("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
+            //System.out.println(Url + "getcustomerlookup?name=" + editData);
             try {
                 //URL url = new URL(Url + "GetCustomer?name=" + acvCustomerName.getText().toString().trim());
                 //URL url = new URL("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
-                URL url = new URL(Url + "getcustomerlookup?name=" + editData);
+                JSONObject object = new JSONObject();
+                object.put("WildCard", editData);
+                object.put("DocGuid", prefs.getString("DOCGUID", ""));
+                object.put("CurrentGuid", prefs.getString("CURRENTGUID", ""));
+
+                URL url = new URL(Url + "getcustomerlookup");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
+                connection.setRequestMethod("POST");
                 connection.setReadTimeout(300000);
                 connection.setConnectTimeout(300000);
                 connection.setRequestProperty("authkey", appWide.getAuthID());
                 connection.setRequestProperty("machineid", appWide.getMachineId());
                 connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("inputxmlstd", mObject.toString());
                 connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(object.toString());
+                wr.flush();
+                wr.close();
 
                 int responsecode = connection.getResponseCode();
                 String responseMsg = connection.getResponseMessage();
@@ -551,13 +585,13 @@ public class RetailCustomerInformation extends AppCompatActivity {
                 try {
                     Gson gson = new Gson();
                     customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
-                    if (customerResponse.statusFlag == 0) {
-                        String[] arrCust = new String[customerResponse.data.size()];
-                        String[] arrMob = new String[customerResponse.data.size()];
+                    if (customerResponse.STATUSFLAG== 0) {
+                        String[] arrCust = new String[customerResponse.DATA.size()];
+                        String[] arrMob = new String[customerResponse.DATA.size()];
 
-                        for (int i = 0; i < customerResponse.data.size(); i++) {
-                            arrCust[i] = customerResponse.data.get(i).cName;
-                            arrMob[i] = String.valueOf(customerResponse.data.get(i).aiPhone2);
+                        for (int i = 0; i < customerResponse.DATA.size(); i++) {
+                            arrCust[i] = customerResponse.DATA.get(i).NAME;
+                            arrMob[i] = String.valueOf(customerResponse.DATA.get(i).PHONE2);
                         }
                         AutocompleteRetailCustomArrayAdapter myAdapter = new AutocompleteRetailCustomArrayAdapter(RetailCustomerInformation.this, R.layout.custom_spinner_retail, arrCust, arrMob);
                         if (checkFlag == 1) {
@@ -571,7 +605,7 @@ public class RetailCustomerInformation extends AppCompatActivity {
                         }
 
                     } else {
-                        tsMessages(customerResponse.errorMessage);
+                        tsMessages(customerResponse.ERRORMESSAGE);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -665,14 +699,16 @@ public class RetailCustomerInformation extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             try {
 
-                URL url = new URL(Url +"SaveDevCustInfo");
+                URL url = new URL(Url + "SaveDevCustInfo");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setReadTimeout(15000);
                 connection.setConnectTimeout(180000);
                 connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
                 connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("inputxmlstd", mObject.toString());
                 connection.connect();
+
 
                 DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
                 wr.writeBytes(sendTestData);
@@ -722,11 +758,11 @@ public class RetailCustomerInformation extends AppCompatActivity {
                 gson = new Gson();
                 //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
                 APIResponse apiResponse = gson.fromJson(s, APIResponse.class);
-                if (apiResponse.statusFlag == 0) {
+                if (apiResponse.STATUSFLAG == 0) {
                     //tsMessages("Saved Sucessfully");
                     startActivity(new Intent(RetailCustomerInformation.this, RetailSOActivity.class));
                 } else {
-                    tsMessages(apiResponse.errorMessage);
+                    tsMessages(apiResponse.ERRORMESSAGE);
                 }
 
             } catch (Exception e) {

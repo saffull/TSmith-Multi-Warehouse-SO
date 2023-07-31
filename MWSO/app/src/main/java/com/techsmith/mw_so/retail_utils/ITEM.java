@@ -19,9 +19,9 @@ public class ITEM {
 
     public double RATE;
 
-    public int PACKQTY;
+    public Double PACKQTY;
 
-    public int DISCPER;
+    public float DISCPER; //previous INt
 
     public String DISCCODE;
 
@@ -32,4 +32,16 @@ public class ITEM {
    // public int IGST;
 
     public double LINETOTAL;
+    public String SCHEMEDISCPER;
+    public String EFFECTIVESCHEMEDISCPER;
+    public String SCHEMEOFFAMOUNT;
+    public String EFFSCHEMEDISCPERC;
+    public String TOTALDISCAMOUNT;
+    public String EFFLCARDDISCPERC;
+    public String TOTALDISCPERC;
+    public int CGST;
+    public int SGST;
+    public int IGST;
+    public String LCARDDISCPER;
+    public String LCARDDISCID;
 }

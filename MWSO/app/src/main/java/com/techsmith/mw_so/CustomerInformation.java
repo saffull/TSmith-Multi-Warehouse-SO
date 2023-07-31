@@ -111,13 +111,13 @@ public class CustomerInformation extends AppCompatActivity {
         try {
             Gson gson = new Gson();
             userPLObj = gson.fromJson(loginResponse, UserPL.class);
-            acvCustomerName.setText(userPLObj.summary.customerName);
-            etCustomerAdrs.setText(userPLObj.summary.customerAddress);
-            etCustomerGSTNo.setText(userPLObj.summary.customerGSTIN);
-            etCustomerMobile.setText(userPLObj.summary.customerPhoneNo);
+            acvCustomerName.setText(userPLObj.summary.CUSTOMERNAME);
+            etCustomerAdrs.setText(userPLObj.summary.CUSTOMERADDRESS);
+            etCustomerGSTNo.setText(userPLObj.summary.CUSTOMERGSTIN);
+            etCustomerMobile.setText(userPLObj.summary.CUSTOMERPHONENO);
 
-            if (userPLObj.summary.customerId != 0)
-                etCustomerId.setText(String.valueOf(userPLObj.summary.customerId));
+            if (userPLObj.summary.CUSTOMERID != 0)
+                etCustomerId.setText(String.valueOf(userPLObj.summary.CUSTOMERID));
             else
                 etCustomerId.setText("");
         } catch (Exception e) {
@@ -279,7 +279,7 @@ public class CustomerInformation extends AppCompatActivity {
 
     public void GetReceivables(View view) {
         System.out.println("Customer ID is " + customerId);
-        customerId = userPLObj.summary.customerId;
+        customerId = userPLObj.summary.CUSTOMERID;
         if (customerId != 0) {
             new GetReceivablesTask().execute();
         } else if (selectedCustomerId != 0) {
