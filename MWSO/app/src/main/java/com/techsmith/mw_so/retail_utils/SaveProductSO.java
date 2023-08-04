@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 public class SaveProductSO {
 
-    public Summary summary;
-    public CUSTOMERDETAIL customerdetail;
-    public DETAIL detail;
-    public PAYMENT payment;
+    public Summary SUMMARY;
+    public CUSTOMERDETAIL CUSTOMERDETAIL;
+    public DETAIL DETAIL;
+    public PAYMENT PAYMENT;
     public ArrayList<SaveProductSOPL> data;
 }

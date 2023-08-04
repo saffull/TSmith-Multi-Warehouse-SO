@@ -43,16 +43,22 @@
             app:srcCompat="@drawable/ic_print"
             app:tint="@color/white" />
         <!--Action name text for the add alarm button-->
-        <TextView
-            android:id="@+id/add_alarm_action_text"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Revert Scheme"
-            android:textColor="@color/black"
+            android:background="@drawable/rounded_corner_textview"
             app:layout_constraintBottom_toBottomOf="@+id/add_alarm_fab"
             app:layout_constraintEnd_toStartOf="@+id/add_alarm_fab"
-            app:layout_constraintTop_toTopOf="@+id/add_alarm_fab" />
+            app:layout_constraintTop_toTopOf="@+id/add_alarm_fab">
+
+            <TextView
+                android:id="@+id/add_alarm_action_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Revert Scheme"
+                android:textColor="@color/black" />
+        </LinearLayout>
         <!--Floating action button for print-->
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -68,16 +74,23 @@
             app:srcCompat="@drawable/ic_coupon"
             app:tint="@color/white" />
         <!--Action name text for the add alarm button-->
-        <TextView
-            android:id="@+id/preview_text"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="Apply Schemes"
-            android:textColor="@color/black"
+            android:background="@drawable/rounded_corner_textview"
             app:layout_constraintBottom_toBottomOf="@+id/preview_fab"
             app:layout_constraintEnd_toStartOf="@+id/preview_fab"
-            app:layout_constraintTop_toTopOf="@+id/preview_fab" />
+            app:layout_constraintTop_toTopOf="@+id/preview_fab">
+
+            <TextView
+                android:id="@+id/preview_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Apply Schemes"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_person_fab"
@@ -93,16 +106,22 @@
             app:srcCompat="@drawable/shopping_cart"
             app:tint="@color/white" />
         <!--Action name text for the add person button-->
-        <TextView
-            android:id="@+id/add_person_action_text"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="S.Order Pending"
-            android:textColor="@color/black"
+            android:background="@drawable/rounded_corner_textview"
             app:layout_constraintBottom_toBottomOf="@+id/add_person_fab"
             app:layout_constraintEnd_toStartOf="@+id/add_person_fab"
-            app:layout_constraintTop_toTopOf="@+id/add_person_fab" />
+            app:layout_constraintTop_toTopOf="@+id/add_person_fab">
+
+            <TextView
+                android:id="@+id/add_person_action_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="S.Order Pending"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -251,6 +270,8 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:orientation="horizontal"
+                                    android:id="@+id/ll2"
+                                    android:visibility="gone"
                                     android:weightSum="3">
 
 
@@ -265,7 +286,49 @@
                                     <TextView
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
-                                        android:layout_weight="2"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="Description"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.5"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:text="MRP"
+                                        android:textColor="@color/black" />
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/fabrica"
+                                        android:gravity="center"
+                                        android:text="Line Total"
+                                        android:textColor="@color/black" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:id="@+id/ll1"
+                                    android:weightSum="3">
+
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="0.5"
+                                        android:fontFamily="@font/fabrica"
+                                        android:text="#"
+                                        android:textColor="@color/black" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1.5"
                                         android:fontFamily="@font/fabrica"
                                         android:text="Description"
                                         android:textColor="@color/black" />
@@ -319,10 +382,10 @@
 
 
                                     <TextView
+                                        android:id="@+id/discText"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="0.1"
-                                        android:id="@+id/discText"
                                         android:fontFamily="@font/fabrica"
                                         android:gravity="center"
                                         android:paddingRight="5px"

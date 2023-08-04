@@ -37,7 +37,7 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
     Gson gson;
     RetailCustomAdapter ad;
     ArrayList<ITEM> sList;
-    TextView tvProductName, tvSOH, tvmrp, tvSelectedItemName, tvMrp;
+    TextView tvProductName, tvSOH, tvmrp, lineTotal, tvMrp;
     private static final DecimalFormat decfor = new DecimalFormat("0.00");
 
     public RetailSOSchemeArrayAdapter(@NonNull Context context, int resource, String s, int size, ArrayList<ITEM> schemeList) {
@@ -59,6 +59,7 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
             tvMrp = convertView.findViewById(R.id.tvMRP);
             TextView tvRate = convertView.findViewById(R.id.tvRate);
             TextView editQty = convertView.findViewById(R.id.tvqty);
+            lineTotal=convertView.findViewById(R.id.lineTotal);
             tvSOH = convertView.findViewById(R.id.tvSOHInQtySelection);
             TextView tvQty = convertView.findViewById(R.id.tvQty);
             TextView tvFreeQty = convertView.findViewById(R.id.tvFreeQty);// disc space
@@ -68,6 +69,10 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
 
             try {
                 ((RetailSOActivity) context).discText.setText("Tot Disc%");
+                ((RetailSOActivity) context).ll2.setVisibility(View.VISIBLE);
+                ((RetailSOActivity) context).ll1.setVisibility(View.GONE);
+
+
             }catch (Exception e){e.printStackTrace();}
 
 
@@ -78,10 +83,11 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
                 tvQty.setText(String.valueOf(sList.get(position).PACKQTY));
                 editQty.setText(String.valueOf(sList.get(position).BATCHCODE));
                 tvRate.setText(String.valueOf(sList.get(position).BATCHID));
+                lineTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
                 double d = sList.get(position).RATE * sList.get(position).PACKQTY;
                 //tvTotal.setText(sList.get(position).pTotal);
                 tvTotal.setText(decfor.format(d));
-                tvFreeQty.setText(sList.get(position).TOTALDISCPERC + "%,\u20B9" + sList.get(position).TOTALDISCAMOUNT + "...");
+                tvFreeQty.setText(sList.get(position).TOTALDISCPERC + "%, ...");
 
             } catch (Exception e) {
                 e.printStackTrace();

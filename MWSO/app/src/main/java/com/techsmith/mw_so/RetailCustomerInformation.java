@@ -196,25 +196,25 @@ public class RetailCustomerInformation extends AppCompatActivity {
 
                 rcData = new RetailReplyData();
                 Gson gson = new Gson();
-                rcData.Name = selectedCustomerName;
+                rcData.NAME = selectedCustomerName;
                 rcData.Latitude = customerResponse.DATA.get(pos).LONGITUDE;
                 rcData.Longitude = customerResponse.DATA.get(pos).LONGITUDE;
                 rcData.GoogleAddress = customerResponse.DATA.get(pos).GOOGLEADDRESS;
                 rcData.UHId = customerResponse.DATA.get(pos).UHID;
                 rcData.Gender = customerResponse.DATA.get(pos).GENDER;
-                rcData.Phone2 = customerResponse.DATA.get(pos).PHONE2;
-                rcData.Phone1 = customerResponse.DATA.get(pos).PHONE1;
-                rcData.LoyaltyId = customerResponse.DATA.get(pos).LOYALTYID;
-                rcData.LoyaltyCode = customerResponse.DATA.get(pos).LOYALTYCODE;
-                rcData.LoyaltyCardType = customerResponse.DATA.get(pos).LOYALTYCARDTYPE;
-                rcData.LoyaltyCardTypeDesc = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
+                rcData.PHONE2 = customerResponse.DATA.get(pos).PHONE2;
+                rcData.PHONE1 = customerResponse.DATA.get(pos).PHONE1;
+                rcData.LOYALTYID = customerResponse.DATA.get(pos).LOYALTYID;
+                rcData.LOYALTYCODE = customerResponse.DATA.get(pos).LOYALTYCODE;
+                rcData.LOYALTYCARDTYPE = customerResponse.DATA.get(pos).LOYALTYCARDTYPE;
+                rcData.LOYALTYCARDTYPEDESC = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
                 rcData.AgeSlab = customerResponse.DATA.get(pos).AGESLAB;
                 rcData.DateOfBirth = customerResponse.DATA.get(pos).DATEOFBIRTH;
-                rcData.Email = customerResponse.DATA.get(pos).EMAIL;
-                rcData.AlternateCode = customerResponse.DATA.get(pos).LOYALTYCODE;
-                rcData.Area = customerResponse.DATA.get(pos).AREA;
+                rcData.EMAIL = customerResponse.DATA.get(pos).EMAIL;
+                rcData.ALTERNATECODE = customerResponse.DATA.get(pos).LOYALTYCODE;
+                rcData.AREA = customerResponse.DATA.get(pos).AREA;
                 // rcData.Pincode=Integer.parseInt(customerResponse.DATA.get(pos).aiPinCode);
-                rcData.State = customerResponse.DATA.get(pos).STATE;
+                rcData.STATE = customerResponse.DATA.get(pos).STATE;
 
 
                 sendTestData = gson.toJson(rcData);
@@ -258,27 +258,27 @@ public class RetailCustomerInformation extends AppCompatActivity {
 
                     rcData = new RetailReplyData();
                     gson = new Gson();
-                    rcData.Name = selectedCustomerName;
+                    rcData.NAME = selectedCustomerName;
                     rcData.Latitude = customerResponse.DATA.get(pos).LONGITUDE;
                     rcData.Longitude = customerResponse.DATA.get(pos).LONGITUDE;
                     rcData.GoogleAddress = customerResponse.DATA.get(pos).GOOGLEADDRESS;
                     rcData.UHId = customerResponse.DATA.get(pos).UHID;
                     rcData.Gender = customerResponse.DATA.get(pos).GENDER;
-                    rcData.Phone2 = customerResponse.DATA.get(pos).PHONE2;
-                    rcData.Phone1 = customerResponse.DATA.get(pos).PHONE1;
-                    rcData.LoyaltyId = customerResponse.DATA.get(pos).LOYALTYID;
-                    rcData.LoyaltyCode = customerResponse.DATA.get(pos).LOYALTYCODE;
-                    rcData.LoyaltyCardType = customerResponse.DATA.get(pos).LOYALTYCARDTYPE;
-                    rcData.LoyaltyCardTypeDesc = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
+                    rcData.PHONE2 = customerResponse.DATA.get(pos).PHONE2;
+                    rcData.PHONE1 = customerResponse.DATA.get(pos).PHONE1;
+                    rcData.LOYALTYID = customerResponse.DATA.get(pos).LOYALTYID;
+                    rcData.LOYALTYCODE = customerResponse.DATA.get(pos).LOYALTYCODE;
+                    rcData.LOYALTYCARDTYPE = customerResponse.DATA.get(pos).LOYALTYCARDTYPE;
+                    rcData.LOYALTYCARDTYPEDESC = customerResponse.DATA.get(pos).LOYALTYCARDTYPEDESC;
                     rcData.AgeSlab = customerResponse.DATA.get(pos).AGESLAB;
                     rcData.DateOfBirth = customerResponse.DATA.get(pos).DATEOFBIRTH;
-                    rcData.Email = customerResponse.DATA.get(pos).EMAIL;
-                    rcData.AlternateCode = customerResponse.DATA.get(pos).LOYALTYCODE;
-                    rcData.Area = customerResponse.DATA.get(pos).AREA;
+                    rcData.EMAIL = customerResponse.DATA.get(pos).EMAIL;
+                    rcData.ALTERNATECODE = customerResponse.DATA.get(pos).LOYALTYCODE;
+                    rcData.AREA = customerResponse.DATA.get(pos).AREA;
                     // rcData.Pincode=Integer.parseInt(customerResponse.DATA.get(pos).aiPinCode);
-                    rcData.State = customerResponse.DATA.get(pos).STATE;
-                    rcData.CurrentGuid = prefs.getString("DOCGUID", "");
-                    rcData.DocGuid = prefs.getString("CURRENTGUID", "");
+                    rcData.STATE = customerResponse.DATA.get(pos).STATE;
+                    rcData.CURRENTGUID = prefs.getString("DOCGUID", "");
+                    rcData.DOCGUID = prefs.getString("CURRENTGUID", "");
                     sendTestData = gson.toJson(rcData);
                     System.out.println("RC data is " + sendTestData);
 
@@ -509,9 +509,9 @@ public class RetailCustomerInformation extends AppCompatActivity {
                 //URL url = new URL(Url + "GetCustomer?name=" + acvCustomerName.getText().toString().trim());
                 //URL url = new URL("https://tsmithy.in/dev/sbill/api/getcustomerlookup?name=" + editData);
                 JSONObject object = new JSONObject();
-                object.put("WildCard", editData);
-                object.put("DocGuid", prefs.getString("DOCGUID", ""));
-                object.put("CurrentGuid", prefs.getString("CURRENTGUID", ""));
+                object.put("WILDCARD", editData);
+                object.put("DOCGUID", prefs.getString("DOCGUID", ""));
+                object.put("CURRENTGUID", prefs.getString("CURRENTGUID", ""));
 
                 URL url = new URL(Url + "getcustomerlookup");
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

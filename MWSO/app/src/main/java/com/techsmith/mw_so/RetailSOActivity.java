@@ -126,7 +126,8 @@ public class RetailSOActivity extends AppCompatActivity {
     ItemDetails itemDetails;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet;
-    public TextView tvAmountValue, discText; // item made public so that to access in its adapter class
+    public LinearLayout ll2, ll1;
+    public TextView tvAmountValue, discText, headTotal; // item made public so that to access in its adapter class
     public ArrayList<AllocateQtyPL> detailProductList;
     public ArrayList<SaveProductSOPL> sList;
     public ArrayList<ITEM> itemArrayList;
@@ -155,7 +156,7 @@ public class RetailSOActivity extends AppCompatActivity {
     ExtendedFloatingActionButton mAddFab;
     TextView addAlarmActionText, addPersonActionText, email_text, MessageDisplay, invoice_text, preview_text;
     Boolean isAllFabsVisible;
-    public Double productTotal = 0.0;
+    public Double productTotal = 0.0, payTotal = 0.0;
     private Button paymentBtn;
     JSONObject mObject;
     AppWide appWide;
@@ -174,12 +175,15 @@ public class RetailSOActivity extends AppCompatActivity {
         appContext = getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(RetailSOActivity.this);
         acvItemSearchSOActivity = findViewById(R.id.acvItemSearchSOActivity);
+        ll2 = findViewById(R.id.ll2);
+        ll1 = findViewById(R.id.ll1);
         mAddFab = findViewById(R.id.add_fab);
         mAddAlarmFab = findViewById(R.id.add_alarm_fab);
         mAddPersonFab = findViewById(R.id.add_person_fab);
         preview_fab = findViewById(R.id.preview_fab);
         MessageDisplay = findViewById(R.id.MessageDisplay);
         discText = findViewById(R.id.discText);
+        // headTotal=findViewById(R.id.headTotal);
         lvProductlist = findViewById(R.id.lvProductlist);
         addAlarmActionText = findViewById(R.id.add_alarm_action_text);
         addPersonActionText = findViewById(R.id.add_person_action_text);
@@ -205,6 +209,7 @@ public class RetailSOActivity extends AppCompatActivity {
         multiSOStoredDevId = prefs.getString("MultiSOStoredDevId", "");
         uniqueId = prefs.getString("guid", "");
         roundingTotal = prefs.getString("roundingPermsn", "No");
+        System.out.println("Rounding Permission Given" + roundingTotal);
 
         customer_Details = prefs.getString("customer_Details", "");
         cceId = prefs.getString("cceId", "");
@@ -217,9 +222,9 @@ public class RetailSOActivity extends AppCompatActivity {
             RetailReplyData rcData = new RetailReplyData();
             rcData = gson.fromJson(customer_Details, RetailReplyData.class);
             System.out.println(rcData.GoogleAddress);
-            tvCustomerName.setText(rcData.Name);
-            LoyaltyID = String.valueOf(rcData.LoyaltyId);
-            LoyaltyCode = rcData.LoyaltyCode;
+            tvCustomerName.setText(rcData.NAME);
+            LoyaltyID = String.valueOf(rcData.LOYALTYID);
+            LoyaltyCode = rcData.LOYALTYCODE;
 
 
             // tvDate.setText(String.valueOf(customer_id));
@@ -235,28 +240,27 @@ public class RetailSOActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         System.out.println("Unique Id is " + uniqueId);
-        if (roundingTotal.equalsIgnoreCase("Yes"))
 
-            acvItemSearchSOActivity.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        acvItemSearchSOActivity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String temp = editable.toString();
+                if (temp.length() == 0) {
+                    acvItemSearchSOActivity.setAdapter(null);
                 }
 
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    String temp = editable.toString();
-                    if (temp.length() == 0) {
-                        acvItemSearchSOActivity.setAdapter(null);
-                    }
-
-                }
-            });
+            }
+        });
         acvItemSearchSOActivity.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
@@ -285,55 +289,66 @@ public class RetailSOActivity extends AppCompatActivity {
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSOActivity.this);
                 alertDialogBuilder.setMessage("Apply Schemes..?");
-                alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
                         try {
+                            sap = new SaveProductSO();
+                            sap.DETAIL = detail;
                             RetailReplyData rcData = new RetailReplyData();
                             rcData = gson.fromJson(customer_Details, RetailReplyData.class);
                             Summary summary = new Summary();
-                            CUSTOMERDETAIL customerdetail = new CUSTOMERDETAIL();
+                            CUSTOMERDETAIL CUSTOMERDETAIL = new CUSTOMERDETAIL();
 
                             summary.BILLDATE = "31/07/2023";
                             summary.BILLNO = "NEW";
                             summary.REFNO = "";
                             summary.BILLTYPE = "CASH";
-                            summary.CUSTOMER = rcData.Name;
+                            summary.CUSTOMER = rcData.NAME;
                             summary.CCEID = cceId;
                             summary.SUMMARYDISC = 0;
                             summary.NOOFITEMS = sList.size();
                             summary.DOCGUID = prefs.getString("DOCGUID", "");
                             summary.CURRENTGUID = prefs.getString("CURRENTGUID", "");
                             if (Double.parseDouble(tvAmountValue.getText().toString()) > 0) {
-                                String temp = tvAmountValue.getText().toString();
-                                String[] partsTemp = temp.split("\\.");
-                                String Temp1 = partsTemp[0]; // 004
-                                String Temp2 = partsTemp[1]; // 034556
-                                summary.NETAMOUNT = Double.parseDouble(Temp1);
-                                summary.ROUNDOFF = Double.parseDouble(Temp2) / 100;
+
+                                double doubleNumber = Double.parseDouble(tvAmountValue.getText().toString());
+                                String doubleAsString = String.valueOf(doubleNumber);
+                                int indexOfDecimal = doubleAsString.indexOf(".");
+                                System.out.println("Double Number: " + doubleNumber);
+                                System.out.println("Integer Part: " + doubleAsString.substring(0, indexOfDecimal));
+                                System.out.println("Decimal Part: " + doubleAsString.substring(indexOfDecimal));
+                                double beforeRound = 0.0, afterRound = 0.0, diff = 0.0;
+                                for (int i = 0; i < sap.DETAIL.ITEM.size(); i++) {
+                                    beforeRound = beforeRound + sap.DETAIL.ITEM.get(i).LINETOTAL;
+                                }
+                                afterRound = Math.round(beforeRound);
+                                diff = afterRound - beforeRound;
+                                // summary.NETAMOUNT = Double.valueOf(doubleAsString.substring(0, indexOfDecimal));
+                                summary.NETAMOUNT = afterRound;
+                                //summary.ROUNDOFF = (Double.parseDouble(doubleAsString.substring(indexOfDecimal)));
+                                summary.ROUNDOFF = Double.parseDouble(df.format(diff));
 
                             } else {
                                 summary.ROUNDOFF = 0.0;
                                 summary.NETAMOUNT = 0.0;
                             }
 
-                            customerdetail.CUSTOMER = rcData.Name;
-                            customerdetail.LoyaltyCode = LoyaltyCode;
-                            customerdetail.LoyaltyID = LoyaltyID;
-                            customerdetail.ADDRESS = (String) rcData.GoogleAddress;
-                            if (rcData.Phone1.isEmpty())
-                                customerdetail.MOBILENO = Long.parseLong(rcData.Phone2);
+                            CUSTOMERDETAIL.CUSTOMER = rcData.NAME;
+                            CUSTOMERDETAIL.LoyaltyCode = LoyaltyCode;
+                            CUSTOMERDETAIL.LoyaltyID = LoyaltyID;
+                            CUSTOMERDETAIL.ADDRESS = (String) rcData.GoogleAddress;
+                            if (rcData.PHONE1.isEmpty())
+                                CUSTOMERDETAIL.MOBILENO = Long.parseLong(rcData.PHONE2);
                             else
-                                customerdetail.MOBILENO = Long.parseLong(rcData.Phone1);
-                            customerdetail.AREA = rcData.Area;
-                            customerdetail.PINCODE = rcData.Pincode;
-                            customerdetail.STATE = rcData.State;
+                                CUSTOMERDETAIL.MOBILENO = Long.parseLong(rcData.PHONE1);
+                            CUSTOMERDETAIL.AREA = rcData.AREA;
+                            CUSTOMERDETAIL.PINCODE = rcData.PINCODE;
+                            CUSTOMERDETAIL.STATE = rcData.STATE;
 
 
-                            sap = new SaveProductSO();
-                            sap.summary = summary;
-                            sap.customerdetail = customerdetail;
-                            sap.detail = detail;
+                            sap.SUMMARY = summary;
+                            sap.CUSTOMERDETAIL = CUSTOMERDETAIL;
                             sendSchemeData = gson.toJson(sap);
                             System.out.println("Final Scheme Input json is " + sendSchemeData);
 
@@ -366,6 +381,9 @@ public class RetailSOActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (schemeList.size() > 0) {
+                    ll2.setVisibility(View.GONE);
+                    ll1.setVisibility(View.VISIBLE);
+                    discText.setText("Disc%");
                     new revertScheme().execute();
                 } else {
                     tsMessages("Scheme Not Applied..");
@@ -499,18 +517,10 @@ public class RetailSOActivity extends AppCompatActivity {
 
     private void SaveRetailSo() {
         System.out.println("Formed json is " + formedSO);
-      /*  if (sList.size() > 0)
-            tsMessages(formedSO);
-        else
-            tsMessages("List Empty");*/
-        System.out.println("Total Value is " + tvAmountValue.getText().toString());
-        String string = tvAmountValue.getText().toString();
-        String[] parts = string.split("\\.");
-        String part1 = parts[0]; // 004
-        String part2 = parts[1]; // 034556
-
 
         try {
+            sap = new SaveProductSO();
+            sap.DETAIL = detail;
             PAYMENT payment = new PAYMENT();
             ArrayList<PAYDETAIL> paydetailList = new ArrayList<>();
             prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
@@ -574,63 +584,78 @@ public class RetailSOActivity extends AppCompatActivity {
             paysummary.PAIDAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
 
 
-            payment.paysummary = paysummary;
+            payment.PAYSUMMARY = paysummary;
             payment.PAYDETAIL = paydetailList;
 
 
             RetailReplyData rcData = new RetailReplyData();
             rcData = gson.fromJson(customer_Details, RetailReplyData.class);
             Summary summary = new Summary();
-            CUSTOMERDETAIL customerdetail = new CUSTOMERDETAIL();
+            CUSTOMERDETAIL CUSTOMERDETAIL = new CUSTOMERDETAIL();
             //  String uniqueID = UUID.randomUUID().toString();
 
             summary.BILLDATE = "31/07/2023";
             summary.BILLNO = "NEW";
             summary.REFNO = "";
             summary.BILLTYPE = "CASH";
-            summary.CUSTOMER = rcData.Name;
+            summary.CUSTOMER = rcData.NAME;
             summary.CCEID = cceId;
             summary.SUMMARYDISC = 0;
             summary.NOOFITEMS = sList.size();
             summary.DOCGUID = prefs.getString("DOCGUID", "");
             summary.CURRENTGUID = prefs.getString("CURRENTGUID", "");
             if (Double.parseDouble(tvAmountValue.getText().toString()) > 0) {
-                String temp = tvAmountValue.getText().toString();
+                double doubleNumber = Double.parseDouble(tvAmountValue.getText().toString());
+                String doubleAsString = String.valueOf(doubleNumber);
+                int indexOfDecimal = doubleAsString.indexOf(".");
+                System.out.println("Double Number: " + doubleNumber);
+                System.out.println("Integer Part: " + doubleAsString.substring(0, indexOfDecimal));
+                System.out.println("Decimal Part: " + doubleAsString.substring(indexOfDecimal));
+
+             /*   String temp = tvAmountValue.getText().toString();
                 String[] partsTemp = temp.split("\\.");
                 String Temp1 = partsTemp[0]; // 004
                 String Temp2 = partsTemp[1]; // 034556
                 summary.NETAMOUNT = Double.parseDouble(Temp1);
-                summary.ROUNDOFF = Double.parseDouble(Temp2) / 100;
+                summary.ROUNDOFF = Double.parseDouble(Temp2) / 100;*/
+
+                double beforeRound = 0.0, afterRound = 0.0, diff = 0.0;
+                for (int i = 0; i < sap.DETAIL.ITEM.size(); i++) {
+                    beforeRound = beforeRound + sap.DETAIL.ITEM.get(i).LINETOTAL;
+                }
+                afterRound = Math.round(beforeRound);
+                diff = afterRound - beforeRound;
+
+                summary.NETAMOUNT = afterRound;
+                summary.ROUNDOFF = Double.parseDouble(df.format(diff));
+                //summary.NETAMOUNT = Double.valueOf(doubleAsString.substring(0, indexOfDecimal));
+                //summary.ROUNDOFF = (Double.parseDouble(doubleAsString.substring(indexOfDecimal)));
 
             } else {
                 summary.ROUNDOFF = 0.0;
                 summary.NETAMOUNT = 0.0;
             }
 
-            //summary.NETAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
 
-
-            customerdetail.CUSTOMER = rcData.Name;
-            customerdetail.LoyaltyCode = LoyaltyCode;
-            customerdetail.LoyaltyID = LoyaltyID;
-            customerdetail.ADDRESS = (String) rcData.GoogleAddress;
-            if (rcData.Phone1.isEmpty())
-                customerdetail.MOBILENO = Long.parseLong(rcData.Phone2);
+            CUSTOMERDETAIL.CUSTOMER = rcData.NAME;
+            CUSTOMERDETAIL.LoyaltyCode = LoyaltyCode;
+            CUSTOMERDETAIL.LoyaltyID = LoyaltyID;
+            CUSTOMERDETAIL.ADDRESS = (String) rcData.GoogleAddress;
+            if (rcData.PHONE1.isEmpty())
+                CUSTOMERDETAIL.MOBILENO = Long.parseLong(rcData.PHONE2);
             else
-                customerdetail.MOBILENO = Long.parseLong(rcData.Phone1);
-            customerdetail.AREA = rcData.Area;
-            customerdetail.PINCODE = rcData.Pincode;
-            customerdetail.STATE = rcData.State;
+                CUSTOMERDETAIL.MOBILENO = Long.parseLong(rcData.PHONE1);
+            CUSTOMERDETAIL.AREA = rcData.AREA;
+            CUSTOMERDETAIL.PINCODE = rcData.PINCODE;
+            CUSTOMERDETAIL.STATE = rcData.STATE;
 
 
-            sap = new SaveProductSO();
-            sap.summary = summary;
-            sap.customerdetail = customerdetail;
-            sap.detail = detail;
-            sap.payment = payment;
+            sap.SUMMARY = summary;
+            sap.CUSTOMERDETAIL = CUSTOMERDETAIL;
+            sap.PAYMENT = payment;
             sendTestData = gson.toJson(sap);
             System.out.println("Final Save json is " + sendTestData);
-            if (sap.payment.PAYDETAIL.size() > 0) {
+            if (sap.PAYMENT.PAYDETAIL.size() > 0) {
 
                 android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
                 alertDialogBuilder.setMessage("Do you want to Save Retail SO..?");
@@ -687,7 +712,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
             String msg = " Store Name:" + appWide.getStoreName() + "\n Store Code:" + appWide.getStoreCode() +
                     "\n SubStore Id: " + appWide.getSubStoreId() + "\n Name: " + appWide.getName()
-                    + "\n LoyaltyCode: " + appWide.getLoyaltyCode() + "\n DOCGUID: " + uniqueId + "\nCURRENTGUID" + uniqueId;
+                    + "\n LoyaltyCode: " + appWide.getLoyaltyCode() + "\n DOCGUID: " + uniqueId + "\n" + "\nCURRENTGUID" + uniqueId + "\n";
             controlInfo.setText(msg);
         } catch (Exception e) {
             e.printStackTrace();
@@ -816,8 +841,8 @@ public class RetailSOActivity extends AppCompatActivity {
             try {
                 JSONObject object = new JSONObject();
                 object.put("ITEMID", itemId);
-                object.put("DocGuid", prefs.getString("DOCGUID", ""));
-                object.put("CurrentGuid", prefs.getString("CURRENTGUID", ""));
+                object.put("DOCGUID", prefs.getString("DOCGUID", ""));
+                object.put("CURRENTGUID", prefs.getString("CURRENTGUID", ""));
                 URL url = new URL(Url + "getbatchlookup?storeId");
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -1082,13 +1107,13 @@ public class RetailSOActivity extends AppCompatActivity {
                             System.out.println(discPer.getText().toString());
                             productTotal = productTotal + Double.parseDouble(tempTotal);
                             System.out.println("Total Product Total 1 is " + productTotal);
-                            if (roundingTotal.equalsIgnoreCase("No")) {
+                          /*  if (roundingTotal.equalsIgnoreCase("No")) {
                                 tvAmountValue.setText(String.valueOf(productTotal));
                             } else {
                                 df.setRoundingMode(RoundingMode.UP);
                                 tvAmountValue.setText(String.valueOf(df.format(productTotal)));
 
-                            }
+                            }*/
                             try {
                                 detail = new DETAIL();
                                 SaveProductSOPL so = new SaveProductSOPL();
@@ -1150,10 +1175,13 @@ public class RetailSOActivity extends AppCompatActivity {
                                 lvProductlist.setAdapter(arrayAdapter);
                                 arrayAdapter.notifyDataSetChanged();
                                 if (roundingTotal.equalsIgnoreCase("No")) {
-                                    tvAmountValue.setText(String.valueOf(productTotal));
-                                } else {
-                                    df.setRoundingMode(RoundingMode.UP);
+                                    //tvAmountValue.setText(String.valueOf(productTotal));
                                     tvAmountValue.setText(String.valueOf(df.format(productTotal)));
+                                } else {
+                                    //df.setRoundingMode(RoundingMode.UP);
+                                    //After adding rounding function
+                                    tvAmountValue.setText(String.valueOf(df.format(Math.round(productTotal))));
+                                    //tvAmountValue.setText(String.valueOf(df.format(productTotal)));
 
                                 }
 
@@ -1253,17 +1281,26 @@ public class RetailSOActivity extends AppCompatActivity {
             item.DISCCODE = "ZART";
             //item.LINETOTAL = Double.parseDouble(tvItemMRP.getText().toString().replace("Rate: ", "")) * Integer.parseInt(etQty.getText().toString());
             if (sList.get(i).Disc == 0.0)
-                item.LINETOTAL = sList.get(i).Rate * Integer.parseInt(sList.get(i).qty);
+                item.LINETOTAL = Double.parseDouble(df.format(sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)));
             else {
                 Double d = (sList.get(i).Disc / 100) * (sList.get(i).Rate * Integer.parseInt(sList.get(i).qty));
-                item.LINETOTAL = (sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)) - d;
+                item.LINETOTAL = Double.parseDouble(df.format((sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)) - d));
 
             }
-
-
             itemArrayList.add(item);
         }
         detail.ITEM = itemArrayList;
+        double d = 0.0;
+        for (int i = 0; i < detail.ITEM.size(); i++) {
+            if (detail.ITEM.get(i).DISCPER == 0.0)
+                d = d + Double.parseDouble(df.format(sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)));
+            else {
+                Double dd = (sList.get(i).Disc / 100) * (sList.get(i).Rate * Integer.parseInt(sList.get(i).qty));
+                d = d + Double.parseDouble(df.format((sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)) - dd));
+
+            }
+            tvAmountValue.setText(String.valueOf(Math.round(d)));
+        }
         String temp = gson.toJson(detail);
         System.out.println("New Formed JSon is " + temp);
     }
@@ -1293,8 +1330,8 @@ public class RetailSOActivity extends AppCompatActivity {
                 //URL url = new URL(Url + "GetSOHAndSchemes?ItemId=" + itemId + "&CustId=" + CustomerId);
                 JSONObject object = new JSONObject();
                 object.put("ITEMID", itemCode);
-                object.put("DocGuid", prefs.getString("DOCGUID", ""));
-                object.put("CurrentGuid", prefs.getString("CURRENTGUID", ""));
+                object.put("DOCGUID", prefs.getString("DOCGUID", ""));
+                object.put("CURRENTGUID", prefs.getString("CURRENTGUID", ""));
 
                 URL url = new URL(Url + "getproductdetails");
 
@@ -1401,9 +1438,9 @@ public class RetailSOActivity extends AppCompatActivity {
             try {
                 //URL url = new URL(Url + "GetProduct?name=" + filter);//
                 JSONObject object = new JSONObject();
-                object.put("wildcard", filter);
-                object.put("DocGuid", prefs.getString("DOCGUID", ""));
-                object.put("CurrentGuid", prefs.getString("CURRENTGUID", ""));
+                object.put("WILDCARD", filter);
+                object.put("DOCGUID", prefs.getString("DOCGUID", ""));
+                object.put("CURRENTGUID", prefs.getString("CURRENTGUID", ""));
                 URL url = new URL(Url + "getproductLookup");
                 System.out.println(Url + "getproductLookup?wildcard=" + filter + "&storeid=" + StoreId + "&substoreid=" + subStoreId);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -1551,8 +1588,8 @@ public class RetailSOActivity extends AppCompatActivity {
             try {
                 JSONObject object = new JSONObject();
                 object.put("ITEMID", itemCode);
-                object.put("DocGuid", prefs.getString("DOCGUID", ""));
-                object.put("CurrentGuid", prefs.getString("CURRENTGUID", ""));
+                object.put("DOCGUID", prefs.getString("DOCGUID", ""));
+                object.put("CURRENTGUID", prefs.getString("CURRENTGUID", ""));
 
                 URL url = new URL(Url + "ApplyScheme_RetailBill");
 
@@ -1621,10 +1658,19 @@ public class RetailSOActivity extends AppCompatActivity {
                     initializeFab();
                     schemeList = new ArrayList<>();
                     schemeList = response.DATA.OUTPUTXML.DETAIL.ITEM;
+                    productTotal = 0.0;
 
 
-                    productTotal = Double.parseDouble(response.DATA.OUTPUTXML.SUMMARY.NETAMOUNT);
-                    tvAmountValue.setText(String.valueOf(df.format(productTotal)));
+                    for (int i = 0; i < response.DATA.OUTPUTXML.DETAIL.ITEM.size(); i++) {
+                        productTotal = productTotal + (response.DATA.OUTPUTXML.DETAIL.ITEM.get(i).LINETOTAL);
+                    }
+                    //  productTotal = Double.parseDouble(response.DATA.OUTPUTXML.SUMMARY.NETAMOUNT);
+                    // tvAmountValue.setText(String.valueOf(df.format(productTotal)));
+                    tvAmountValue.setText(String.valueOf(df.format(Math.round(productTotal))));
+                  /*  if (roundingTotal.equalsIgnoreCase("Yes"))
+                        tvAmountValue.setText(String.valueOf(df.format(Math.round(productTotal))));
+                    else
+                        tvAmountValue.setText(String.valueOf(df.format(productTotal)));*/
                     RetailSOSchemeArrayAdapter arrayAdapter = new RetailSOSchemeArrayAdapter(RetailSOActivity.this, R.layout.list_row, s, schemeList.size(), schemeList);
                     lvProductlist.setAdapter(arrayAdapter);
                     arrayAdapter.notifyDataSetChanged();
@@ -1643,6 +1689,7 @@ public class RetailSOActivity extends AppCompatActivity {
         try {
             itemArrayList = new ArrayList<>();
             PAYMENT payment = new PAYMENT();
+            double totalSum = 0.0;
             ArrayList<PAYDETAIL> paydetailList = new ArrayList<>();
             prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
             String t1 = prefsD.getString("cashSave", "");
@@ -1660,6 +1707,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
             System.out.println(cashAmount + "\t<------------->\t" + cardAmount);
+            totalSum = totalSum + Double.parseDouble(cashAmount) + Double.parseDouble(cardAmount);
 
             if (cashAmount.equalsIgnoreCase("0.0") && cardAmount.equalsIgnoreCase("0.0")) {
                 tsMessages("Add Payment");
@@ -1705,11 +1753,12 @@ public class RetailSOActivity extends AppCompatActivity {
 
             PAYSUMMARY paysummary = new PAYSUMMARY();
             paysummary.BILLAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
-            paysummary.PAIDAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+            paysummary.PAIDAMOUNT = totalSum;
 
 
-            payment.paysummary = paysummary;
+            payment.PAYSUMMARY = paysummary;
             payment.PAYDETAIL = paydetailList;
+            double tempSum = 0.0;
 
             for (int i = 0; i < schemeList.size(); i++) {
                 ITEM item = new ITEM();
@@ -1722,7 +1771,7 @@ public class RetailSOActivity extends AppCompatActivity {
                 item.BATCHEXPIRY = schemeList.get(i).BATCHEXPIRY;
                 item.MRP = schemeList.get(i).MRP;
                 item.RATE = schemeList.get(i).RATE;
-                item.PACKQTY =  schemeList.get(i).PACKQTY;
+                item.PACKQTY = schemeList.get(i).PACKQTY;
                 item.DISCPER = schemeList.get(i).DISCPER;
                 item.DISCCODE = "ZART";
                 item.LINETOTAL = schemeList.get(i).LINETOTAL;
@@ -1735,6 +1784,7 @@ public class RetailSOActivity extends AppCompatActivity {
                 item.LCARDDISCID = schemeList.get(i).LCARDDISCID;
                 item.EFFLCARDDISCPERC = schemeList.get(i).EFFLCARDDISCPERC;
                 itemArrayList.add(item);
+                tempSum = tempSum + schemeList.get(i).LINETOTAL;
 
             }
             detail.ITEM = itemArrayList;
@@ -1744,7 +1794,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
             Summary summary = new Summary();
-            CUSTOMERDETAIL customerdetail = new CUSTOMERDETAIL();
+            CUSTOMERDETAIL CUSTOMERDETAIL = new CUSTOMERDETAIL();
 
             //summary.BILLDATE = response.DATA.OUTPUTXML.SUMMARY.BILLDATE;
             summary.BILLDATE = "31/07/2023";
@@ -1757,29 +1807,46 @@ public class RetailSOActivity extends AppCompatActivity {
             summary.NOOFITEMS = response.DATA.OUTPUTXML.SUMMARY.NOOFITEMS;
             summary.DOCGUID = response.DATA.OUTPUTXML.SUMMARY.DOCGUID;
             summary.CURRENTGUID = response.DATA.OUTPUTXML.SUMMARY.CURRENTGUID;
-            summary.ROUNDOFF = Double.parseDouble(response.DATA.OUTPUTXML.SUMMARY.ROUNDOFF);
-            summary.NETAMOUNT = Double.parseDouble(response.DATA.OUTPUTXML.SUMMARY.NETAMOUNT);
+            // summary.ROUNDOFF = Double.parseDouble(response.DATA.OUTPUTXML.SUMMARY.ROUNDOFF);
+            summary.ROUNDOFF = Double.parseDouble(df.format(totalSum - tempSum));
+            //summary.NETAMOUNT = Double.parseDouble(response.DATA.OUTPUTXML.SUMMARY.NETAMOUNT);//need round amount
+            summary.NETAMOUNT = Math.round(totalSum);
 
 
-            customerdetail.CUSTOMER = response.DATA.OUTPUTXML.CUSTOMERDETAIL.CUSTOMER;
-            customerdetail.LoyaltyCode = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYCODE;
-            customerdetail.LoyaltyID = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYID;
-            customerdetail.ADDRESS = response.DATA.OUTPUTXML.CUSTOMERDETAIL.ADDRESS;
-            customerdetail.MOBILENO = Long.parseLong(response.DATA.OUTPUTXML.CUSTOMERDETAIL.MOBILENO);
-            customerdetail.AREA = response.DATA.OUTPUTXML.CUSTOMERDETAIL.AREA;
-            customerdetail.PINCODE = Integer.parseInt(response.DATA.OUTPUTXML.CUSTOMERDETAIL.PINCODE);
-            customerdetail.STATE = response.DATA.OUTPUTXML.CUSTOMERDETAIL.STATE;
+            CUSTOMERDETAIL.CUSTOMER = response.DATA.OUTPUTXML.CUSTOMERDETAIL.CUSTOMER;
+            CUSTOMERDETAIL.LoyaltyCode = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYCODE;
+            CUSTOMERDETAIL.LoyaltyID = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYID;
+            CUSTOMERDETAIL.ADDRESS = response.DATA.OUTPUTXML.CUSTOMERDETAIL.ADDRESS;
+            CUSTOMERDETAIL.MOBILENO = Long.parseLong(response.DATA.OUTPUTXML.CUSTOMERDETAIL.MOBILENO);
+            CUSTOMERDETAIL.AREA = response.DATA.OUTPUTXML.CUSTOMERDETAIL.AREA;
+            CUSTOMERDETAIL.PINCODE = Integer.parseInt(response.DATA.OUTPUTXML.CUSTOMERDETAIL.PINCODE);
+            CUSTOMERDETAIL.STATE = response.DATA.OUTPUTXML.CUSTOMERDETAIL.STATE;
 
 
             sap = new SaveProductSO();
-            sap.summary = summary;
-            sap.customerdetail = customerdetail;
-            sap.detail = detail;
-            sap.payment = payment;
+            sap.SUMMARY = summary;
+            sap.CUSTOMERDETAIL = CUSTOMERDETAIL;
+            sap.DETAIL = detail;
+            sap.PAYMENT = payment;
             sendSchemeData = gson.toJson(sap);
             System.out.println("New Formed Scheme Json is " + sendSchemeData);
+            android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
+            alertDialogBuilder.setMessage("Do you want to Save Retail SO..?");
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    new saveSchemeSO().execute();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
 
-            new saveSchemeSO().execute();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2128,6 +2195,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
                 JSONObject jObject = new JSONObject();
                 jObject.put("CURRENTGUID", prefs.getString("CURRENTGUID", ""));
+                jObject.put("DOCGUID", prefs.getString("DOCGUID", ""));
 
 
                 URL url = new URL(Url + "RevertScheme_RetailBill");
@@ -2163,9 +2231,6 @@ public class RetailSOActivity extends AppCompatActivity {
 
                         reader.close();
                         strRevertScheme = sb.toString();
-                        ;
-                        ;
-                        ;
                         System.out.println("Revert Response is " + strRevertScheme);
 
 
@@ -2195,6 +2260,7 @@ public class RetailSOActivity extends AppCompatActivity {
                 if (sc.STATUSFLAG == 0) {
                     schemeList = new ArrayList<>();
                     strSchemeResponse = "";
+                    initializeFab();
                     ArrayList<SchemeReverseItem> rItem = new ArrayList<>();
                     rItem = sc.DATA.INPUTXML.DETAIL.ITEM;
                     for (int i = 0; i < rItem.size(); i++) {

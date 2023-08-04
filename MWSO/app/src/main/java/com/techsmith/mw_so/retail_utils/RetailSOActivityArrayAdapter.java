@@ -415,7 +415,7 @@ public class RetailSOActivityArrayAdapter extends ArrayAdapter {
                 System.out.println("Value 2 " + productTotal);
                 ((RetailSOActivity) context).productTotal = productTotal;
                 System.out.println("Total Product Total after Edit is  " + productTotal);
-                ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
+                //((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
                 try {
 
 

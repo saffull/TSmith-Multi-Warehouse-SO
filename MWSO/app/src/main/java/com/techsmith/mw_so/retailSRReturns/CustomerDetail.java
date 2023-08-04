@@ -6,4 +6,5 @@ public class CustomerDetail {
     public String MOBILENO;
     public int PINCODE;
     public String AREA;
+    public String DOCGUID;
 }

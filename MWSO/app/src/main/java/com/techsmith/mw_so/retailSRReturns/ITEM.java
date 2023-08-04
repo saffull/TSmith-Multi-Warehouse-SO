@@ -2,16 +2,17 @@ package com.techsmith.mw_so.retailSRReturns;
 
 public class ITEM {
 
-    public String LineId;
-    public String ItemId;
-    public String ItemCode;
-    public String ItemName;
-    public String HsnCode;
-    public String BatchCode;
-    public String BatchId;
-    public String BatchExpiry;
+    public String LINEID;
+    public String ITEMID;
+    public String ITEMCODE;
+    public String ITEMNAME;
+    public String HSNCODE;
+    public String BATCHCODE;
+    public String BATCHID;
+    public String BATCHEXPIRY;
     public String MRP;
-    public String Rate;
-    public String PackQty;
-    public String DiscPer;
+    public String RATE;
+    public String PACKQTY;
+    public String DISCPER;
+    public double LINETOTAL;
 }

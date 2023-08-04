@@ -24,7 +24,7 @@
             android:id="@+id/tvProductName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:text="Product Name"
             android:textColor="@color/black" />
 
@@ -34,10 +34,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
             android:fontFamily="@font/fabrica"
-            android:gravity="right"
+            android:gravity="start"
             android:text="MRP"
             android:textColor="@color/black" />
-
+        <TextView
+            android:layout_width="0dp"
+            android:id="@+id/lineTotal"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:fontFamily="@font/fabrica"
+            android:gravity="center"
+            android:text="LAMT"
+            android:textColor="@color/black" />
         <ImageButton
             android:id="@+id/btnDeleteItem"
             android:layout_width="wrap_content"
@@ -110,10 +118,10 @@
             android:layout_weight="0.4"
             android:background="@drawable/border"
             android:fontFamily="@font/fabrica"
-            android:gravity="start"
+            android:gravity="center"
             android:text="0"
             android:textColor="@color/colorRed"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:drawableEndCompat="@drawable/ic_expand" />
         <!-- <TextView

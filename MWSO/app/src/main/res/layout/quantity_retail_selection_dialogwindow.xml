@@ -260,6 +260,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0.0"
+                android:selectAllOnFocus="true"
                 android:background="@drawable/et_roundedbox_bg"
                 android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>

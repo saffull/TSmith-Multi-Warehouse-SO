@@ -2,28 +2,28 @@ package com.techsmith.mw_so.retail_utils;
 
 public class RetailReplyData {
 
-    public int LoyaltyId;
+    public int LOYALTYID;
 
-    public String LoyaltyCode;
+    public String LOYALTYCODE;
 
-    public String Name;
+    public String NAME;
 
-    public String Phone2;
+    public String PHONE2;
 
-    public String Phone1;
+    public String PHONE1;
 
-    public String Email;
+    public String EMAIL;
 
-    public String AlternateCode;
+    public String ALTERNATECODE;
 
-    public String LoyaltyCardTypeDesc;
-    public String Area;
-    public int Pincode;
-    public String State;
-    public String DocGuid;
-    public String CurrentGuid;
+    public String LOYALTYCARDTYPEDESC;
+    public String AREA;
+    public int PINCODE;
+    public String STATE;
+    public String DOCGUID;
+    public String CURRENTGUID;
 
-    public int LoyaltyCardType;
+    public int LOYALTYCARDTYPE;
 
     public Object UHId;
 

@@ -1,7 +1,7 @@
 package com.techsmith.mw_so.retailSRReturns;
 
 public class RetrieveProductSO {
-    public int statusFlag;
-    public String errorMessage;
+    public int STATUSFLAG;
+    public String ERRORMESSAGE;
     public DATA DATA;
 }

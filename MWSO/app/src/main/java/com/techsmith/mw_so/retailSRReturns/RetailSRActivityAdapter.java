@@ -30,6 +30,8 @@ import com.techsmith.mw_so.RetailSRBillCustomerInfoActivity;
 import com.techsmith.mw_so.RetailSalesReturnActivity;
 import com.techsmith.mw_so.retail_utils.SaveProductSOPL;
 
+import org.w3c.dom.Text;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -65,8 +67,8 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         //batchID = new ArrayList<>();
         pList = new ArrayList<>();
         for (int i = 0; i < sList.size(); i++) {
-            batchCode.add(sList.get(i).BatchCode);
-            batchExpiry.add(sList.get(i).BatchExpiry);
+            batchCode.add(sList.get(i).BATCHCODE);
+            batchExpiry.add(sList.get(i).BATCHEXPIRY);
             batchMrp.add(Double.valueOf(sList.get(i).MRP));
 
         }
@@ -94,19 +96,17 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
             try {
                 //"batchCode":"EX271","batchId":1025034269,"batchMrp":14.96,"Rate":10.02,"sohInPacks":0.47,"batchExpiry":"01/01/2023"}]}
 
-                tvProductName.setText(sList.get(position).ItemName);
+                tvProductName.setText(sList.get(position).ITEMNAME);
                 tvmrp.setText(String.valueOf(sList.get(position).MRP));
-                tvMrp.setText(String.valueOf(sList.get(position).Rate));
-                tvQty.setText(String.valueOf(sList.get(position).PackQty));
+                tvMrp.setText(String.valueOf(sList.get(position).RATE));
+                tvQty.setText(String.valueOf(sList.get(position).PACKQTY));
                 prevQty = 0.0;
-                prevQty = Double.valueOf(sList.get(position).PackQty);
-                editQty.setText(String.valueOf(sList.get(position).BatchCode));
-                //tvRate.setText(String.valueOf(sList.get(position).));
-                //double d = Double.parseDouble(sList.get(position).pTotal);
-                //tvTotal.setText(sList.get(position).pTotal);
-                // tvTotal.setText(decfor.format(d));
-                tvSlNo.setText(sList.get(position).LineId);
-                tvFreeQty.setText(String.valueOf(sList.get(position).DiscPer) + "%");
+                prevQty = Double.valueOf(sList.get(position).PACKQTY);
+                editQty.setText(String.valueOf(sList.get(position).BATCHCODE));
+
+                tvTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
+                tvSlNo.setText(sList.get(position).LINEID);
+                tvFreeQty.setText(String.valueOf(sList.get(position).DISCPER) + "%");
 
                 btnDelete.setOnClickListener(new View.OnClickListener() {// delete
                     @Override
@@ -176,7 +176,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
     private void callItemTotal() {
         Double newTotal = 0.0;
         for (int i = 0; i < sList.size(); i++) {
-            newTotal = newTotal + Double.parseDouble(sList.get(i).Rate) * Double.parseDouble(sList.get(i).PackQty);
+            newTotal = newTotal + Double.parseDouble(sList.get(i).RATE) * Double.parseDouble(sList.get(i).PACKQTY);
         }
         System.out.println("New Total is " + newTotal);
         ((RetailSalesReturnActivity) context).tvAmountValue.setText(String.valueOf(round(newTotal, 2)));
@@ -206,42 +206,42 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         lp.copyFrom(qtydialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        System.out.println("currentBatchCode:--------------->" + sList.get(position).BatchCode);
-        currentBcode = sList.get(position).BatchCode;
+        System.out.println("currentBatchCode:--------------->" + sList.get(position).BATCHCODE);
+        currentBcode = sList.get(position).BATCHCODE;
         TextView tvSelectedItemName = qtydialog.findViewById(R.id.tvSelectedItemName);
         TextInputEditText discPer = qtydialog.findViewById(R.id.discField);
         TextView pTotal = qtydialog.findViewById(R.id.pTotal);
 
-        tvSelectedItemName.setText(sList.get(position).ItemName);
-        discPer.setText(String.valueOf(sList.get(position).DiscPer));
+        tvSelectedItemName.setText(sList.get(position).ITEMNAME);
+        discPer.setText(String.valueOf(sList.get(position).DISCPER));
         TextView tvSelectedItemCode = qtydialog.findViewById(R.id.tvSelectedItemCode);
-        tvSelectedItemCode.setText("Product Code: " + sList.get(position).ItemCode);
+        tvSelectedItemCode.setText("Product Code: " + sList.get(position).ITEMCODE);
         // temppCode = sList.get(position).pCode;
         TextView tvItemSOH = qtydialog.findViewById(R.id.tvItemSOH);
-        tvItemSOH.setText("Quantity: " + sList.get(position).PackQty);
+        tvItemSOH.setText("Quantity: " + sList.get(position).PACKQTY);
         TextView tvSelectedItemExp = qtydialog.findViewById(R.id.tvSelectedItemExp);
         TextView tvItemMRP = qtydialog.findViewById(R.id.tvItemMRP);
         TextView tvbMRP = qtydialog.findViewById(R.id.tvbMRP);
         tvbMRP.setText("MRP: " + sList.get(position).MRP);
-        tvItemMRP.setText("Rate: " + sList.get(position).Rate);
-        pRate = Double.parseDouble(sList.get(position).Rate);
-        tvSelectedItemExp.setText("Expiry: " + sList.get(position).BatchExpiry);
+        tvItemMRP.setText("Rate: " + sList.get(position).RATE);
+        pRate = Double.parseDouble(sList.get(position).RATE);
+        tvSelectedItemExp.setText("Expiry: " + sList.get(position).BATCHEXPIRY);
         Button caculate = qtydialog.findViewById(R.id.caculate);
         EditText etQty = qtydialog.findViewById(R.id.etQty);
-        if (sList.get(position).PackQty.contains(".")) {
-            String string = sList.get(position).PackQty;
+        if (sList.get(position).PACKQTY.contains(".")) {
+            String string = sList.get(position).PACKQTY;
             String[] parts = string.split("\\.");
             currentQty = parts[0]; // 004
             String part2 = parts[1];
             etQty.setText(currentQty);
         } else {
-            etQty.setText(sList.get(position).PackQty);
+            etQty.setText(sList.get(position).PACKQTY);
         }
 
         ImageButton imgBtn = qtydialog.findViewById(R.id.imgBtn);
         ImageButton imgBtnMinusPack = qtydialog.findViewById(R.id.imgBtnMinusPack);
         ImageButton imgBtnPlusPack = qtydialog.findViewById(R.id.imgBtnPlusPack);
-        pTotal.setText(String.valueOf(Double.parseDouble(sList.get(position).Rate) * Double.parseDouble(sList.get(position).PackQty)));
+        pTotal.setText(String.valueOf(Double.parseDouble(sList.get(position).RATE) * Double.parseDouble(sList.get(position).PACKQTY)));
         etQty.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -295,7 +295,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         bSpinner.setAdapter(ad);
         bSpinner.setEnabled(false);
         for (int i = 0; i < sList.size(); i++) {
-            if (sList.get(i).BatchCode.equalsIgnoreCase(currentBcode)) {
+            if (sList.get(i).BATCHCODE.equalsIgnoreCase(currentBcode)) {
                 bSpinner.setSelection(i);
                 System.out.println("Selected batch code");
             }
@@ -311,7 +311,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         caculate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Double.parseDouble(etQty.getText().toString()) > Double.parseDouble(sList.get(position).PackQty)) {
+                if (Double.parseDouble(etQty.getText().toString()) > Double.parseDouble(sList.get(position).PACKQTY)) {
                     System.out.println("Current item quantity is " + prevQty);
                     Toast.makeText(context, " Quantity Cannot Be Increased", Toast.LENGTH_SHORT).show();
                 } else if (Double.parseDouble(discPer.getText().toString()) > 100) {
@@ -320,11 +320,11 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                     btnAddItem_qtySelection.setEnabled(true);
                     double d = 0.0, disc = 0.0, temp;
                     if (!etQty.getText().toString().isEmpty()) {
-                        ((RetailSalesReturnActivity) context).sList.get(position).PackQty = etQty.getText().toString();
-                        sList.get(position).PackQty = etQty.getText().toString();
+                        ((RetailSalesReturnActivity) context).sList.get(position).PACKQTY = etQty.getText().toString();
+                        sList.get(position).PACKQTY = etQty.getText().toString();
                         if (!discPer.getText().toString().isEmpty()) {
-                            ((RetailSalesReturnActivity) context).sList.get(position).DiscPer = discPer.getText().toString();
-                            sList.get(position).DiscPer = discPer.getText().toString();
+                            ((RetailSalesReturnActivity) context).sList.get(position).DISCPER = discPer.getText().toString();
+                            sList.get(position).DISCPER = discPer.getText().toString();
                             if (Double.parseDouble(discPer.getText().toString()) > 0) {
                                 disc = Double.parseDouble(discPer.getText().toString()) / 100;
                                 d = pRate * Double.parseDouble(etQty.getText().toString());
@@ -335,7 +335,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                                 pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
 
                             } else {
-                                d = Double.parseDouble(sList.get(position).Rate) * Double.parseDouble(etQty.getText().toString());
+                                d = Double.parseDouble(sList.get(position).RATE) * Double.parseDouble(etQty.getText().toString());
                                 tempTotal = String.valueOf(round(d, 2));
                                 ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
                                 System.out.println("After Discount " + total);
@@ -343,7 +343,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                             }
 
                         } else {
-                            d = Double.parseDouble(sList.get(position).Rate) * Double.parseDouble(etQty.getText().toString());
+                            d = Double.parseDouble(sList.get(position).RATE) * Double.parseDouble(etQty.getText().toString());
                             tempTotal = String.valueOf(round(d, 2));
                             ptotal = tempTotal;
                             pTotal.setText(decfor.format(d));
@@ -363,12 +363,12 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
             public void onClick(View view) {
                 Double newTotal = 0.0;
                 for (int i = 0; i < sList.size(); i++) {
-                    if (Double.parseDouble(sList.get(i).DiscPer) == 0.0) {
-                        newTotal = newTotal + Double.parseDouble(sList.get(i).Rate) * Double.parseDouble(sList.get(i).PackQty);
+                    if (Double.parseDouble(sList.get(i).DISCPER) == 0.0) {
+                        newTotal = newTotal + Double.parseDouble(sList.get(i).RATE) * Double.parseDouble(sList.get(i).PACKQTY);
                     } else {
-                        double d = Double.parseDouble(sList.get(i).Rate) * Double.parseDouble(sList.get(i).PackQty);
-                        newTotal = newTotal + d - ((Double.parseDouble(sList.get(i).DiscPer) / 100) *
-                                (Double.parseDouble(sList.get(i).Rate) * Double.parseDouble(sList.get(i).PackQty)));
+                        double d = Double.parseDouble(sList.get(i).RATE) * Double.parseDouble(sList.get(i).PACKQTY);
+                        newTotal = newTotal + d - ((Double.parseDouble(sList.get(i).DISCPER) / 100) *
+                                (Double.parseDouble(sList.get(i).RATE) * Double.parseDouble(sList.get(i).PACKQTY)));
                     }
 
                 }

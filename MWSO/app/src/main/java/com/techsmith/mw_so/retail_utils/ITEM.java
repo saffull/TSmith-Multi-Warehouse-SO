@@ -39,9 +39,6 @@ public class ITEM {
     public String TOTALDISCAMOUNT;
     public String EFFLCARDDISCPERC;
     public String TOTALDISCPERC;
-    public int CGST;
-    public int SGST;
-    public int IGST;
     public String LCARDDISCPER;
     public String LCARDDISCID;
 }

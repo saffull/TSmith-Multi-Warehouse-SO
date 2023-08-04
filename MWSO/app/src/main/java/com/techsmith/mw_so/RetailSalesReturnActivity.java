@@ -67,7 +67,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
     public ArrayList<ITEM> sList;
     public ListView lvProductlist;
     public Double productTotal;
-    public TextView tvAmountValue,tvCustomerName;
+    public TextView tvAmountValue, tvCustomerName, tvDate;
 
 
     @Override
@@ -82,7 +82,8 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         acvmobileNo = findViewById(R.id.acvmobileNo);
         lvProductlist = findViewById(R.id.lvProductlist);
         etCustomerGoogleAdrs = findViewById(R.id.etCustomerGoogleAdrs);
-        tvCustomerName=findViewById(R.id.tvCustomerName);
+        tvDate = findViewById(R.id.tvDate);
+        tvCustomerName = findViewById(R.id.tvCustomerName);
         Url = prefs.getString("MultiSOURL", "");
         billNo = prefs.getString("billNo", "");
         System.out.println(billNo);
@@ -130,7 +131,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         String part1 = parts[0]; // 004
         String part2 = parts[1]; // 034556
 
-        sop.DATA.SALESBILL.DETAIL.Item = sList;
+        sop.DATA.SALESBILL.DETAIL.ITEM = sList;
         System.out.println(sop);
 
 
@@ -150,6 +151,23 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
     public void ResetList(View view) {
         lvProductlist.setAdapter(null);
         new TakeBillDetails().execute();
+    }
+
+    public void showDialog(View view) {
+        try {
+            gson = new Gson();
+            sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
+            if (sop.STATUSFLAG == 0) {
+                tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
+               String msg="Name: "+sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER+
+                       "\nBillNo: "+billNo+"\nDOCGUID: "+sop.DATA.SALESBILL.SUMMARY.DOCGUID;
+               tsMessages(msg);
+            } else {
+                tsMessages(sop.ERRORMESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private class TakeBillDetails extends AsyncTask<String, String, String> {
@@ -246,16 +264,21 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
                 try {
                     gson = new Gson();
                     sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
-                    if (sop.statusFlag == 0) {
+                    if (sop.STATUSFLAG == 0) {
                         tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
-                        sList = sop.DATA.SALESBILL.DETAIL.Item;
+                        tvDate.setText("BillNo: " + billNo);
+                        sList = sop.DATA.SALESBILL.DETAIL.ITEM;
                         RetailSRActivityAdapter arrayAdapter = new RetailSRActivityAdapter(RetailSalesReturnActivity.this, R.layout.list_row, sList);
                         lvProductlist.setAdapter(arrayAdapter);
                         arrayAdapter.notifyDataSetChanged();
-                        double d = Double.parseDouble(sop.DATA.SALESBILL.SUMMARY.NETAMOUNT) + Double.parseDouble(sop.DATA.SALESBILL.SUMMARY.ROUNDOFF);
+                        double d=0.0;
+                        for (int i = 0; i <sop.DATA.SALESBILL.DETAIL.ITEM.size() ; i++) {
+                             d = d+sop.DATA.SALESBILL.DETAIL.ITEM.get(i).LINETOTAL;
+                        }
+                       // double d = Double.parseDouble(sop.DATA.SALESBILL.DETAIL.ITEM.get());
                         tvAmountValue.setText(String.valueOf(d));
                     } else {
-
+                        tsMessages(sop.ERRORMESSAGE);
                     }
 
 
@@ -313,7 +336,6 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
             });
-
             tvMsgTodisplay.setText(msg);
             dialog.show();
         } catch (Exception ex) {

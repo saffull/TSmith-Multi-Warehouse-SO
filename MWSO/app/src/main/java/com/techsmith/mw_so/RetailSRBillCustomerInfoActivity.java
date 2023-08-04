@@ -74,6 +74,10 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
         etCustomerGoogleAdrs = findViewById(R.id.etCustomerGoogleAdrs);
         Url = prefs.getString("MultiSOURL", "");
         uniqueID = UUID.randomUUID().toString();
+
+        if (!prefs.getString("billNo", "").isEmpty())
+            acvBillNo.setText(prefs.getString("billNo", ""));
+
     }
 
     public void gotoSRList(View view) {
@@ -182,7 +186,7 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
                 try {
                     gson = new Gson();
                     RetrieveProductSO sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
-                    if (sop.statusFlag == 0) {
+                    if (sop.STATUSFLAG == 0) {
                         System.out.println(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
                         acvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
                         acvmobileNo.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.MOBILENO);
@@ -192,7 +196,7 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
                         etCustomerGoogleAdrs.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.ADDRESS);
 
                     } else {
-                        tsMessages(sop.errorMessage);
+                        tsMessages(sop.ERRORMESSAGE);
                     }
 
 
