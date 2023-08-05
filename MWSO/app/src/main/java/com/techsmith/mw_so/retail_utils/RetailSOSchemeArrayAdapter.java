@@ -31,8 +31,8 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
     Context context, appContext;
     String IncomingData = "";
     int totalCount = 0;
-    ImageButton btnDelete,imgBtn;
-    EditText totaldiscamount, totaldiscperc, effschemediscperc, schemeoffamount, lcarddiscper,schemediscper;
+    ImageButton btnDelete, imgBtn;
+    EditText totaldiscamount, totaldiscperc, effschemediscperc, schemeoffamount, lcarddiscper, schemediscper;
     Dialog qtydialog;
     Gson gson;
     RetailCustomAdapter ad;
@@ -42,7 +42,7 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
 
     public RetailSOSchemeArrayAdapter(@NonNull Context context, int resource, String s, int size, ArrayList<ITEM> schemeList) {
         super(context, resource);
-        this.context=context;
+        this.context = context;
         this.IncomingData = s;
         this.totalCount = size;
         this.sList = schemeList;
@@ -59,21 +59,13 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
             tvMrp = convertView.findViewById(R.id.tvMRP);
             TextView tvRate = convertView.findViewById(R.id.tvRate);
             TextView editQty = convertView.findViewById(R.id.tvqty);
-            lineTotal=convertView.findViewById(R.id.lineTotal);
+            lineTotal = convertView.findViewById(R.id.lineTotal);
             tvSOH = convertView.findViewById(R.id.tvSOHInQtySelection);
             TextView tvQty = convertView.findViewById(R.id.tvQty);
             TextView tvFreeQty = convertView.findViewById(R.id.tvFreeQty);// disc space
             TextView tvTotal = convertView.findViewById(R.id.tvTotal);
             final ImageButton imgBtnRemarksItem = convertView.findViewById(R.id.imgBtnRemarksItem);
             btnDelete = convertView.findViewById(R.id.btnDeleteItem);
-
-            try {
-                ((RetailSOActivity) context).discText.setText("Tot Disc%");
-                ((RetailSOActivity) context).ll2.setVisibility(View.VISIBLE);
-                ((RetailSOActivity) context).ll1.setVisibility(View.GONE);
-
-
-            }catch (Exception e){e.printStackTrace();}
 
 
             try {
@@ -83,16 +75,26 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
                 tvQty.setText(String.valueOf(sList.get(position).PACKQTY));
                 editQty.setText(String.valueOf(sList.get(position).BATCHCODE));
                 tvRate.setText(String.valueOf(sList.get(position).BATCHID));
-                lineTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
+//                lineTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
                 double d = sList.get(position).RATE * sList.get(position).PACKQTY;
                 //tvTotal.setText(sList.get(position).pTotal);
                 tvTotal.setText(decfor.format(d));
+                tvTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
+                lineTotal.setText(decfor.format(d));
+
                 tvFreeQty.setText(sList.get(position).TOTALDISCPERC + "%, ...");
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            try {
+                ((RetailSOActivity) context).discText.setText("Tot Disc%");
+                ((RetailSOActivity) context).lineTotal.setVisibility(View.VISIBLE);
+                ((RetailSOActivity) context).lineTotal.setText("Total");
+                ((RetailSOActivity) context).fullTotal.setText("Line Total");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
           /*  btnDelete.setOnClickListener(new View.OnClickListener() {// delete
                 @Override
@@ -176,7 +178,7 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
         lp.copyFrom(qtydialog.getWindow().getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        imgBtn=qtydialog.findViewById(R.id.imgBtn);
+        imgBtn = qtydialog.findViewById(R.id.imgBtn);
         totaldiscamount = qtydialog.findViewById(R.id.totaldiscamount);
         totaldiscamount.setText(sList.get(position).TOTALDISCAMOUNT);
         totaldiscperc = qtydialog.findViewById(R.id.totaldiscperc);
@@ -187,7 +189,7 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
         schemeoffamount.setText(sList.get(position).SCHEMEOFFAMOUNT);
         lcarddiscper = qtydialog.findViewById(R.id.lcarddiscper);
         lcarddiscper.setText(sList.get(position).LCARDDISCPER);
-        schemediscper=qtydialog.findViewById(R.id.schemediscper);
+        schemediscper = qtydialog.findViewById(R.id.schemediscper);
         schemediscper.setText(sList.get(position).SCHEMEDISCPER);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override

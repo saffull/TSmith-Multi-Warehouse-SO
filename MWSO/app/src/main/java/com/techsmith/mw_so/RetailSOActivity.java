@@ -126,8 +126,7 @@ public class RetailSOActivity extends AppCompatActivity {
     ItemDetails itemDetails;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet;
-    public LinearLayout ll2, ll1;
-    public TextView tvAmountValue, discText, headTotal; // item made public so that to access in its adapter class
+    public TextView tvAmountValue, discText, lineTotal, fullTotal; // item made public so that to access in its adapter class
     public ArrayList<AllocateQtyPL> detailProductList;
     public ArrayList<SaveProductSOPL> sList;
     public ArrayList<ITEM> itemArrayList;
@@ -175,15 +174,14 @@ public class RetailSOActivity extends AppCompatActivity {
         appContext = getApplicationContext();
         prefs = PreferenceManager.getDefaultSharedPreferences(RetailSOActivity.this);
         acvItemSearchSOActivity = findViewById(R.id.acvItemSearchSOActivity);
-        ll2 = findViewById(R.id.ll2);
-        ll1 = findViewById(R.id.ll1);
         mAddFab = findViewById(R.id.add_fab);
         mAddAlarmFab = findViewById(R.id.add_alarm_fab);
         mAddPersonFab = findViewById(R.id.add_person_fab);
         preview_fab = findViewById(R.id.preview_fab);
         MessageDisplay = findViewById(R.id.MessageDisplay);
         discText = findViewById(R.id.discText);
-        // headTotal=findViewById(R.id.headTotal);
+        lineTotal = findViewById(R.id.lineTotal);
+        fullTotal = findViewById(R.id.fullTotal);
         lvProductlist = findViewById(R.id.lvProductlist);
         addAlarmActionText = findViewById(R.id.add_alarm_action_text);
         addPersonActionText = findViewById(R.id.add_person_action_text);
@@ -381,9 +379,9 @@ public class RetailSOActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (schemeList.size() > 0) {
-                    ll2.setVisibility(View.GONE);
-                    ll1.setVisibility(View.VISIBLE);
                     discText.setText("Disc%");
+                    lineTotal.setVisibility(View.INVISIBLE);
+                    fullTotal.setText("Total");
                     new revertScheme().execute();
                 } else {
                     tsMessages("Scheme Not Applied..");
