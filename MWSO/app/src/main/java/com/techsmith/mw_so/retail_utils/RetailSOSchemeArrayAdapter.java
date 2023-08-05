@@ -32,7 +32,7 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
     String IncomingData = "";
     int totalCount = 0;
     ImageButton btnDelete, imgBtn;
-    EditText totaldiscamount, totaldiscperc, effschemediscperc, schemeoffamount, lcarddiscper, schemediscper;
+    EditText totaldiscamount, totaldiscperc, effschemediscperc, schemeoffamount, lcarddiscper, schemediscper,schemeuserdiscount;
     Dialog qtydialog;
     Gson gson;
     RetailCustomAdapter ad;
@@ -96,62 +96,6 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
                 e.printStackTrace();
             }
 
-          /*  btnDelete.setOnClickListener(new View.OnClickListener() {// delete
-                @Override
-                public void onClick(View v) {
-                    try {
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                        alertDialogBuilder.setMessage("Do you want to delete the entry ...?");
-                        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int arg1) {
-                                productTotal = productTotal - Double.parseDouble(sList.get(position).pTotal);
-                                //((RetailSOActivity) context).productTotal = productTotal;
-                                sList.remove(position);
-                                ((RetailSOActivity) context).sList = sList;
-                                // callItemTotal();
-                                ((RetailSOActivity) context).productTotal = productTotal;
-                                System.out.println("save list size is " + ((RetailSOActivity) context).sList.size());
-                                gson = new Gson();
-                                ((RetailSOActivity) context).formedSO = gson.toJson(((RetailSOActivity) context).sList);
-                                System.out.println("Formed json in Adapter class is  " + ((RetailSOActivity) context).formedSO);
-                                RetailSOActivityArrayAdapter arrayAdapter = new RetailSOActivityArrayAdapter(context,
-                                        R.layout.list_row, productTotal, listSODetailPL, itemArraylist, sList, batchCode, batchExpiry, batchMrp, batchRate, batchSOH, appContext, selectedPos, pID);
-                                ((RetailSOActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                                if (sList.size() == 0) {
-                                    productTotal = 0.00;
-                                    ((RetailSOActivity) context).productTotal = 0.0;
-                                }
-                                ((RetailSOActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
-                                arrayAdapter.notifyDataSetChanged();
-
-                            }
-                        });
-                        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-
-                            }
-                        });
-
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-            editQty.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    prevTotal = Double.parseDouble(sList.get(position).pTotal);
-                    System.out.println("Current total is " + position);
-                    callDialog(position);
-                }
-            });*/
-
             tvFreeQty.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -191,6 +135,8 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
         lcarddiscper.setText(sList.get(position).LCARDDISCPER);
         schemediscper = qtydialog.findViewById(R.id.schemediscper);
         schemediscper.setText(sList.get(position).SCHEMEDISCPER);
+        schemeuserdiscount=qtydialog.findViewById(R.id.schemeuserdiscount);
+        schemeuserdiscount.setText(String.valueOf(sList.get(position).DISCPER));
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
