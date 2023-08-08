@@ -32,7 +32,8 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
     String IncomingData = "";
     int totalCount = 0;
     ImageButton btnDelete, imgBtn;
-    EditText totaldiscamount, totaldiscperc, effschemediscperc, schemeoffamount, lcarddiscper, schemediscper,schemeuserdiscount;
+    EditText totaldiscamount, totaldiscperc, efflcarddiscperc,
+            effschemediscperc, schemeoffamount, lcarddiscper, schemediscper,schemeuserdiscount;
     Dialog qtydialog;
     Gson gson;
     RetailCustomAdapter ad;
@@ -80,18 +81,27 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
                 //tvTotal.setText(sList.get(position).pTotal);
                 tvTotal.setText(decfor.format(d));
                 tvTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
-                lineTotal.setText(decfor.format(d));
+               // lineTotal.setText(decfor.format(d));
+               // lineTotal.setText(decfor.format(d));
+               // lineTotal.setText(decfor.format(d));
 
                 tvFreeQty.setText(sList.get(position).TOTALDISCPERC + "%, ...");
+
+                btnDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((RetailSOActivity) context).popUp("Function Not available after schemes are applied..!!");
+                    }
+                });
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                ((RetailSOActivity) context).discText.setText("Tot Disc%");
-                ((RetailSOActivity) context).lineTotal.setVisibility(View.VISIBLE);
-                ((RetailSOActivity) context).lineTotal.setText("Total");
-                ((RetailSOActivity) context).fullTotal.setText("Line Total");
+                //((RetailSOActivity) context).discText.setText("Tot Disc%");
+                //((RetailSOActivity) context).lineTotal.setVisibility(View.VISIBLE);
+               // ((RetailSOActivity) context).lineTotal.setText("Total");
+               // ((RetailSOActivity) context).fullTotal.setText("Line Total");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -137,6 +147,9 @@ public class RetailSOSchemeArrayAdapter extends ArrayAdapter {
         schemediscper.setText(sList.get(position).SCHEMEDISCPER);
         schemeuserdiscount=qtydialog.findViewById(R.id.schemeuserdiscount);
         schemeuserdiscount.setText(String.valueOf(sList.get(position).DISCPER));
+        efflcarddiscperc=qtydialog.findViewById(R.id.efflcarddiscperc);
+        efflcarddiscperc.setText(sList.get(position).EFFLCARDDISCPERC);
+
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

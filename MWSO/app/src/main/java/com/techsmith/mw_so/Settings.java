@@ -216,7 +216,8 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     public void testPrint(View view) {
         if (isBluetoothEnabled()) {
             try {
-                String temp = "Test Print";
+                //String temp = "Test Print";
+                String temp="Design and deploy business solutions that are relevant to the needs of the real India.";
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
                 } else {

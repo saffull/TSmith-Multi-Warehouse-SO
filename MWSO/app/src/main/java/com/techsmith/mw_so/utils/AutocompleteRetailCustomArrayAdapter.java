@@ -17,9 +17,10 @@ public class AutocompleteRetailCustomArrayAdapter extends KArrayAdapter<String>{
     int layoutResourceId;
     public String[]  items;
     public String[] mobs;
+    public  String [] loyals;
 
 
-    public AutocompleteRetailCustomArrayAdapter(Context mContext, int layoutResourceId, String[] objects,String[] mobs) {
+    public AutocompleteRetailCustomArrayAdapter(Context mContext, int layoutResourceId, String[] objects,String[] mobs,String[] loyals) {
 
         super(mContext, layoutResourceId, objects);
 
@@ -27,6 +28,7 @@ public class AutocompleteRetailCustomArrayAdapter extends KArrayAdapter<String>{
         this.mContext = mContext;
         this.items = objects;
         this.mobs=mobs;
+        this.loyals=loyals;
     }
 
     @Override
@@ -43,12 +45,15 @@ public class AutocompleteRetailCustomArrayAdapter extends KArrayAdapter<String>{
             // object item based on the position
             String objectItem = items[position];
             String MobItem=mobs[position];
+            String loyalItem=loyals[position];
 
             // get the TextView and then set the text (item name) and tag (item ID) values
             TextView textViewItem = convertView.findViewById(R.id.cName);
             TextView txtmob=convertView.findViewById(R.id.cMob);
+            TextView txtLoyalty=convertView.findViewById(R.id.cLoyalty);
             textViewItem.setText(objectItem);
             txtmob.setText(MobItem);
+            txtLoyalty.setText("LC: "+loyalItem);
 
             // in case you want to add some style, you can do something like:
 //            textViewItem.setBackgroundColor(Color.CYAN);

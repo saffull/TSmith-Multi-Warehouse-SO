@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="Reset Scheme"
-                android:textColor="@color/black" />
+                android:textColor="@color/white" />
         </LinearLayout>
         <!--Floating action button for print-->
 
@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="Apply Schemes"
-                android:textColor="@color/black" />
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -103,7 +103,7 @@
             app:layout_constraintBottom_toTopOf="@+id/preview_fab"
             app:layout_constraintEnd_toEndOf="@+id/preview_fab"
             app:layout_constraintStart_toStartOf="@+id/preview_fab"
-            app:srcCompat="@drawable/shopping_cart"
+            app:srcCompat="@drawable/ic_print_white"
             app:tint="@color/white" />
         <!--Action name text for the add person button-->
         <LinearLayout
@@ -119,8 +119,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="S.Order Pending"
-                android:textColor="@color/black" />
+                android:text="Print"
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <RelativeLayout

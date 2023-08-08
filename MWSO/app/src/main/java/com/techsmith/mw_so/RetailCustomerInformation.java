@@ -588,12 +588,15 @@ public class RetailCustomerInformation extends AppCompatActivity {
                     if (customerResponse.STATUSFLAG== 0) {
                         String[] arrCust = new String[customerResponse.DATA.size()];
                         String[] arrMob = new String[customerResponse.DATA.size()];
+                        String [] arrLoyal=new String[customerResponse.DATA.size()];
+
 
                         for (int i = 0; i < customerResponse.DATA.size(); i++) {
                             arrCust[i] = customerResponse.DATA.get(i).NAME;
                             arrMob[i] = String.valueOf(customerResponse.DATA.get(i).PHONE2);
+                            arrLoyal[i]=String.valueOf(customerResponse.DATA.get(i).LOYALTYCODE);
                         }
-                        AutocompleteRetailCustomArrayAdapter myAdapter = new AutocompleteRetailCustomArrayAdapter(RetailCustomerInformation.this, R.layout.custom_spinner_retail, arrCust, arrMob);
+                        AutocompleteRetailCustomArrayAdapter myAdapter = new AutocompleteRetailCustomArrayAdapter(RetailCustomerInformation.this, R.layout.custom_spinner_retail, arrCust, arrMob, arrLoyal);
                         if (checkFlag == 1) {
                             acvCustomerName.setAdapter(myAdapter);
                             acvCustomerName.showDropDown();

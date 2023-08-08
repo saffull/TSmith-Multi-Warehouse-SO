@@ -1,15 +1,15 @@
 package com.techsmith.mw_so;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.AsyncQueryHandler;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,19 +37,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.dantsu.escposprinter.EscPosPrinter;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
-import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.Spinner.RetailCustomAdapter;
-import com.techsmith.mw_so.e_invoice.Einvoice;
-import com.techsmith.mw_so.e_invoice.EinvoicePL;
-import com.techsmith.mw_so.e_invoice.IRNAdapter;
-import com.techsmith.mw_so.e_invoice.InvResponse;
-import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
 import com.techsmith.mw_so.payment_util.PaymentList;
 import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.AutoCompleteRetailProductCustomAdapter;
@@ -69,11 +70,9 @@ import com.techsmith.mw_so.retail_utils.SaveProductSOPL;
 import com.techsmith.mw_so.retail_utils.Summary;
 import com.techsmith.mw_so.scheme_reverse.SchemeReverseItem;
 import com.techsmith.mw_so.scheme_reverse.SchemeReverseResponse;
-import com.techsmith.mw_so.scheme_reverse.SchemeReverseResponseData;
 import com.techsmith.mw_so.scheme_utils.SchemeResponse;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
-import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.ItemDetails;
 import com.techsmith.mw_so.utils.ItemList;
 import com.techsmith.mw_so.utils.UserPL;
@@ -84,24 +83,26 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Locale;
 
 public class RetailSOActivity extends AppCompatActivity {
     SharedPreferences prefs, prefsD;
     RetailSOActivityArrayAdapter arrayAdapter;
     private static final DecimalFormat decfor = new DecimalFormat("0.00");
-    List<String> storeidList;
+    private BluetoothConnection selectedDevice;
     DETAIL detail;
+    SimpleDateFormat dff = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     BatchRetailResponse pd;
     SaveProductSO sap;
     Context appContext;
@@ -115,7 +116,7 @@ public class RetailSOActivity extends AppCompatActivity {
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "", cardAmount = "0.0", cashAmount = "0.0",
             cceId = "", sendTestData = "", roundingTotal = "No";// item made public so that to access in its adapter class
-    int CustomerId, itemId, itemQty, selectedQty, soResponseCount = 0;
+    int  itemId;
     public int selectedPos;
     ImageButton ic_search, imgBtn;
     private ToggleButton tbUpDown;
@@ -136,7 +137,7 @@ public class RetailSOActivity extends AppCompatActivity {
     public Button btnAllClear, btnSave;
     PaymentList paymentList;
     PaymentList paymentCardList;
-    List<String> offerList, houseList, sohList, batchCode, batchExpiry;
+    List<String>  batchCode, batchExpiry;
     List<Double> batchMrp, batchRate, batchSOH;
     List<Integer> batchID;
     TextView tvCustomerName, tvDate, etReceivables;
@@ -214,6 +215,12 @@ public class RetailSOActivity extends AppCompatActivity {
         DocGuid = prefs.getString("DOCGUID", "");
         CurrentGuid = prefs.getString("CURRENTGUID", "");
         System.out.println("GUIDs are " + customer_Details);
+        mAddPersonFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startPrint();
+            }
+        });
         try {
             Gson gson = new Gson();
             //gson.fromJson(loginResponse, UserPL.class);
@@ -298,7 +305,10 @@ public class RetailSOActivity extends AppCompatActivity {
                             Summary summary = new Summary();
                             CUSTOMERDETAIL CUSTOMERDETAIL = new CUSTOMERDETAIL();
 
-                            summary.BILLDATE = "31/07/2023";
+                            Date c = Calendar.getInstance().getTime();
+                            String formattedDate = dff.format(c);
+                            summary.BILLDATE = formattedDate;
+                            // summary.BILLDATE = "31/07/2023";
                             summary.BILLNO = "NEW";
                             summary.REFNO = "";
                             summary.BILLTYPE = "CASH";
@@ -379,10 +389,22 @@ public class RetailSOActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (schemeList.size() > 0) {
-                    discText.setText("Disc%");
-                    lineTotal.setVisibility(View.INVISIBLE);
-                    fullTotal.setText("Total");
-                    new revertScheme().execute();
+                    android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
+                    alertDialogBuilder.setMessage("Do you want to Reset The Schemes Applied..?");
+                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            new revertScheme().execute();
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
                 } else {
                     tsMessages("Scheme Not Applied..");
                 }
@@ -463,12 +485,6 @@ public class RetailSOActivity extends AppCompatActivity {
                     }
                 });
 
-        mAddPersonFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(RetailSOActivity.this, "Function not yet implemented..", Toast.LENGTH_SHORT).show();
-            }
-        });
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -501,6 +517,7 @@ public class RetailSOActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void SaveRetailSchemeSo() {
 
@@ -592,7 +609,11 @@ public class RetailSOActivity extends AppCompatActivity {
             CUSTOMERDETAIL CUSTOMERDETAIL = new CUSTOMERDETAIL();
             //  String uniqueID = UUID.randomUUID().toString();
 
-            summary.BILLDATE = "31/07/2023";
+            //summary.BILLDATE = response.DATA.OUTPUTXML.SUMMARY.BILLDATE;
+            Date c = Calendar.getInstance().getTime();
+            String formattedDate = dff.format(c);
+            // summary.BILLDATE = "31/07/2023";
+            summary.BILLDATE = formattedDate;
             summary.BILLNO = "NEW";
             summary.REFNO = "";
             summary.BILLTYPE = "CASH";
@@ -1657,6 +1678,8 @@ public class RetailSOActivity extends AppCompatActivity {
                     schemeList = new ArrayList<>();
                     schemeList = response.DATA.OUTPUTXML.DETAIL.ITEM;
                     productTotal = 0.0;
+                    acvItemSearchSOActivity.setEnabled(false);
+                    ic_search.setEnabled(false);
 
 
                     for (int i = 0; i < response.DATA.OUTPUTXML.DETAIL.ITEM.size(); i++) {
@@ -1795,7 +1818,10 @@ public class RetailSOActivity extends AppCompatActivity {
             CUSTOMERDETAIL CUSTOMERDETAIL = new CUSTOMERDETAIL();
 
             //summary.BILLDATE = response.DATA.OUTPUTXML.SUMMARY.BILLDATE;
-            summary.BILLDATE = "31/07/2023";
+            Date c = Calendar.getInstance().getTime();
+            String formattedDate = dff.format(c);
+            // summary.BILLDATE = "31/07/2023";
+            summary.BILLDATE = formattedDate;
             summary.BILLNO = response.DATA.OUTPUTXML.SUMMARY.BILLNO;
             summary.REFNO = String.valueOf(response.DATA.OUTPUTXML.SUMMARY.REFNO);
             summary.BILLTYPE = response.DATA.OUTPUTXML.SUMMARY.BILLTYPE;
@@ -1962,7 +1988,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
     }
 
-    private void popUp(String msg) {
+    public void popUp(String msg) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSOActivity.this);
         alertDialogBuilder.setMessage(msg);
         alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -2256,6 +2282,8 @@ public class RetailSOActivity extends AppCompatActivity {
             try {
                 SchemeReverseResponse sc = gson.fromJson(strRevertScheme, SchemeReverseResponse.class);
                 if (sc.STATUSFLAG == 0) {
+                    ic_search.setEnabled(true);
+                    acvItemSearchSOActivity.setEnabled(true);
                     schemeList = new ArrayList<>();
                     strSchemeResponse = "";
                     initializeFab();
@@ -2308,6 +2336,120 @@ public class RetailSOActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    //Printing Function
+    private void startPrint() {
+        if (isBluetoothEnabled()) {
+            try {
+                String temp = "Design and deploy business solutions that are relevant to the needs of the real India.";
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
+                } else {
+                    /*  "[L]" + df.format(new Date()) + "\n","[C]--------------------------------\n" + */
+                    BluetoothConnection connection = BluetoothPrintersConnections.selectFirstPaired();
+                    if (connection != null) {
+                        EscPosPrinter printer = new EscPosPrinter(connection, 210, 48f, 32);
+                        final String text =
+                                "[L]" + temp;
+
+                        printer.printFormattedText(text);
+                        connection.disconnect();
+                    } else {
+                        //Toast.makeText(this, "No printer was connected...!", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSOActivity.this);
+                        alertDialogBuilder.setMessage("Check the printer status whether it is OFF or not paired with the device.." +
+                                "or Select  Printer..!!");
+                        alertDialogBuilder.setPositiveButton("Select Printer", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int arg1) {
+                                browseBluetooth();
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setCanceledOnTouchOutside(false);
+                        alertDialog.show();
+
+
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("APP", "Can't print", e);
+            }
+
+
+        } else {
+            popUp("Enable bluetooth and try again..!!!");
+        }
+
+    }
+
+    public boolean isBluetoothEnabled() {
+        BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        return myBluetoothAdapter.isEnabled();
+    }
+
+    private void browseBluetooth() {
+        try {
+
+            if (isBluetoothEnabled()) {
+                final BluetoothConnection[] bluetoothDevicesList = (new BluetoothPrintersConnections()).getList();
+
+                if (bluetoothDevicesList != null) {
+                    final String[] items = new String[bluetoothDevicesList.length + 1];
+                    items[0] = "Default printer";
+                    int i = 0;
+                    for (BluetoothConnection device : bluetoothDevicesList) {
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
+                        items[++i] = device.getDevice().getName();
+                    }
+
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(RetailSOActivity.this);
+                    alertDialog.setTitle("Bluetooth printer selection");
+                    alertDialog.setItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            int index = i - 1;
+                            if (index == -1) {
+                                selectedDevice = null;
+                            } else {
+                                selectedDevice = bluetoothDevicesList[index];
+                            }
+
+                            // button.setText(items[i]);
+                            //  printer.setText(items[i]);
+                        }
+                    });
+
+                    AlertDialog alert = alertDialog.create();
+                    alert.setCanceledOnTouchOutside(false);
+                    alert.show();
+
+                }
+            } else {
+                Toast.makeText(RetailSOActivity.this, "Enable Bluetooth First", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(RetailSOActivity.this, "Bluetooth Browse Exception", Toast.LENGTH_LONG).show();
+        }
+        ;
     }
 
 }
