@@ -1,10 +1,15 @@
 package com.techsmith.mw_so;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,10 +42,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import com.dantsu.escposprinter.EscPosPrinter;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
@@ -49,8 +50,14 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.Spinner.RetailCustomAdapter;
+import com.techsmith.mw_so.e_invoice.Einvoice;
+import com.techsmith.mw_so.e_invoice.EinvoicePL;
+import com.techsmith.mw_so.e_invoice.IRNAdapter;
+import com.techsmith.mw_so.e_invoice.InvResponse;
+import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
 import com.techsmith.mw_so.payment_util.PaymentList;
 import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.AutoCompleteRetailProductCustomAdapter;
@@ -70,9 +77,11 @@ import com.techsmith.mw_so.retail_utils.SaveProductSOPL;
 import com.techsmith.mw_so.retail_utils.Summary;
 import com.techsmith.mw_so.scheme_reverse.SchemeReverseItem;
 import com.techsmith.mw_so.scheme_reverse.SchemeReverseResponse;
+import com.techsmith.mw_so.scheme_reverse.SchemeReverseResponseData;
 import com.techsmith.mw_so.scheme_utils.SchemeResponse;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
+import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.ItemDetails;
 import com.techsmith.mw_so.utils.ItemList;
 import com.techsmith.mw_so.utils.UserPL;
@@ -83,9 +92,11 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -95,6 +106,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class RetailSOActivity extends AppCompatActivity {
     SharedPreferences prefs, prefsD;
@@ -116,7 +128,7 @@ public class RetailSOActivity extends AppCompatActivity {
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "", cardAmount = "0.0", cashAmount = "0.0",
             cceId = "", sendTestData = "", roundingTotal = "No";// item made public so that to access in its adapter class
-    int  itemId;
+    int CustomerId, itemId, itemQty, selectedQty, soResponseCount = 0;
     public int selectedPos;
     ImageButton ic_search, imgBtn;
     private ToggleButton tbUpDown;
@@ -137,7 +149,7 @@ public class RetailSOActivity extends AppCompatActivity {
     public Button btnAllClear, btnSave;
     PaymentList paymentList;
     PaymentList paymentCardList;
-    List<String>  batchCode, batchExpiry;
+    List<String> offerList, houseList, sohList, batchCode, batchExpiry;
     List<Double> batchMrp, batchRate, batchSOH;
     List<Integer> batchID;
     TextView tvCustomerName, tvDate, etReceivables;
@@ -1802,8 +1814,12 @@ public class RetailSOActivity extends AppCompatActivity {
                 item.LCARDDISCPER = schemeList.get(i).LCARDDISCPER;
                 item.SCHEMEDISCPER = schemeList.get(i).SCHEMEDISCPER;
                 item.SCHEMEOFFAMOUNT = schemeList.get(i).SCHEMEOFFAMOUNT;
+                item.EFFSCHEMEDISCPERC=schemeList.get(i).EFFSCHEMEDISCPERC;
                 item.LCARDDISCID = schemeList.get(i).LCARDDISCID;
                 item.EFFLCARDDISCPERC = schemeList.get(i).EFFLCARDDISCPERC;
+                item.SCHEMECAUSINGID=schemeList.get(i).SCHEMECAUSINGID;
+                item.SCHEMEBENEFICIARYID=schemeList.get(i).SCHEMEBENEFICIARYID;
+
                 itemArrayList.add(item);
                 tempSum = tempSum + schemeList.get(i).LINETOTAL;
 
@@ -2350,20 +2366,22 @@ public class RetailSOActivity extends AppCompatActivity {
                     BluetoothConnection connection = BluetoothPrintersConnections.selectFirstPaired();
                     if (connection != null) {
                         EscPosPrinter printer = new EscPosPrinter(connection, 210, 48f, 32);
-                        final String text =
-                                "[L]" + temp;
+                     /*   final String text =
+                                "[L]" + temp;*/
+                        final String text="[L]\n" +
+                                "[C]<u><font size='small'>Design and deploy business solutions that are relevant to the needs of the real India.</font></u>\n" +
+                                "[L]\n" ;
 
                         printer.printFormattedText(text);
                         connection.disconnect();
                     } else {
                         //Toast.makeText(this, "No printer was connected...!", Toast.LENGTH_SHORT).show();
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSOActivity.this);
-                        alertDialogBuilder.setMessage("Check the printer status whether it is OFF or not paired with the device.." +
-                                "or Select  Printer..!!");
-                        alertDialogBuilder.setPositiveButton("Select Printer", new DialogInterface.OnClickListener() {
+                        alertDialogBuilder.setMessage("Check The Printer Status or Add Printer..!!");
+                        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int arg1) {
-                                browseBluetooth();
+
                             }
                         });
                         alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -2407,16 +2425,6 @@ public class RetailSOActivity extends AppCompatActivity {
                     items[0] = "Default printer";
                     int i = 0;
                     for (BluetoothConnection device : bluetoothDevicesList) {
-                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
-                            return;
-                        }
                         items[++i] = device.getDevice().getName();
                     }
 
@@ -2433,7 +2441,7 @@ public class RetailSOActivity extends AppCompatActivity {
                             }
 
                             // button.setText(items[i]);
-                            //  printer.setText(items[i]);
+                          //  printer.setText(items[i]);
                         }
                     });
 

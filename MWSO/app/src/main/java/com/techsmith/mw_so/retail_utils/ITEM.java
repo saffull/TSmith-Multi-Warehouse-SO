@@ -41,4 +41,6 @@ public class ITEM {
     public String TOTALDISCPERC;
     public String LCARDDISCPER;
     public String LCARDDISCID;
+    public String SCHEMECAUSINGID;
+    public String SCHEMEBENEFICIARYID;
 }

@@ -26,4 +26,7 @@ public class ITEM {
     public int IGST;
     public String LCARDDISCPER;
     public double LINETOTAL;
+    public String SCHEMECAUSINGID;
+    public String SCHEMEBENEFICIARYID;
+
 }
