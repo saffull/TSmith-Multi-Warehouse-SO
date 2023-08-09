@@ -9,12 +9,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.anggastudio.printama.Printama;
 import com.dantsu.escposprinter.EscPosPrinter;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
@@ -50,6 +54,10 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.Spinner.RetailCustomAdapter;
@@ -59,6 +67,7 @@ import com.techsmith.mw_so.e_invoice.IRNAdapter;
 import com.techsmith.mw_so.e_invoice.InvResponse;
 import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
 import com.techsmith.mw_so.payment_util.PaymentList;
+import com.techsmith.mw_so.print_utils.PrintResponse;
 import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.AutoCompleteRetailProductCustomAdapter;
 import com.techsmith.mw_so.retail_utils.BatchRetailResponse;
@@ -123,7 +132,7 @@ public class RetailSOActivity extends AppCompatActivity {
     EditText etQty;
     ArrayList<com.techsmith.mw_so.scheme_utils.ITEM> schemeList;
     String loginResponse, filter = "", Url = "", strGetItems, strErrorMsg, strRevertScheme = "", billRemarks = "", itemExpiry,
-            strGetItemDetail, strProductBatch, itemName, strSchemeResponse = "", itemCode, sendSchemeData = "", strCheckLogin, LoyaltyID = "", LoyaltyCode = "", itemMRP = "", itemRate = "",
+            strGetItemDetail, strPrintBill = "", strProductBatch, itemName, strSchemeResponse = "", itemCode, sendSchemeData = "", strCheckLogin, LoyaltyID = "", LoyaltyCode = "", itemMRP = "", itemRate = "",
             multiSOStoredDevId = "", uniqueId, strfromweb, strerrormsg, DocGuid = "", customer_Details, CurrentGuid = "";
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "", cardAmount = "0.0", cashAmount = "0.0",
@@ -230,7 +239,8 @@ public class RetailSOActivity extends AppCompatActivity {
         mAddPersonFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startPrint();
+                new PrintBill().execute();
+                //startPrint();
             }
         });
         try {
@@ -1814,11 +1824,11 @@ public class RetailSOActivity extends AppCompatActivity {
                 item.LCARDDISCPER = schemeList.get(i).LCARDDISCPER;
                 item.SCHEMEDISCPER = schemeList.get(i).SCHEMEDISCPER;
                 item.SCHEMEOFFAMOUNT = schemeList.get(i).SCHEMEOFFAMOUNT;
-                item.EFFSCHEMEDISCPERC=schemeList.get(i).EFFSCHEMEDISCPERC;
+                item.EFFSCHEMEDISCPERC = schemeList.get(i).EFFSCHEMEDISCPERC;
                 item.LCARDDISCID = schemeList.get(i).LCARDDISCID;
                 item.EFFLCARDDISCPERC = schemeList.get(i).EFFLCARDDISCPERC;
-                item.SCHEMECAUSINGID=schemeList.get(i).SCHEMECAUSINGID;
-                item.SCHEMEBENEFICIARYID=schemeList.get(i).SCHEMEBENEFICIARYID;
+                item.SCHEMECAUSINGID = schemeList.get(i).SCHEMECAUSINGID;
+                item.SCHEMEBENEFICIARYID = schemeList.get(i).SCHEMEBENEFICIARYID;
 
                 itemArrayList.add(item);
                 tempSum = tempSum + schemeList.get(i).LINETOTAL;
@@ -2104,6 +2114,9 @@ public class RetailSOActivity extends AppCompatActivity {
                 APIResponse apiResponse = gson.fromJson(s, APIResponse.class);
                 if (apiResponse.STATUSFLAG == 0) {
                     String msg = apiResponse.DATA.RESPONSE.MSG + "\nBill No: " + apiResponse.DATA.RESPONSE.BILLNO;
+                    editor = prefs.edit();
+                    editor.putString("billNo", apiResponse.DATA.RESPONSE.BILLNO);
+                    editor.apply();
                     tsMessages(msg);
                     disableButtons();
                     //
@@ -2201,6 +2214,9 @@ public class RetailSOActivity extends AppCompatActivity {
                 if (apiResponse.STATUSFLAG == 0) {
                     String msg = apiResponse.DATA.RESPONSE.MSG + "\nBill No: " + apiResponse.DATA.RESPONSE.BILLNO;
                     tsMessages(msg);
+                    editor = prefs.edit();
+                    editor.putString("billNo", apiResponse.DATA.RESPONSE.BILLNO);
+                    editor.apply();
                     disableButtons();
                     //
                 } else {
@@ -2355,10 +2371,11 @@ public class RetailSOActivity extends AppCompatActivity {
     }
 
     //Printing Function
-    private void startPrint() {
+    private void startPrint(String msg) {
+
         if (isBluetoothEnabled()) {
             try {
-                String temp = "Design and deploy business solutions that are relevant to the needs of the real India.";
+                //String temp = "Design and deploy business solutions that are relevant to the needs of the real India.";
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
                 } else {
@@ -2368,11 +2385,11 @@ public class RetailSOActivity extends AppCompatActivity {
                         EscPosPrinter printer = new EscPosPrinter(connection, 210, 48f, 32);
                      /*   final String text =
                                 "[L]" + temp;*/
-                        final String text="[L]\n" +
-                                "[C]<u><font size='small'>Design and deploy business solutions that are relevant to the needs of the real India.</font></u>\n" +
-                                "[L]\n" ;
+                       /* final String text="[L]\n" +
+                                "[C]<u><font size='medium'>"+msg+"</font></u>\n" ;*/
 
-                        printer.printFormattedText(text);
+                        printer.printFormattedText(msg);
+
                         connection.disconnect();
                     } else {
                         //Toast.makeText(this, "No printer was connected...!", Toast.LENGTH_SHORT).show();
@@ -2409,6 +2426,24 @@ public class RetailSOActivity extends AppCompatActivity {
 
     }
 
+    private void printamaPrint(String msg) {
+        BluetoothDevice connectedPrinter = Printama.with(this).getConnectedPrinter();
+        if (connectedPrinter != null) {
+
+            Printama.with(this).connect(printama -> {
+                printama.printText(msg, Printama.CENTER);
+                printama.close();
+            });
+        }
+
+
+    }
+
+    private void showToast(String s) {
+        // System.out.println("Message is " + message);
+        // Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     public boolean isBluetoothEnabled() {
         BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         return myBluetoothAdapter.isEnabled();
@@ -2441,7 +2476,7 @@ public class RetailSOActivity extends AppCompatActivity {
                             }
 
                             // button.setText(items[i]);
-                          //  printer.setText(items[i]);
+                            //  printer.setText(items[i]);
                         }
                     });
 
@@ -2457,7 +2492,124 @@ public class RetailSOActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(RetailSOActivity.this, "Bluetooth Browse Exception", Toast.LENGTH_LONG).show();
         }
-        ;
+
+    }
+
+    private class PrintBill extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(RetailSOActivity.this);
+            pDialog.setMessage("Fetching Bill Data....");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                JSONObject object = new JSONObject();
+                object.put("StoreCode", "2021-DLF-PH1");
+                object.put("SubStoreCode", "MAIN");
+                object.put("UserId", "1");
+                object.put("CounterId", "1");
+                object.put("CustType", "1");
+
+                JSONObject jObject = new JSONObject();
+                jObject.put("INVOICENO", prefs.getString("billNo", ""));
+                jObject.put("FORMAT", "1");
+
+
+                URL url = new URL(Url + "GetSBillPrint");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(180000);
+                connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("StoreCode", "2021-DLF-PH1");
+                connection.setRequestProperty("SubStoreCode", "MAIN");
+                connection.setRequestProperty("UserId", "1");
+                connection.setRequestProperty("CounterId", "1");
+                connection.setRequestProperty("CustType", "1");
+                connection.setRequestProperty("inputxmlstd", object.toString());
+                connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(jObject.toString());
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strPrintBill = sb.toString();
+                        System.out.println("Revert Response is " + strPrintBill);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strPrintBill = "httperror";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return strPrintBill;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            try {
+                gson = new Gson();
+                //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
+                PrintResponse apiResponse = gson.fromJson(s, PrintResponse.class);
+                if (apiResponse.STATUSFLAG == 0) {
+                    String msg = apiResponse.DATA.SALESBILL;
+                    //tsMessages(msg);
+                    //printamaPrint(msg);
+                    android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
+                    alertDialogBuilder.setMessage("Print Sales Bill For " +  prefs.getString("billNo", "") + "..?");
+                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            dialog.cancel();
+                            startPrint(msg);
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    disableButtons();
+                    //
+                } else {
+                    tsMessages(apiResponse.ERRORMESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
