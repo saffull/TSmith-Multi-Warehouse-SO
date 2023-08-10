@@ -1,7 +1,7 @@
 package com.techsmith.mw_so.scheme_utils;
 
 public class SchemeResponse {
-    public int statusFlag;
-    public String errorMessage;
+    public int STATUSFLAG;
+    public String ERRORMESSAGE;
     public SchemeData DATA;
 }

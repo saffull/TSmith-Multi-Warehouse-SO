@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -31,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -210,6 +212,10 @@ public class RetailSOActivity extends AppCompatActivity {
         preview_text = findViewById(R.id.preview_text);
         paymentBtn = findViewById(R.id.paymentBtn);
         imgBtn = findViewById(R.id.imgBtn);
+        email_fab = findViewById(R.id.email_fab);
+        email_text=findViewById(R.id.email_text);
+        invoice_fab = findViewById(R.id.invoice_fab);
+        invoice_text = findViewById(R.id.invoice_text);
         initializeFab();
         detailProductList = new ArrayList<>();
         appWide = AppWide.getInstance();
@@ -310,6 +316,12 @@ public class RetailSOActivity extends AppCompatActivity {
                 }
             }
         });
+        email_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         preview_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -365,8 +377,8 @@ public class RetailSOActivity extends AppCompatActivity {
                             }
 
                             CUSTOMERDETAIL.CUSTOMER = rcData.NAME;
-                            CUSTOMERDETAIL.LoyaltyCode = LoyaltyCode;
-                            CUSTOMERDETAIL.LoyaltyID = LoyaltyID;
+                            CUSTOMERDETAIL.LOYALTYCODE = LoyaltyCode;
+                            CUSTOMERDETAIL.LOYALTYID = LoyaltyID;
                             CUSTOMERDETAIL.ADDRESS = (String) rcData.GoogleAddress;
                             if (rcData.PHONE1.isEmpty())
                                 CUSTOMERDETAIL.MOBILENO = Long.parseLong(rcData.PHONE2);
@@ -492,12 +504,16 @@ public class RetailSOActivity extends AppCompatActivity {
                             addPersonActionText
                                     .setVisibility(View.VISIBLE);
                             preview_text.setVisibility(View.VISIBLE);
+                            email_fab.setVisibility(View.VISIBLE);
+                            email_text.setVisibility(View.VISIBLE);
                             mAddFab.extend();
                             isAllFabsVisible = true;
                         } else {
                             mAddAlarmFab.hide();
                             mAddPersonFab.hide();
                             preview_fab.hide();
+                            email_fab.hide();
+                            email_text.setVisibility(View.GONE);
                             addAlarmActionText.setVisibility(View.GONE);
                             addPersonActionText.setVisibility(View.GONE);
                             preview_text.setVisibility(View.GONE);
@@ -542,14 +558,11 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
     private void SaveRetailSchemeSo() {
-
         try {
             addSchemeItem(schemeList, strSchemeResponse);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void SaveRetailSo() {
@@ -679,8 +692,8 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
             CUSTOMERDETAIL.CUSTOMER = rcData.NAME;
-            CUSTOMERDETAIL.LoyaltyCode = LoyaltyCode;
-            CUSTOMERDETAIL.LoyaltyID = LoyaltyID;
+            CUSTOMERDETAIL.LOYALTYCODE = LoyaltyCode;
+            CUSTOMERDETAIL.LOYALTYID = LoyaltyID;
             CUSTOMERDETAIL.ADDRESS = (String) rcData.GoogleAddress;
             if (rcData.PHONE1.isEmpty())
                 CUSTOMERDETAIL.MOBILENO = Long.parseLong(rcData.PHONE2);
@@ -776,9 +789,13 @@ public class RetailSOActivity extends AppCompatActivity {
         mAddAlarmFab.setVisibility(View.GONE);
         mAddPersonFab.setVisibility(View.GONE);
         preview_fab.setVisibility(View.GONE);
+        email_fab.setVisibility(View.GONE);
         addAlarmActionText.setVisibility(View.GONE);
         addPersonActionText.setVisibility(View.GONE);
         preview_text.setVisibility(View.GONE);
+        email_text.setVisibility(View.GONE);
+        invoice_fab.setVisibility(View.GONE);
+        invoice_text.setVisibility(View.GONE);
         isAllFabsVisible = false;
         mAddFab.shrink();
         init();
@@ -1320,12 +1337,14 @@ public class RetailSOActivity extends AppCompatActivity {
             item.PACKQTY = Double.parseDouble(sList.get(i).qty);
             item.DISCPER = Float.parseFloat(String.valueOf(sList.get(i).Disc));
             item.DISCCODE = "ZART";
+
             //item.LINETOTAL = Double.parseDouble(tvItemMRP.getText().toString().replace("Rate: ", "")) * Integer.parseInt(etQty.getText().toString());
             if (sList.get(i).Disc == 0.0)
                 item.LINETOTAL = Double.parseDouble(df.format(sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)));
             else {
                 Double d = (sList.get(i).Disc / 100) * (sList.get(i).Rate * Integer.parseInt(sList.get(i).qty));
                 item.LINETOTAL = Double.parseDouble(df.format((sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)) - d));
+                item.TOTALDISCPERC= String.valueOf(sList.get(i).Disc);
 
             }
             itemArrayList.add(item);
@@ -1695,7 +1714,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
             try {
                 SchemeResponse response = gson.fromJson(s, SchemeResponse.class);
-                if (response.statusFlag == 0) {
+                if (response.STATUSFLAG == 0) {
                     initializeFab();
                     schemeList = new ArrayList<>();
                     schemeList = response.DATA.OUTPUTXML.DETAIL.ITEM;
@@ -1719,7 +1738,7 @@ public class RetailSOActivity extends AppCompatActivity {
                     arrayAdapter.notifyDataSetChanged();
 
                 } else {
-                    tsMessages(response.errorMessage);
+                    tsMessages(response.ERRORMESSAGE);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1802,7 +1821,7 @@ public class RetailSOActivity extends AppCompatActivity {
             payment.PAYSUMMARY = paysummary;
             payment.PAYDETAIL = paydetailList;
             double tempSum = 0.0;
-
+            System.out.println("look here");
             for (int i = 0; i < schemeList.size(); i++) {
                 ITEM item = new ITEM();
                 item.ITEMID = schemeList.get(i).ITEMID;
@@ -1864,8 +1883,8 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
             CUSTOMERDETAIL.CUSTOMER = response.DATA.OUTPUTXML.CUSTOMERDETAIL.CUSTOMER;
-            CUSTOMERDETAIL.LoyaltyCode = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYCODE;
-            CUSTOMERDETAIL.LoyaltyID = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYID;
+            CUSTOMERDETAIL.LOYALTYCODE = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYCODE;
+            CUSTOMERDETAIL.LOYALTYID = response.DATA.OUTPUTXML.CUSTOMERDETAIL.LOYALTYID;
             CUSTOMERDETAIL.ADDRESS = response.DATA.OUTPUTXML.CUSTOMERDETAIL.ADDRESS;
             CUSTOMERDETAIL.MOBILENO = Long.parseLong(response.DATA.OUTPUTXML.CUSTOMERDETAIL.MOBILENO);
             CUSTOMERDETAIL.AREA = response.DATA.OUTPUTXML.CUSTOMERDETAIL.AREA;
@@ -2517,6 +2536,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
                 JSONObject jObject = new JSONObject();
                 jObject.put("INVOICENO", prefs.getString("billNo", ""));
+                //jObject.put("INVOICENO","2021/23/S-58");
                 jObject.put("FORMAT", "1");
 
 
@@ -2586,11 +2606,11 @@ public class RetailSOActivity extends AppCompatActivity {
                     //tsMessages(msg);
                     //printamaPrint(msg);
                     android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
-                    alertDialogBuilder.setMessage("Print Sales Bill For " +  prefs.getString("billNo", "") + "..?");
+                    alertDialogBuilder.setMessage("Print Sales Bill For " + prefs.getString("billNo", "") + "..?");
                     alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
-                            dialog.cancel();
+                            // dialog.cancel();
                             startPrint(msg);
                         }
                     });
@@ -2610,6 +2630,15 @@ public class RetailSOActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+    private void hideKeyboard() {
+        try {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

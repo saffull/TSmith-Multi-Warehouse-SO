@@ -7,6 +7,6 @@ public class CUSTOMERDETAIL {
     public String AREA;
     public int PINCODE;
     public String STATE;
-    public String LoyaltyID;
-    public String LoyaltyCode;
+    public String LOYALTYID;
+    public String LOYALTYCODE;
 }

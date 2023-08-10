@@ -112,7 +112,7 @@
         app:layout_constraintBottom_toTopOf="@+id/add_person_fab"
         app:layout_constraintEnd_toEndOf="@+id/add_person_fab"
         app:layout_constraintStart_toStartOf="@+id/add_person_fab"
-        app:srcCompat="@drawable/ic_arrow_up"
+        app:srcCompat="@drawable/ic_email"
         app:tint="@color/white" />
 
     <TextView

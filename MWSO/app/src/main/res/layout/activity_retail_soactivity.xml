@@ -123,6 +123,71 @@
                 android:textColor="@color/white" />
         </LinearLayout>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/email_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/app_name"
+            app:backgroundTint="@color/purple_500"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/add_person_fab"
+            app:layout_constraintEnd_toEndOf="@+id/add_person_fab"
+            app:layout_constraintStart_toStartOf="@+id/add_person_fab"
+            app:srcCompat="@drawable/ic_email"
+            app:tint="@color/white" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner_textview"
+            app:layout_constraintBottom_toBottomOf="@id/email_fab"
+            app:layout_constraintEnd_toStartOf="@id/email_fab"
+            app:layout_constraintTop_toTopOf="@+id/email_fab">
+
+            <TextView
+                android:id="@+id/email_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Email"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/invoice_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/app_name"
+            app:backgroundTint="@color/purple_500"
+            app:fabSize="mini"
+            app:layout_constraintBottom_toTopOf="@+id/email_fab"
+            app:layout_constraintEnd_toEndOf="@+id/email_fab"
+            app:layout_constraintStart_toStartOf="@+id/email_fab"
+            app:srcCompat="@drawable/ic_invoice"
+            app:tint="@color/white" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner_textview"
+            app:layout_constraintBottom_toBottomOf="@id/invoice_fab"
+            app:layout_constraintEnd_toStartOf="@id/invoice_fab"
+            app:layout_constraintTop_toTopOf="@+id/invoice_fab">
+
+            <TextView
+                android:id="@+id/invoice_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="E-invoice"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -298,16 +363,17 @@
                                         android:gravity="center"
                                         android:text="MRP"
                                         android:textColor="@color/black" />
+
                                     <TextView
+                                        android:id="@+id/lineTotal"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="1"
                                         android:fontFamily="@font/fabrica"
                                         android:gravity="center"
-                                        android:id="@+id/lineTotal"
-                                        android:visibility="invisible"
                                         android:text="Line Total"
-                                        android:textColor="@color/black" />
+                                        android:textColor="@color/black"
+                                        android:visibility="invisible" />
                                 </LinearLayout>
 
                                 <LinearLayout
@@ -361,6 +427,7 @@
                                         android:textSize="12sp" />
 
                                     <TextView
+                                        android:id="@+id/fullTotal"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="0.1"
@@ -368,7 +435,6 @@
                                         android:gravity="center"
                                         android:paddingRight="5px"
                                         android:text="Total"
-                                        android:id="@+id/fullTotal"
                                         android:textColor="@color/black"
                                         android:textSize="12sp" />
 
