@@ -301,8 +301,8 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
 
             Date c = Calendar.getInstance().getTime();
             String formattedDate = dff.format(c);
-            summary.BILLDATE = "17/08/2023";
-            //summary.BILLDATE = formattedDate;
+            //summary.BILLDATE = "17/08/2023";
+            summary.BILLDATE = formattedDate;
             summary.BILLNO = sop.DATA.SALESBILL.SUMMARY.BILLNO;
             summary.REFNO = String.valueOf(sop.DATA.SALESBILL.SUMMARY.REFNO);
             summary.BILLTYPE = "CASH";
