@@ -11,14 +11,11 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,25 +53,15 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.techsmith.mw_so.Expandable.RecyclerTouchListener;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.Spinner.RetailCustomAdapter;
-import com.techsmith.mw_so.e_invoice.Einvoice;
-import com.techsmith.mw_so.e_invoice.EinvoicePL;
-import com.techsmith.mw_so.e_invoice.IRNAdapter;
-import com.techsmith.mw_so.e_invoice.InvResponse;
-import com.techsmith.mw_so.e_invoice.InvoiceAdapter;
 import com.techsmith.mw_so.payment_util.PaymentList;
+import com.techsmith.mw_so.print_utils.EmailResponse;
 import com.techsmith.mw_so.print_utils.PrintResponse;
 import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.retail_utils.AutoCompleteRetailProductCustomAdapter;
 import com.techsmith.mw_so.retail_utils.BatchRetailResponse;
 import com.techsmith.mw_so.retail_utils.CUSTOMERDETAIL;
-import com.techsmith.mw_so.retail_utils.DETAIL;
 import com.techsmith.mw_so.retail_utils.ITEM;
 import com.techsmith.mw_so.retail_utils.PAYDETAIL;
 import com.techsmith.mw_so.retail_utils.PAYMENT;
@@ -88,11 +75,9 @@ import com.techsmith.mw_so.retail_utils.SaveProductSOPL;
 import com.techsmith.mw_so.retail_utils.Summary;
 import com.techsmith.mw_so.scheme_reverse.SchemeReverseItem;
 import com.techsmith.mw_so.scheme_reverse.SchemeReverseResponse;
-import com.techsmith.mw_so.scheme_reverse.SchemeReverseResponseData;
 import com.techsmith.mw_so.scheme_utils.SchemeResponse;
 import com.techsmith.mw_so.utils.AllocateQty;
 import com.techsmith.mw_so.utils.AllocateQtyPL;
-import com.techsmith.mw_so.utils.AppConfigSettings;
 import com.techsmith.mw_so.utils.ItemDetails;
 import com.techsmith.mw_so.utils.ItemList;
 import com.techsmith.mw_so.utils.UserPL;
@@ -103,11 +88,9 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -117,14 +100,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 public class RetailSOActivity extends AppCompatActivity {
     SharedPreferences prefs, prefsD;
     RetailSOActivityArrayAdapter arrayAdapter;
     private static final DecimalFormat decfor = new DecimalFormat("0.00");
     private BluetoothConnection selectedDevice;
-    DETAIL detail;
+    com.techsmith.mw_so.retail_utils.DETAIL detail;
     SimpleDateFormat dff = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     BatchRetailResponse pd;
     SaveProductSO sap;
@@ -139,7 +121,7 @@ public class RetailSOActivity extends AppCompatActivity {
     public Double itemSoh, total = 0.0, totalSOH;// item made public so that to access in its adapter class
     public String itemMrp, ptotal = "", formedSO = "", pRate = "", tempTotal = "", subStoreId = "", StoreId = "", cardAmount = "0.0", cashAmount = "0.0",
             cceId = "", sendTestData = "", roundingTotal = "No";// item made public so that to access in its adapter class
-    int CustomerId, itemId, itemQty, selectedQty, soResponseCount = 0;
+    int itemId, FORMAT = 0;
     public int selectedPos;
     ImageButton ic_search, imgBtn;
     private ToggleButton tbUpDown;
@@ -156,8 +138,8 @@ public class RetailSOActivity extends AppCompatActivity {
     public ArrayList<ITEM> itemArrayList;
     SaveProductSO saveProductSO;
     Boolean batchFlag = false;
-    EditText etAddRemarks;
     public Button btnAllClear, btnSave;
+    EditText etAddRemarks;
     PaymentList paymentList;
     PaymentList paymentCardList;
     List<String> offerList, houseList, sohList, batchCode, batchExpiry;
@@ -213,7 +195,7 @@ public class RetailSOActivity extends AppCompatActivity {
         paymentBtn = findViewById(R.id.paymentBtn);
         imgBtn = findViewById(R.id.imgBtn);
         email_fab = findViewById(R.id.email_fab);
-        email_text=findViewById(R.id.email_text);
+        email_text = findViewById(R.id.email_text);
         invoice_fab = findViewById(R.id.invoice_fab);
         invoice_text = findViewById(R.id.invoice_text);
         initializeFab();
@@ -245,7 +227,9 @@ public class RetailSOActivity extends AppCompatActivity {
         mAddPersonFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FORMAT = 1;
                 new PrintBill().execute();
+
                 //startPrint();
             }
         });
@@ -319,7 +303,8 @@ public class RetailSOActivity extends AppCompatActivity {
         email_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                FORMAT = 2;
+                new EmailBill().execute();
             }
         });
         preview_fab.setOnClickListener(new View.OnClickListener() {
@@ -647,8 +632,8 @@ public class RetailSOActivity extends AppCompatActivity {
             //summary.BILLDATE = response.DATA.OUTPUTXML.SUMMARY.BILLDATE;
             Date c = Calendar.getInstance().getTime();
             String formattedDate = dff.format(c);
-            // summary.BILLDATE = "31/07/2023";
-            summary.BILLDATE = formattedDate;
+             summary.BILLDATE = "17/08/2023";
+          //  summary.BILLDATE = formattedDate;
             summary.BILLNO = "NEW";
             summary.REFNO = "";
             summary.BILLTYPE = "CASH";
@@ -940,7 +925,7 @@ public class RetailSOActivity extends AppCompatActivity {
                         reader.close();
                         String str = "";
                         strProductBatch = sb.toString();
-                        System.out.println("Response of Batch Detail  is --->" + strProductBatch);
+                        System.out.println("Response of Batch DETAIL  is --->" + strProductBatch);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -1173,7 +1158,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
                             }*/
                             try {
-                                detail = new DETAIL();
+                                detail = new com.techsmith.mw_so.retail_utils.DETAIL();
                                 SaveProductSOPL so = new SaveProductSOPL();
                                 so.pName = itemName;
                                 so.pID = String.valueOf(itemId);
@@ -1344,7 +1329,7 @@ public class RetailSOActivity extends AppCompatActivity {
             else {
                 Double d = (sList.get(i).Disc / 100) * (sList.get(i).Rate * Integer.parseInt(sList.get(i).qty));
                 item.LINETOTAL = Double.parseDouble(df.format((sList.get(i).Rate * Integer.parseInt(sList.get(i).qty)) - d));
-                item.TOTALDISCPERC= String.valueOf(sList.get(i).Disc);
+                item.TOTALDISCPERC = String.valueOf(sList.get(i).Disc);
 
             }
             itemArrayList.add(item);
@@ -1432,7 +1417,7 @@ public class RetailSOActivity extends AppCompatActivity {
                         reader.close();
                         String str = "";
                         strGetItemDetail = sb.toString();
-                        System.out.println("Response of Item Detail  is --->" + strGetItemDetail);
+                        System.out.println("Response of Item DETAIL  is --->" + strGetItemDetail);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;
@@ -2537,7 +2522,7 @@ public class RetailSOActivity extends AppCompatActivity {
                 JSONObject jObject = new JSONObject();
                 jObject.put("INVOICENO", prefs.getString("billNo", ""));
                 //jObject.put("INVOICENO","2021/23/S-58");
-                jObject.put("FORMAT", "1");
+                jObject.put("FORMAT", FORMAT);
 
 
                 URL url = new URL(Url + "GetSBillPrint");
@@ -2573,7 +2558,7 @@ public class RetailSOActivity extends AppCompatActivity {
 
                         reader.close();
                         strPrintBill = sb.toString();
-                        System.out.println("Revert Response is " + strPrintBill);
+                        System.out.println("Print Bill Response is " + strPrintBill);
 
 
                     } finally {
@@ -2603,8 +2588,6 @@ public class RetailSOActivity extends AppCompatActivity {
                 PrintResponse apiResponse = gson.fromJson(s, PrintResponse.class);
                 if (apiResponse.STATUSFLAG == 0) {
                     String msg = apiResponse.DATA.SALESBILL;
-                    //tsMessages(msg);
-                    //printamaPrint(msg);
                     android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
                     alertDialogBuilder.setMessage("Print Sales Bill For " + prefs.getString("billNo", "") + "..?");
                     alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -2621,6 +2604,7 @@ public class RetailSOActivity extends AppCompatActivity {
                     });
                     android.app.AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
+
                     disableButtons();
                     //
                 } else {
@@ -2631,6 +2615,116 @@ public class RetailSOActivity extends AppCompatActivity {
             }
         }
     }
+
+    private class EmailBill extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(RetailSOActivity.this);
+            pDialog.setMessage("Emailing....");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                JSONObject object = new JSONObject();
+                object.put("StoreCode", "2021-DLF-PH1");
+                object.put("SubStoreCode", "MAIN");
+                object.put("UserId", "1");
+                object.put("CounterId", "1");
+                object.put("CustType", "1");
+
+                JSONObject jObject = new JSONObject();
+                jObject.put("INVOICENO", prefs.getString("billNo", ""));
+                //jObject.put("INVOICENO","2021/23/S-58");
+                jObject.put("FORMAT", FORMAT);
+
+
+                URL url = new URL(Url + "GetSBillPrint");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(180000);
+                connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("StoreCode", "2021-DLF-PH1");
+                connection.setRequestProperty("SubStoreCode", "MAIN");
+                connection.setRequestProperty("UserId", "1");
+                connection.setRequestProperty("CounterId", "1");
+                connection.setRequestProperty("CustType", "1");
+                connection.setRequestProperty("inputxmlstd", object.toString());
+                connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(jObject.toString());
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strPrintBill = sb.toString();
+                        System.out.println("Print Bill Response is " + strPrintBill);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strPrintBill = "httperror";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return strPrintBill;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            try {
+                gson = new Gson();
+
+                EmailResponse apiResponse = gson.fromJson(s, EmailResponse.class);
+                if (apiResponse.STATUSFLAG == 0) {
+                    String msg = apiResponse.DATA;
+                    android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
+                    alertDialogBuilder.setMessage(msg);
+
+                    alertDialogBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                    disableButtons();
+                } else {
+                    tsMessages(apiResponse.ERRORMESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void hideKeyboard() {
         try {
             InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);

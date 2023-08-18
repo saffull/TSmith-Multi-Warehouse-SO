@@ -853,7 +853,7 @@ public class SOActivity extends AppCompatActivity {
                         reader.close();
                         String str = "";
                         strGetItemDetail = sb.toString();
-                        System.out.println("Response of Item Detail  is --->" + strGetItemDetail);
+                        System.out.println("Response of Item DETAIL  is --->" + strGetItemDetail);
                     } else {
 //                        strErrorMsg = connection.getResponseMessage();
                         strErrorMsg = responseMsg;

@@ -1,16 +1,16 @@
 package com.techsmith.mw_so.retailSRReturns;
 
-public class Summary {
-    public String SUMMARYID;
+public class SUMMARY {
     public String BILLDATE;
     public String BILLNO;
-    public Object REFNO;
+    public String REFNO;
     public String BILLTYPE;
-    public String SSCCEID;
-    public String SUMMARYDISC;
-    public String NETAMOUNT;
+    public String CUSTOMER;
+    public String CCEID;
+    public int SUMMARYDISC;
+    public double ROUNDOFF;
+    public double NETAMOUNT;
+    public int NOOFITEMS;
     public String DOCGUID;
-    public String ROUNDOFF;
-    public String BILLAMOUNT;
-    public String PAIDAMOUNT;
+    public String CURRENTGUID;
 }

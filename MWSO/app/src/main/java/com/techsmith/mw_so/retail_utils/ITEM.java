@@ -31,6 +31,7 @@ public class ITEM {
 
    // public int IGST;
 
+
     public double LINETOTAL;
     public String SCHEMEDISCPER;
     public String EFFECTIVESCHEMEDISCPER;

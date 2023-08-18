@@ -15,4 +15,19 @@ public class ITEM {
     public String PACKQTY;
     public String DISCPER;
     public double LINETOTAL;
+    public String SALESBILLNO;
+    public int SALESITEMROWID;
+
+
+    public String SCHEMEDISCPER;
+    public String EFFECTIVESCHEMEDISCPER;
+    public String SCHEMEOFFAMOUNT;
+    public String EFFSCHEMEDISCPERC;
+    public String TOTALDISCAMOUNT;
+    public String EFFLCARDDISCPERC;
+    public String TOTALDISCPERC;
+    public String LCARDDISCPER;
+    public String LCARDDISCID;
+    public String SCHEMECAUSINGID;
+    public String SCHEMEBENEFICIARYID;
 }

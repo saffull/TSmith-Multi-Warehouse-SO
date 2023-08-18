@@ -3,8 +3,12 @@ package com.techsmith.mw_so;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,12 +31,20 @@ import android.widget.ToggleButton;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.Global.AppWide;
+import com.techsmith.mw_so.payment_util.PaymentList;
+import com.techsmith.mw_so.retailSRReturns.CUSTOMERDETAIL;
+import com.techsmith.mw_so.retailSRReturns.DETAIL;
 import com.techsmith.mw_so.retailSRReturns.ITEM;
+import com.techsmith.mw_so.retailSRReturns.PAYMENT;
 import com.techsmith.mw_so.retailSRReturns.RetailSRActivityAdapter;
 import com.techsmith.mw_so.retailSRReturns.RetrieveProductSO;
-import com.techsmith.mw_so.retail_utils.AutoCompleteRetailSalesReturnAdapter;
+import com.techsmith.mw_so.retailSRReturns.SRSaveSOResponse;
+import com.techsmith.mw_so.retailSRReturns.SUMMARY;
+import com.techsmith.mw_so.retailSRReturns.SaveSRBill;
+import com.techsmith.mw_so.retail_utils.APIResponse;
 import com.techsmith.mw_so.Retail_Customer_utils.RetailCustomerResponse;
-import com.techsmith.mw_so.retail_utils.RetailReplyData;
+import com.techsmith.mw_so.retail_utils.PAYDETAIL;
+import com.techsmith.mw_so.retail_utils.PAYSUMMARY;
 
 import org.json.JSONObject;
 
@@ -42,29 +54,40 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class RetailSalesReturnActivity extends AppCompatActivity {
     ImageButton imgBtnCustSearchbyName;
     AutoCompleteTextView acvLcardNo, acvmobileNo, acvCustomerName;
     List<AutoCompleteTextView> autoCompleteTextViewList;
-    SharedPreferences prefs;
+    SharedPreferences prefs, prefsD;
     SharedPreferences.Editor editor;
+    PaymentList paymentList;
+    PaymentList paymentCardList;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+    SimpleDateFormat dff = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet;
     private ToggleButton tbUpDown;
     RetrieveProductSO sop;
+    public Button btnAllClear, btnSave;
     Button btnSaveSR;
-    EditText place, pincode, gstno, cardType, etCustomerGoogleAdrs, cEmail, latLong;
-    String Url, strCustomer, strErrorMsg, billNo = "", LoyaltyCardType = "", customerAddress = "";
+    EditText etCustomerGoogleAdrs;
+    SaveSRBill sr;
+    String Url, strCustomer, strfromweb, strerrormsg, strErrorMsg, billNo = "", customerAddress = "", cashAmount, cardAmount, totalData = "";
     ProgressDialog pDialog;
     RetailCustomerResponse customerResponse;
     AppWide appWide;
-    AutoCompleteRetailSalesReturnAdapter myAdapter;
-    RetailReplyData rcData;
+    RetailSRActivityAdapter arrayAdapter;
     Gson gson;
-    public ArrayList<ITEM> sList;
+    public ArrayList<ITEM> sList, itemArrayList;
+    private Button paymentBtn;
     public ListView lvProductlist;
     public Double productTotal;
     public TextView tvAmountValue, tvCustomerName, tvDate;
@@ -81,6 +104,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         acvCustomerName = findViewById(R.id.acvCustomerName);
         acvmobileNo = findViewById(R.id.acvmobileNo);
         lvProductlist = findViewById(R.id.lvProductlist);
+        paymentBtn = findViewById(R.id.paymentBtn);
         etCustomerGoogleAdrs = findViewById(R.id.etCustomerGoogleAdrs);
         tvDate = findViewById(R.id.tvDate);
         tvCustomerName = findViewById(R.id.tvCustomerName);
@@ -90,7 +114,40 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         if (!billNo.isEmpty()) {
             new TakeBillDetails().execute();
         }
+        paymentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                String d = tvAmountValue.getText().toString();
+                double dle = 0.0;
+                if (!d.isEmpty())
+                    dle = Double.parseDouble(d);
+                else
+                    dle = 0.0;
+
+                if (dle > 0.0) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("billTotal", d);
+                    System.out.println("total amount is " + d);
+                    editor.apply();
+                    startActivity(new Intent(RetailSalesReturnActivity.this, PaymentMenu.class));
+                } else {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSalesReturnActivity.this);
+                    alertDialogBuilder.setMessage("No Items Found.....!!");
+                    alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int arg1) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.setCanceledOnTouchOutside(true);
+                    alertDialog.show();
+                }
+
+            }
+        });
         tbUpDown.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -126,13 +183,166 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
 
     }
 
-    private void saveSR() {// Repace
-        String[] parts = tvAmountValue.getText().toString().split("\\.");
-        String part1 = parts[0]; // 004
-        String part2 = parts[1]; // 034556
+    private void saveSR() {// Replace
 
-        sop.DATA.SALESBILL.DETAIL.ITEM = sList;
-        System.out.println(sop);
+        itemArrayList = new ArrayList<>();
+        double totalSum = 0.0;
+        try {
+            PAYMENT payment = new PAYMENT();
+            ArrayList<PAYDETAIL> paydetailList = new ArrayList<>();
+            prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+            String t1 = prefsD.getString("cashSave", "");
+            String t2 = prefsD.getString("cardSave", "");
+
+            gson = new Gson();
+            if (!t1.isEmpty()) {
+                paymentList = gson.fromJson(t1, PaymentList.class);
+                cashAmount = paymentList.cashAmount;
+                cardAmount = "0.00";
+            }
+            if (!t2.isEmpty()) {
+                paymentCardList = gson.fromJson(t2, PaymentList.class);
+                cardAmount = paymentCardList.cardAmount;
+                cashAmount = "0.00";
+            }
+
+
+            System.out.println(cashAmount + "\t<------------->\t" + cardAmount);
+            totalSum = totalSum + Double.parseDouble(cashAmount) + Double.parseDouble(cardAmount);
+            if (cashAmount.equalsIgnoreCase("0.0") && cardAmount.equalsIgnoreCase("0.0")) {
+                tsMessages("Add Payment");
+            } else {
+                PAYDETAIL pd = new PAYDETAIL();
+                if (!t1.isEmpty()) {
+                    pd.PAYTYPE = "CASH";
+                    pd.AMOUNT = Float.parseFloat(paymentList.cashAmount);
+                } else {
+                    pd.PAYTYPE = "CASH";
+                    pd.AMOUNT = 0;
+                }
+
+                paydetailList.add(pd);
+
+                PAYDETAIL pdd = new PAYDETAIL();
+                if (!t2.isEmpty()) {
+                    pdd.PAYTYPE = "CARD";
+                    pdd.AMOUNT = Float.parseFloat(paymentCardList.cardAmount);
+                    pdd.CARDNAME = paymentCardList.accquringBank;
+                    pdd.CARDNO = paymentCardList.cardNo;
+                    pdd.AUTHORISATIONNO = paymentCardList.auCode;
+                    pdd.CARDOWNER = paymentCardList.cardName;
+                    pdd.CARDISSUEDBANK = paymentCardList.issuingBank;// paymentCardList.issuingBank
+                    pdd.SWIPINGMACHINEID = paymentCardList.swipingMachineId;
+                    pdd.CARDEXPIRY = paymentCardList.expiryMonth + "/" + paymentCardList.expiryYear;
+                    paydetailList.add(pdd);
+                } else {
+                    pdd.AMOUNT = 0;
+                    pdd.CARDNAME = "";
+                    pdd.CARDNO = "";
+                    pdd.AUTHORISATIONNO = "";
+                    pdd.CARDOWNER = "";
+                    pdd.CARDISSUEDBANK = "";// paymentCardList.issuingBank
+                    pdd.SWIPINGMACHINEID = "";
+                    pdd.CARDEXPIRY = "";
+                }
+
+            }
+
+
+            PAYSUMMARY paysummary = new PAYSUMMARY();
+            paysummary.BILLAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+            paysummary.PAIDAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+
+
+            payment.PAYSUMMARY = paysummary;
+            payment.PAYDETAIL = paydetailList;
+            double tempSum = 0.0;
+            for (int i = 0; i < sList.size(); i++) {
+                ITEM item = new ITEM();
+                item.SALESBILLNO = billNo;
+                item.SALESITEMROWID = Integer.parseInt(sList.get(i).LINEID);
+                item.ITEMID = sList.get(i).ITEMID;
+                item.ITEMCODE = sList.get(i).ITEMCODE;
+                item.HSNCODE = sList.get(i).HSNCODE;
+                item.BATCHCODE = sList.get(i).BATCHCODE;
+                item.BATCHEXPIRY = sList.get(i).BATCHEXPIRY;
+                item.BATCHID = sList.get(i).BATCHID;
+                item.MRP = sList.get(i).MRP;
+                item.RATE = sList.get(i).RATE;
+                item.PACKQTY = sList.get(i).PACKQTY;
+                item.DISCPER = sList.get(i).DISCPER;
+                if (Double.parseDouble(sList.get(i).DISCPER) > 0.0) {
+                    double d = (Double.parseDouble(sList.get(i).PACKQTY) * Double.parseDouble(sList.get(i).RATE)) * Double.parseDouble(sList.get(i).DISCPER) / 100;
+                    double tot = (Double.parseDouble(sList.get(i).PACKQTY) * Double.parseDouble(sList.get(i).RATE)) - d;
+                    item.LINETOTAL = tot;
+                } else {
+                    item.LINETOTAL = Double.parseDouble(sList.get(i).PACKQTY) * Double.parseDouble(sList.get(i).RATE);
+                }
+
+                itemArrayList.add(item);
+                tempSum = tempSum + item.LINETOTAL;
+            }
+            DETAIL detail = new DETAIL();
+            detail.ITEM = itemArrayList;
+
+
+            SUMMARY summary = new SUMMARY();
+            CUSTOMERDETAIL CUSTOMERDETAILS = new CUSTOMERDETAIL();
+            CUSTOMERDETAILS.CUSTOMER = sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER;
+            CUSTOMERDETAILS.LOYALTYCODE = sop.DATA.SALESBILL.CUSTOMERDETAIL.LOYALTYCODE;
+            CUSTOMERDETAILS.LOYALTYID = sop.DATA.SALESBILL.CUSTOMERDETAIL.LOYALTYID;
+            CUSTOMERDETAILS.ADDRESS = sop.DATA.SALESBILL.CUSTOMERDETAIL.ADDRESS;
+            CUSTOMERDETAILS.MOBILENO = sop.DATA.SALESBILL.CUSTOMERDETAIL.MOBILENO;
+            CUSTOMERDETAILS.AREA = sop.DATA.SALESBILL.CUSTOMERDETAIL.AREA;
+            CUSTOMERDETAILS.PINCODE = sop.DATA.SALESBILL.CUSTOMERDETAIL.PINCODE;
+            CUSTOMERDETAILS.STATE = sop.DATA.SALESBILL.CUSTOMERDETAIL.STATE;
+            CUSTOMERDETAILS.DOCGUID = sop.DATA.SALESBILL.CUSTOMERDETAIL.DOCGUID;
+
+
+            Date c = Calendar.getInstance().getTime();
+            String formattedDate = dff.format(c);
+            summary.BILLDATE = "17/08/2023";
+            //summary.BILLDATE = formattedDate;
+            summary.BILLNO = sop.DATA.SALESBILL.SUMMARY.BILLNO;
+            summary.REFNO = String.valueOf(sop.DATA.SALESBILL.SUMMARY.REFNO);
+            summary.BILLTYPE = "CASH";
+            summary.CUSTOMER = sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER;
+            summary.CCEID = sop.DATA.SALESBILL.SUMMARY.CCEID;
+            summary.SUMMARYDISC = sop.DATA.SALESBILL.SUMMARY.SUMMARYDISC;
+            summary.NOOFITEMS = sop.DATA.SALESBILL.SUMMARY.NOOFITEMS;
+            summary.DOCGUID = sop.DATA.SALESBILL.SUMMARY.DOCGUID;
+            summary.CURRENTGUID = sop.DATA.SALESBILL.SUMMARY.CURRENTGUID;
+            summary.ROUNDOFF = Double.parseDouble(df.format(totalSum - tempSum));
+            summary.NETAMOUNT = Math.round(totalSum);
+            sr = new SaveSRBill();
+            sr.CUSTOMERDETAIL = CUSTOMERDETAILS;
+            sr.PAYMENT = payment;
+            sr.DETAIL = detail;
+            sr.SUMMARY = summary;
+            String temp = gson.toJson(sr.CUSTOMERDETAIL);
+            System.out.println(temp);
+            totalData = gson.toJson(sr);
+            System.out.println("Final Save Data is " + totalData);
+            android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSalesReturnActivity.this);
+            alertDialogBuilder.setMessage("Do you want to Save Retail SO..?");
+            alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface arg0, int arg1) {
+                    new SaveData().execute();
+                }
+            });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -159,15 +369,19 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
             if (sop.STATUSFLAG == 0) {
                 tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
-               String msg="Name: "+sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER+
-                       "\nBillNo: "+billNo+"\nDOCGUID: "+sop.DATA.SALESBILL.SUMMARY.DOCGUID;
-               tsMessages(msg);
+                String msg = "Name: " + sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER +
+                        "\nBillNo: " + billNo + "\nDOCGUID: " + sop.DATA.SALESBILL.SUMMARY.DOCGUID;
+                tsMessages(msg);
             } else {
                 tsMessages(sop.ERRORMESSAGE);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void resetData(View view) {
+        new TakeBillDetails().execute();
     }
 
     private class TakeBillDetails extends AsyncTask<String, String, String> {
@@ -265,18 +479,18 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
                     gson = new Gson();
                     sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
                     if (sop.STATUSFLAG == 0) {
-                        tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
+                        tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER + "\n" + sop.DATA.SALESBILL.CUSTOMERDETAIL.LOYALTYCODE);
                         tvDate.setText("BillNo: " + billNo);
                         sList = sop.DATA.SALESBILL.DETAIL.ITEM;
-                        RetailSRActivityAdapter arrayAdapter = new RetailSRActivityAdapter(RetailSalesReturnActivity.this, R.layout.list_row, sList);
+                        arrayAdapter = new RetailSRActivityAdapter(RetailSalesReturnActivity.this, R.layout.list_row, sList);
                         lvProductlist.setAdapter(arrayAdapter);
                         arrayAdapter.notifyDataSetChanged();
-                        double d=0.0;
-                        for (int i = 0; i <sop.DATA.SALESBILL.DETAIL.ITEM.size() ; i++) {
-                             d = d+sop.DATA.SALESBILL.DETAIL.ITEM.get(i).LINETOTAL;
+                        double d = 0.0;
+                        for (int i = 0; i < sop.DATA.SALESBILL.DETAIL.ITEM.size(); i++) {
+                            d = d + sop.DATA.SALESBILL.DETAIL.ITEM.get(i).LINETOTAL;
                         }
-                       // double d = Double.parseDouble(sop.DATA.SALESBILL.DETAIL.ITEM.get());
-                        tvAmountValue.setText(String.valueOf(d));
+                        // double d = Double.parseDouble(sop.DATA.SALESBILL.DETAIL.ITEM.get());
+                        tvAmountValue.setText(df.format(Math.round(d)));
                     } else {
                         tsMessages(sop.ERRORMESSAGE);
                     }
@@ -344,4 +558,115 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
 
     }
 
+    private class SaveData extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(RetailSalesReturnActivity.this);
+            pDialog.setMessage("Saving Pre Data....");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            try {
+                JSONObject object = new JSONObject();
+                object.put("StoreCode", "2021-DLF-PH1");
+                object.put("SubStoreCode", "MAIN");
+                object.put("UserId", "1");
+                object.put("CounterId", "1");
+                object.put("CustType", "1");
+
+
+                URL url = new URL(Url + "Save_RetailBill_SR");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(180000);
+                connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("StoreCode", "2021-DLF-PH1");
+                connection.setRequestProperty("SubStoreCode", "MAIN");
+                connection.setRequestProperty("UserId", "1");
+                connection.setRequestProperty("CounterId", "1");
+                connection.setRequestProperty("CustType", "1");
+                connection.setRequestProperty("inputxmlstd", object.toString());
+                connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(totalData);
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strfromweb = sb.toString();
+                        System.out.println("SR Bill  Save Response is " + strfromweb);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strfromweb = "httperror";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return strfromweb;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            System.out.println("Save Data Response is " + s);
+            try {
+                gson = new Gson();
+                //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
+                SRSaveSOResponse apiResponse = gson.fromJson(s, SRSaveSOResponse.class);
+                if (apiResponse.STATUSFLAG == 0) {
+                    String msg = apiResponse.DATA.RESPONSE.MSG + "\nBill No: " + apiResponse.DATA.RESPONSE.BILLNO
+                            + "\n Amount: ";
+                    popUp(msg);
+
+                } else {
+                    tsMessages(apiResponse.ERRORMESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void popUp(String msg) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSalesReturnActivity.this);
+        alertDialogBuilder.setMessage(msg);
+        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg1) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(true);
+        alertDialog.show();
+    }
 }

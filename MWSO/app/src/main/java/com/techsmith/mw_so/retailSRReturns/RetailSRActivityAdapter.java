@@ -41,7 +41,7 @@ import java.util.List;
 public class RetailSRActivityAdapter extends ArrayAdapter {
     Context context;
     TextView tvProductName, tvSOH, tvmrp, tvSelectedItemName, tvMrp, tvSlNo;
-    private static final DecimalFormat decfor = new DecimalFormat("0.00");
+    private static final DecimalFormat df = new DecimalFormat("0.00");
     ImageButton btnDelete;
     Gson gson;
     RetailSRActivityAdapter arrayAdapter;
@@ -49,9 +49,9 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
     Dialog qtydialog;
     public ArrayList<SaveProductSOPL> pList;
     RetailSRCustomAdapter ad;
-    List<String> batchCode, batchExpiry, tempBatchCode, tempbatchList;
+    List<String> batchCode, batchExpiry, qtyList, discList;
     List<Double> batchMrp, batchRate, batchSOH;
-    String tempTotal = "", ptotal = "", tempBCode = "", currentQty = "", pID = "", currentBcode = "";
+    String tempTotal = "", ptotal = "", tempBCode = "", currentQty = "", currentDisc = "", currentBcode = "";
     public ArrayList<ITEM> sList;
 
     public RetailSRActivityAdapter(@NonNull Context context, int resource, ArrayList<ITEM> sList) {
@@ -64,13 +64,15 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         batchMrp = new ArrayList<>();
         batchRate = new ArrayList<>();
         batchSOH = new ArrayList<>();
-        //batchID = new ArrayList<>();
+        qtyList = new ArrayList<>();
         pList = new ArrayList<>();
+        discList = new ArrayList<>();
         for (int i = 0; i < sList.size(); i++) {
             batchCode.add(sList.get(i).BATCHCODE);
             batchExpiry.add(sList.get(i).BATCHEXPIRY);
             batchMrp.add(Double.valueOf(sList.get(i).MRP));
-
+            qtyList.add(sList.get(i).PACKQTY);
+            discList.add(sList.get(i).DISCPER);
         }
 
     }
@@ -94,7 +96,6 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
             btnDelete = convertView.findViewById(R.id.btnDeleteItem);
 
             try {
-                //"batchCode":"EX271","batchId":1025034269,"batchMrp":14.96,"Rate":10.02,"sohInPacks":0.47,"batchExpiry":"01/01/2023"}]}
 
                 tvProductName.setText(sList.get(position).ITEMNAME);
                 tvmrp.setText(String.valueOf(sList.get(position).MRP));
@@ -106,6 +107,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
 
                 tvTotal.setText(String.valueOf(sList.get(position).LINETOTAL));
                 tvSlNo.setText(sList.get(position).LINEID);
+                currentDisc = sList.get(position).DISCPER;
                 tvFreeQty.setText(String.valueOf(sList.get(position).DISCPER) + "%");
 
                 btnDelete.setOnClickListener(new View.OnClickListener() {// delete
@@ -117,16 +119,10 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                             alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int arg1) {
-                                    // productTotal = productTotal - Double.parseDouble(sList.get(position).pTotal);
-                                    //((RetailSOActivity) context).productTotal = productTotal;
                                     sList.remove(position);
                                     ((RetailSalesReturnActivity) context).sList = sList;
                                     callItemTotal();
-                                    // ((RetailSOActivity) context).productTotal = productTotal;
                                     System.out.println("save list size is " + ((RetailSalesReturnActivity) context).sList.size());
-                                    //gson = new Gson();
-                                    //((RetailSOActivity) context).formedSO = gson.toJson(((RetailSOActivity) context).sList);
-                                    //System.out.println("Formed json in Adapter class is  " +  ((RetailSOActivity) context).formedSO);
                                     RetailSRActivityAdapter arrayAdapter = new RetailSRActivityAdapter(context,
                                             R.layout.list_row, sList);
                                     ((RetailSalesReturnActivity) context).lvProductlist.setAdapter(arrayAdapter);
@@ -134,7 +130,6 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                                         productTotal = 0.00;
                                         ((RetailSalesReturnActivity) context).productTotal = 0.0;
                                     }
-                                    // ((RetailSalesReturnActivity) context).tvAmountValue.setText(String.format("%.2f", productTotal));
                                     arrayAdapter.notifyDataSetChanged();
 
                                 }
@@ -218,7 +213,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         tvSelectedItemCode.setText("Product Code: " + sList.get(position).ITEMCODE);
         // temppCode = sList.get(position).pCode;
         TextView tvItemSOH = qtydialog.findViewById(R.id.tvItemSOH);
-        tvItemSOH.setText("Quantity: " + sList.get(position).PACKQTY);
+        tvItemSOH.setText("Article Quantity: " + sList.get(position).PACKQTY);
         TextView tvSelectedItemExp = qtydialog.findViewById(R.id.tvSelectedItemExp);
         TextView tvItemMRP = qtydialog.findViewById(R.id.tvItemMRP);
         TextView tvbMRP = qtydialog.findViewById(R.id.tvbMRP);
@@ -316,6 +311,8 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                     Toast.makeText(context, " Quantity Cannot Be Increased", Toast.LENGTH_SHORT).show();
                 } else if (Double.parseDouble(discPer.getText().toString()) > 100) {
                     Toast.makeText(context, "Discount cannot be more than 100%", Toast.LENGTH_SHORT).show();
+                } else if (Double.parseDouble(discPer.getText().toString()) < Double.parseDouble(currentDisc)) {
+                    Toast.makeText(context, "Discount cannot be decreased..!!", Toast.LENGTH_SHORT).show();
                 } else {
                     btnAddItem_qtySelection.setEnabled(true);
                     double d = 0.0, disc = 0.0, temp;
@@ -330,24 +327,35 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                                 d = pRate * Double.parseDouble(etQty.getText().toString());
                                 temp = disc * d;
                                 tempTotal = String.valueOf(round(d, 2) - temp);
-                                ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
+                                ptotal = String.valueOf(df.format(Double.parseDouble(tempTotal)));
+                                sList.get(position).LINETOTAL = Double.parseDouble(ptotal);
                                 System.out.println("After Discount " + total);
-                                pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
+                                //df.format(Math.round(productTotal))
+                                pTotal.setText(df.format(Math.round(Double.parseDouble(tempTotal))));
+                                ((RetailSalesReturnActivity) context).tvAmountValue.setText(df.format(Math.round(Double.parseDouble(tempTotal))));
 
                             } else {
                                 d = Double.parseDouble(sList.get(position).RATE) * Double.parseDouble(etQty.getText().toString());
                                 tempTotal = String.valueOf(round(d, 2));
-                                ptotal = String.valueOf(decfor.format(Double.parseDouble(tempTotal)));
+                                ptotal = String.valueOf(df.format(Double.parseDouble(tempTotal)));
+                                sList.get(position).LINETOTAL = Double.parseDouble(ptotal);
                                 System.out.println("After Discount " + total);
-                                pTotal.setText(decfor.format(Double.parseDouble(tempTotal)));
+                                //df.format(Math.round(productTotal))
+                                pTotal.setText(df.format(Math.round(Double.parseDouble(tempTotal))));
+                                ((RetailSalesReturnActivity) context).tvAmountValue.setText(df.format(Math.round(Double.parseDouble(tempTotal))));
                             }
 
                         } else {
                             d = Double.parseDouble(sList.get(position).RATE) * Double.parseDouble(etQty.getText().toString());
+                            sList.get(position).LINETOTAL = d;
                             tempTotal = String.valueOf(round(d, 2));
                             ptotal = tempTotal;
-                            pTotal.setText(decfor.format(d));
+                            pTotal.setText(df.format(Math.round(productTotal)));
+                            ((RetailSalesReturnActivity) context).tvAmountValue.setText(df.format(Math.round(productTotal)));
                         }
+                        arrayAdapter = new RetailSRActivityAdapter(context, R.layout.list_row, sList);
+                        ((RetailSalesReturnActivity) context).lvProductlist.setAdapter(arrayAdapter);
+                        arrayAdapter.notifyDataSetChanged();
 
                     } else {
                         Toast.makeText(context, "Empty Quantity", Toast.LENGTH_SHORT).show();
@@ -383,7 +391,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
 
                     arrayAdapter = new RetailSRActivityAdapter(context, R.layout.list_row, sList);
                     ((RetailSalesReturnActivity) context).lvProductlist.setAdapter(arrayAdapter);
-                    ((RetailSalesReturnActivity) context).tvAmountValue.setText(String.format("%.2f", newTotal));
+                    ((RetailSalesReturnActivity) context).tvAmountValue.setText(df.format(Math.round(newTotal)));
 
                     qtydialog.cancel();
                 } catch (Exception e) {

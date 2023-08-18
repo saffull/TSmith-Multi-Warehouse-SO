@@ -47,8 +47,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.4"
+                                android:gravity="right"
                                 android:fontFamily="@font/fabrica"
-                                android:hint="Retail Sales Return"
                                 android:textColor="@color/black"
                                 android:textStyle="bold" />
 
@@ -56,12 +56,13 @@
                                 android:id="@+id/tvDate"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="0.5"
+                                android:layout_weight="0.4"
                                 android:gravity="right"
                                 android:singleLine="true"
                                 android:text=""
                                 android:textColor="@color/black"
                                 android:textStyle="bold" />
+
                             <ImageButton
                                 android:id="@+id/imageButton"
                                 android:layout_width="wrap_content"
@@ -71,15 +72,17 @@
                                 android:onClick="showDialog"
                                 app:srcCompat="@drawable/info" />
 
-                           <!-- <ImageButton
+                            <ImageButton
                                 android:id="@+id/imgBtn"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="0.1"
                                 android:background="@null"
-                                app:srcCompat="@drawable/ic_dots" />-->
+                                android:onClick="resetData"
+                                app:srcCompat="@drawable/ic_reset" />
 
                         </LinearLayout>
+
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
@@ -91,9 +94,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="5dp"
-                            android:visibility="gone"
                             android:background="@drawable/border"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -133,8 +136,8 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:visibility="gone"
-                                android:orientation="horizontal">
+                                android:orientation="horizontal"
+                                android:visibility="gone">
 
                                 <RelativeLayout
                                     android:layout_width="match_parent"
@@ -179,8 +182,8 @@
                                         android:layout_height="wrap_content"
                                         android:layout_alignRight="@+id/etCustomerGoogleAdrs"
                                         android:layout_centerVertical="true"
-                                        android:background="@null"
                                         android:layout_marginRight="10dp"
+                                        android:background="@null"
                                         android:onClick="getAddress"
                                         android:src="@drawable/ic_expand" />
                                 </RelativeLayout>
@@ -216,8 +219,8 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="2"
-                                    android:gravity="center"
                                     android:fontFamily="@font/fabrica"
+                                    android:gravity="center"
                                     android:text="Description"
                                     android:textColor="@color/black" />
 
