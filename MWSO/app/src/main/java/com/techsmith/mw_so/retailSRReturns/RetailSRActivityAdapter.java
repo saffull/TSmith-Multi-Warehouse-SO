@@ -39,20 +39,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RetailSRActivityAdapter extends ArrayAdapter {
-    Context context;
-    TextView tvProductName, tvSOH, tvmrp, tvSelectedItemName, tvMrp, tvSlNo;
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    public ArrayList<SaveProductSOPL> pList;
+    public ArrayList<ITEM> sList;
+    Context context;
+    TextView tvProductName, tvSOH, tvmrp,  tvItemSOH, tvMrp, tvSlNo;
     ImageButton btnDelete;
     Gson gson;
     RetailSRActivityAdapter arrayAdapter;
     Double productTotal, total = 0.0, prevTotal = 0.0, pRate, prevQty = 0.0;
     Dialog qtydialog;
-    public ArrayList<SaveProductSOPL> pList;
     RetailSRCustomAdapter ad;
     List<String> batchCode, batchExpiry, qtyList, discList;
     List<Double> batchMrp, batchRate, batchSOH;
     String tempTotal = "", ptotal = "", tempBCode = "", currentQty = "", currentDisc = "", currentBcode = "";
-    public ArrayList<ITEM> sList;
 
     public RetailSRActivityAdapter(@NonNull Context context, int resource, ArrayList<ITEM> sList) {
         super(context, resource);
@@ -75,6 +75,14 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
             discList.add(sList.get(i).DISCPER);
         }
 
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     @NonNull
@@ -147,7 +155,6 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
 
@@ -155,7 +162,14 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
                     @Override
                     public void onClick(View view) {
                         System.out.println("Current total is " + position);
-                        callDialog(position);
+                        System.out.println("Current total qty  is " + sList.get(position).PACKQTY);
+                        if (Double.parseDouble(sList.get(position).PACKQTY) < 1) {
+                            Toast.makeText(context, "No quantity to edit", Toast.LENGTH_SHORT).show();
+                        } else {
+                            callDialog(position);
+                        }
+
+
                     }
                 });
 
@@ -212,7 +226,7 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         TextView tvSelectedItemCode = qtydialog.findViewById(R.id.tvSelectedItemCode);
         tvSelectedItemCode.setText("Product Code: " + sList.get(position).ITEMCODE);
         // temppCode = sList.get(position).pCode;
-        TextView tvItemSOH = qtydialog.findViewById(R.id.tvItemSOH);
+       tvItemSOH = qtydialog.findViewById(R.id.tvItemSOH);
         tvItemSOH.setText("Article Quantity: " + sList.get(position).PACKQTY);
         TextView tvSelectedItemExp = qtydialog.findViewById(R.id.tvSelectedItemExp);
         TextView tvItemMRP = qtydialog.findViewById(R.id.tvItemMRP);
@@ -407,17 +421,8 @@ public class RetailSRActivityAdapter extends ArrayAdapter {
         qtydialog.show();
     }
 
-
     @Override
     public int getCount() {
         return sList.size();
-    }
-
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        BigDecimal bd = BigDecimal.valueOf(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 }
