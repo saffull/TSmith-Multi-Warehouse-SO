@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -54,6 +55,7 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
     Gson gson;
     public ListView lvProductlist;
     int currenPos;
+    Button btnCreateSO;
     Dialog dialog;
 
 
@@ -71,9 +73,15 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
         place = findViewById(R.id.place);
         pincode = findViewById(R.id.pincode);
         state = findViewById(R.id.state);
+        btnCreateSO=findViewById(R.id.btnCreateSO);
         etCustomerGoogleAdrs = findViewById(R.id.etCustomerGoogleAdrs);
         Url = prefs.getString("MultiSOURL", "");
         uniqueID = UUID.randomUUID().toString();
+
+        editor = prefs.edit();
+        editor.putString("SRDOCGUID", uniqueID);
+        editor.putString("SRCURRENTGUID", uniqueID);
+        editor.apply();
 
         if (!prefs.getString("billNo", "").isEmpty())
             acvBillNo.setText(prefs.getString("billNo", ""));
@@ -84,12 +92,23 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
         editor = prefs.edit();
         editor.putString("billNo", acvBillNo.getText().toString());
         editor.apply();
-        ;
         startActivity(new Intent(RetailSRBillCustomerInfoActivity.this, RetailSalesReturnActivity.class));
     }
 
     public void TakeBillDetails(View view) {
         new TakeBillDetails().execute();
+    }
+
+    public void CLearALL(View view) {
+        acvCustomerName.setText("");
+        acvmobileNo.setText("");
+        cEmail .setText("");
+        place.setText("");
+        pincode .setText("");
+        state .setText("");
+        etCustomerGoogleAdrs .setText("");
+        btnCreateSO.setEnabled(false);
+        btnCreateSO.setAlpha(0.8f);
     }
 
     private class TakeBillDetails extends AsyncTask<String, String, String> {
@@ -187,6 +206,8 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
                     gson = new Gson();
                     RetrieveProductSO sop = gson.fromJson(strCustomer, RetrieveProductSO.class);
                     if (sop.STATUSFLAG == 0) {
+                        btnCreateSO.setAlpha(1f);
+                        btnCreateSO.setEnabled(true);
                         System.out.println(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
                         acvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
                         acvmobileNo.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.MOBILENO);
@@ -206,6 +227,12 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     private void tsMessages(String msg) {

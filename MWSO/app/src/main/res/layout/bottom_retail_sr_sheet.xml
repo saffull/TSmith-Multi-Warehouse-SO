@@ -127,7 +127,7 @@
                 android:textSize="12sp" />
 
             <Button
-                android:id="@+id/btnReset"
+                android:id="@+id/btnNew"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_margin="2dp"
@@ -136,9 +136,8 @@
                 android:drawableLeft="@drawable/ic_file_new"
                 android:drawablePadding="5dp"
                 android:fontFamily="@font/fabrica"
-                android:onClick="ResetList"
-                android:paddingLeft="15px"
-                android:text="Reset"
+                android:paddingLeft="15dp"
+                android:text="New"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
 

@@ -121,6 +121,9 @@ public class RetailCustomerInformation extends AppCompatActivity {
         editor = prefs.edit();
         editor.putString("DOCGUID", uniqueID);
         editor.putString("CURRENTGUID", uniqueID);
+        editor.putString("billTotal", "0.0");
+        editor.putString("billCash", "0.0");
+        editor.putString("billCard", "0.0");
         editor.apply();
         try {
             mObject = new JSONObject();

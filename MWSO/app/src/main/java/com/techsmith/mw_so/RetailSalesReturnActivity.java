@@ -76,11 +76,12 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
     private LinearLayout linearLayoutBSheet;
     private ToggleButton tbUpDown;
     RetrieveProductSO sop;
-    public Button btnAllClear, btnSave;
+    public Button btnNew, btnSave;
     Button btnSaveSR;
     EditText etCustomerGoogleAdrs;
     SaveSRBill sr;
-    String Url, strCustomer, strfromweb, strerrormsg, strErrorMsg, billNo = "", customerAddress = "", cashAmount, cardAmount, totalData = "";
+    String Url, strCustomer, strfromweb, strerrormsg, strErrorMsg, billNo = "", customerAddress = "",
+            cashAmount, cardAmount, totalData = "", DocGuid = "", CurrentGuid = "";
     ProgressDialog pDialog;
     RetailCustomerResponse customerResponse;
     AppWide appWide;
@@ -110,10 +111,24 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         tvCustomerName = findViewById(R.id.tvCustomerName);
         Url = prefs.getString("MultiSOURL", "");
         billNo = prefs.getString("billNo", "");
+        DocGuid = prefs.getString("SRDOCGUID", "");
+        CurrentGuid = prefs.getString("SRCURRENTGUID", "");
         System.out.println(billNo);
         if (!billNo.isEmpty()) {
             new TakeBillDetails().execute();
         }
+        btnNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor = prefs.edit();
+                editor.putString("billTotal", "0.0");
+                editor.putString("billCash", "0.0");
+                editor.putString("billCard", "0.0");
+                editor.apply();
+                finish();
+                startActivity(new Intent(RetailSalesReturnActivity.this, RetailSRBillCustomerInfoActivity.class));
+            }
+        });
         paymentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -271,6 +286,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
                 item.RATE = sList.get(i).RATE;
                 item.PACKQTY = sList.get(i).PACKQTY;
                 item.DISCPER = sList.get(i).DISCPER;
+                //item.TOTALDISCPERC = sList.get(i).DISCPER;
                 if (Double.parseDouble(sList.get(i).DISCPER) > 0.0) {
                     double d = (Double.parseDouble(sList.get(i).PACKQTY) * Double.parseDouble(sList.get(i).RATE)) * Double.parseDouble(sList.get(i).DISCPER) / 100;
                     double tot = (Double.parseDouble(sList.get(i).PACKQTY) * Double.parseDouble(sList.get(i).RATE)) - d;
@@ -296,7 +312,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             CUSTOMERDETAILS.AREA = sop.DATA.SALESBILL.CUSTOMERDETAIL.AREA;
             CUSTOMERDETAILS.PINCODE = sop.DATA.SALESBILL.CUSTOMERDETAIL.PINCODE;
             CUSTOMERDETAILS.STATE = sop.DATA.SALESBILL.CUSTOMERDETAIL.STATE;
-            CUSTOMERDETAILS.DOCGUID = sop.DATA.SALESBILL.CUSTOMERDETAIL.DOCGUID;
+            // CUSTOMERDETAILS.DOCGUID = sop.DATA.SALESBILL.CUSTOMERDETAIL.DOCGUID;
 
 
             Date c = Calendar.getInstance().getTime();
@@ -310,8 +326,8 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             summary.CCEID = sop.DATA.SALESBILL.SUMMARY.CCEID;
             summary.SUMMARYDISC = sop.DATA.SALESBILL.SUMMARY.SUMMARYDISC;
             summary.NOOFITEMS = sop.DATA.SALESBILL.SUMMARY.NOOFITEMS;
-            summary.DOCGUID = sop.DATA.SALESBILL.SUMMARY.DOCGUID;
-            summary.CURRENTGUID = sop.DATA.SALESBILL.SUMMARY.CURRENTGUID;
+            summary.DOCGUID = DocGuid;
+            summary.CURRENTGUID = CurrentGuid;
             summary.ROUNDOFF = Double.parseDouble(df.format(totalSum - tempSum));
             summary.NETAMOUNT = Math.round(totalSum);
             sr = new SaveSRBill();
@@ -324,7 +340,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             totalData = gson.toJson(sr);
             System.out.println("Final Save Data is " + totalData);
             android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSalesReturnActivity.this);
-            alertDialogBuilder.setMessage("Do you want to Save Retail SO..?");
+            alertDialogBuilder.setMessage("Do you want to Update Retail Sales Bill..?");
             alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface arg0, int arg1) {
@@ -351,6 +367,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         this.linearLayoutBSheet = findViewById(R.id.bottomSheetSalesReturn);
         this.bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBSheet);
         this.tbUpDown = findViewById(R.id.toggleButton);
+        this.btnNew = findViewById(R.id.btnNew);
         this.tvAmountValue = findViewById(R.id.tvAmountValue);
         this.btnSaveSR = findViewById(R.id.btnSaveSR);
     }
@@ -370,7 +387,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             if (sop.STATUSFLAG == 0) {
                 tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
                 String msg = "Name: " + sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER +
-                        "\nBillNo: " + billNo + "\nDOCGUID: " + sop.DATA.SALESBILL.SUMMARY.DOCGUID;
+                        "\nBillNo: " + billNo +"\nLoyaltyCode: "+sop.DATA.SALESBILL.CUSTOMERDETAIL.LOYALTYCODE+ "\nDOCGUID: " + sop.DATA.SALESBILL.SUMMARY.DOCGUID;
                 tsMessages(msg);
             } else {
                 tsMessages(sop.ERRORMESSAGE);
@@ -630,7 +647,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             }
             return strfromweb;
         }
-
+//
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -642,9 +659,13 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
                 //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
                 SRSaveSOResponse apiResponse = gson.fromJson(s, SRSaveSOResponse.class);
                 if (apiResponse.STATUSFLAG == 0) {
-                    String msg = apiResponse.DATA.RESPONSE.MSG + "\nBill No: " + apiResponse.DATA.RESPONSE.BILLNO
-                            + "\n Amount: ";
+                    String msg = apiResponse.DATA.RESPONSE.MSG + "\nBill No: " + apiResponse.DATA.RESPONSE.BILLNO;
                     popUp(msg);
+                    editor = prefsD.edit();
+                    editor.putString("cashSave", "");
+                    editor.putString("cardSave", "");
+                    editor.putString("billNo", "");
+                    editor.apply();
 
                 } else {
                     tsMessages(apiResponse.ERRORMESSAGE);

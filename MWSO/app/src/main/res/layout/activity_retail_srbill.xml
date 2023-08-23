@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/llCustInfoToolbar"
@@ -28,6 +28,7 @@
                 android:text="@string/customer_information"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
+            <!--CLearALL-->
 
             <ImageView
                 android:id="@+id/btnSOReport1"
@@ -35,11 +36,20 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:srcCompat="@drawable/info" />
+
+            <ImageButton
+                android:id="@+id/imgBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:background="@null"
+                android:onClick="CLearALL"
+                app:srcCompat="@drawable/ic_reset" />
         </LinearLayout>
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="520dp"
+            android:layout_height="480dp"
             android:layout_below="@+id/llCustInfoToolbar">
 
             <LinearLayout
@@ -48,35 +58,36 @@
                 android:layout_margin="10dp"
                 android:orientation="vertical">
 
-                   <TextView
-                       android:layout_width="match_parent"
-                       android:layout_height="match_parent"
-                       android:fontFamily="@font/fabrica"
-                       android:text="Bill No"
-                       android:textColor="@color/black"
-                       android:textStyle="bold" />
-                   <RelativeLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/fabrica"
+                    android:text="Bill No"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
 
-                       <AutoCompleteTextView
-                           android:id="@+id/acvBillNo"
-                           android:layout_width="match_parent"
-                           android:layout_height="wrap_content"
-                           android:hint="BillNo"
-                           android:text="2021/23/S-27"
-                           android:textColor="@color/custinfo_edittext_color" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                       <ImageButton
-                           android:id="@+id/imgBtnBillByNo"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_alignRight="@+id/acvBillNo"
-                           android:layout_centerVertical="true"
-                           android:background="@null"
-                           android:onClick="TakeBillDetails"
-                           android:src="@drawable/ic_search" />
-                   </RelativeLayout>
+                    <AutoCompleteTextView
+                        android:id="@+id/acvBillNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="BillNo"
+                        android:text="2021/23/S-27"
+                        android:textColor="@color/custinfo_edittext_color" />
+
+                    <ImageButton
+                        android:id="@+id/imgBtnBillByNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@+id/acvBillNo"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:onClick="TakeBillDetails"
+                        android:src="@drawable/ic_search" />
+                </RelativeLayout>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -102,13 +113,12 @@
                         android:id="@+id/imgBtnCustSearchbyName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:visibility="invisible"
                         android:layout_alignRight="@+id/acvCustomerName"
                         android:layout_centerVertical="true"
                         android:background="@null"
-                        android:src="@drawable/ic_search" />
+                        android:src="@drawable/ic_search"
+                        android:visibility="invisible" />
                 </RelativeLayout>
-
 
 
                 <TextView
@@ -116,14 +126,14 @@
                     android:layout_height="match_parent"
                     android:fontFamily="@font/fabrica"
                     android:text="Loyalty Card No"
-                    android:visibility="gone"
                     android:textColor="@color/black"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:visibility="gone"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
                     <AutoCompleteTextView
                         android:id="@+id/acvLcardNo"
@@ -180,8 +190,8 @@
                         android:layout_alignRight="@+id/acvmobileNo"
                         android:layout_centerVertical="true"
                         android:background="@null"
-                        android:visibility="invisible"
-                        android:src="@drawable/ic_search" />
+                        android:src="@drawable/ic_search"
+                        android:visibility="invisible" />
                 </RelativeLayout>
 
 
@@ -203,34 +213,34 @@
                     android:singleLine="true"
                     android:textColor="@color/custinfo_edittext_color" />
 
-               <!-- <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:fontFamily="@font/fabrica"
-                    android:text="Doctor"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                <!-- <TextView
+                     android:layout_width="match_parent"
+                     android:layout_height="match_parent"
+                     android:fontFamily="@font/fabrica"
+                     android:text="Doctor"
+                     android:textColor="@color/black"
+                     android:textStyle="bold" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                 <RelativeLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content">
 
-                    <AutoCompleteTextView
-                        android:id="@+id/acvDoctorName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Doctor Name"
-                        android:textColor="@color/custinfo_edittext_color" />
+                     <AutoCompleteTextView
+                         android:id="@+id/acvDoctorName"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:hint="Doctor Name"
+                         android:textColor="@color/custinfo_edittext_color" />
 
-                    <ImageButton
-                        android:id="@+id/imgBtnDocSearchbyName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignRight="@+id/acvDoctorName"
-                        android:layout_centerVertical="true"
-                        android:background="@null"
-                        android:src="@drawable/ic_search" />
-                </RelativeLayout>-->
+                     <ImageButton
+                         android:id="@+id/imgBtnDocSearchbyName"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_alignRight="@+id/acvDoctorName"
+                         android:layout_centerVertical="true"
+                         android:background="@null"
+                         android:src="@drawable/ic_search" />
+                 </RelativeLayout>-->
 
                 <!-- <TextView
                     android:layout_width="match_parent"
@@ -367,22 +377,22 @@
                     android:inputType="textCapSentences|textMultiLine"
                     android:textColor="@color/custinfo_edittext_color" />
 
-               <!-- <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:fontFamily="@font/fabrica"
-                    android:text="@string/customer_address"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
+                <!-- <TextView
+                     android:layout_width="match_parent"
+                     android:layout_height="match_parent"
+                     android:fontFamily="@font/fabrica"
+                     android:text="@string/customer_address"
+                     android:textColor="@color/black"
+                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/etCustomerAdrs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:editable="false"
-                    android:hint="@string/customer_address"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:textColor="@color/custinfo_edittext_color" />-->
+                 <EditText
+                     android:id="@+id/etCustomerAdrs"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:editable="false"
+                     android:hint="@string/customer_address"
+                     android:inputType="textCapSentences|textMultiLine"
+                     android:textColor="@color/custinfo_edittext_color" />-->
 
 
                 <View
@@ -415,17 +425,18 @@
                     android:orientation="vertical"
                     android:padding="10px">
 
-
                     <Button
                         android:id="@+id/btnCreateSO"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+                        android:alpha="0.8"
                         android:background="@drawable/corners_round_btn"
                         android:drawableLeft="@drawable/ic_so"
+                        android:enabled="false"
                         android:fontFamily="@font/fabrica"
-                        android:paddingLeft="10dp"
                         android:onClick="gotoSRList"
+                        android:paddingLeft="10dp"
                         android:text="Continue"
                         android:textColor="@color/white" />
                 </LinearLayout>
