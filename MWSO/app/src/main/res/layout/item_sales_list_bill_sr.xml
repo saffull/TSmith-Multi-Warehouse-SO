@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?><!--Created by Pavithra on 24-08-2020-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <TextView
+            android:id="@+id/tvSlNo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="1"
+            android:textSize="14sp"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tvPartyName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.7"
+            android:text="Party Name"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tvssid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:fontFamily="@font/fabrica"
+            android:text="SSID"
+            android:textSize="14sp"
+            android:gravity="start"
+            android:textColor="@color/black" />
+
+        <ImageButton
+            android:id="@+id/btnPrintItem"
+            android:layout_width="wrap_content"
+            android:layout_weight="0.2"
+            android:paddingBottom="5dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_print" />
+        <ImageButton
+            android:id="@+id/btnEmailItem"
+            android:layout_width="wrap_content"
+            android:layout_weight="0.2"
+            android:paddingBottom="5dp"
+            android:layout_marginStart="20dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_mail" />
+
+    </LinearLayout>
+
+
+    <!--Not used-->
+  <!--  <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal">
+
+        &lt;!&ndash;.2 .3 .4 .1&ndash;&gt;
+        <TextView
+            android:id="@+id/tvMRP"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="left"
+            android:text="Rate"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tvqty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="start"
+            android:textColor="@color/black"
+            app:drawableStartCompat="@drawable/ic_edit" />
+
+        <TextView
+            android:id="@+id/tvRate"
+            android:layout_width="0dp"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:text="Rate"
+            android:textColor="@color/black" />
+
+
+        <TextView
+            android:id="@+id/tvQty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="end"
+            android:paddingRight="5dp"
+            android:text="QTY"
+            android:textColor="#152E61" />
+
+        &lt;!&ndash;<EditText&ndash;&gt;
+        &lt;!&ndash;android:id="@+id/tvQty"&ndash;&gt;
+        &lt;!&ndash;android:layout_width="0dp"&ndash;&gt;
+        &lt;!&ndash;android:layout_weight="0.3"&ndash;&gt;
+        &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;
+        &lt;!&ndash;android:textColor="#152E61"&ndash;&gt;
+        &lt;!&ndash;android:textStyle="bold"&ndash;&gt;
+        &lt;!&ndash;android:paddingRight="30px"&ndash;&gt;
+        &lt;!&ndash;android:text="QTY"/>&ndash;&gt;
+
+        <TextView
+            android:id="@+id/tvFreeQty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="right"
+            android:text="0"
+            android:textColor="@color/black" />
+        &lt;!&ndash; <TextView
+             android:id="@+id/tvTotall"
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+             android:layout_weight="0.2"
+             android:gravity="right"
+             android:text="Total"
+             android:textColor="@color/black" />&ndash;&gt;
+
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="right"
+            android:text="Total"
+            android:textColor="@color/black" />
+
+        <ImageButton
+            android:id="@+id/imgBtnRemarksItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/grey" />-->
+
+</LinearLayout>

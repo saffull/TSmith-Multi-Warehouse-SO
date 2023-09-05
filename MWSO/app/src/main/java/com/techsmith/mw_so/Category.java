@@ -17,6 +17,7 @@ public class Category extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 //        getSupportActionBar().hide();
+        startActivity(new Intent(Category.this, SoMenu.class));
     }
 
     @Override

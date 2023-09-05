@@ -1,18 +1,24 @@
 package com.techsmith.mw_so;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,10 +34,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.dantsu.escposprinter.EscPosPrinter;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
+import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.payment_util.PaymentList;
+import com.techsmith.mw_so.print_utils.PrintResponse;
 import com.techsmith.mw_so.retailSRReturns.CUSTOMERDETAIL;
 import com.techsmith.mw_so.retailSRReturns.DETAIL;
 import com.techsmith.mw_so.retailSRReturns.ITEM;
@@ -76,12 +86,12 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
     private LinearLayout linearLayoutBSheet;
     private ToggleButton tbUpDown;
     RetrieveProductSO sop;
-    public Button btnNew, btnSave;
+    public Button btnNew, btnPrint;
     Button btnSaveSR;
     EditText etCustomerGoogleAdrs;
     SaveSRBill sr;
     String Url, strCustomer, strfromweb, strerrormsg, strErrorMsg, billNo = "", customerAddress = "",
-            cashAmount, cardAmount, totalData = "", DocGuid = "", CurrentGuid = "";
+            cashAmount, cardAmount, totalData = "", DocGuid = "", CurrentGuid = "", strPrintBill = "";
     ProgressDialog pDialog;
     RetailCustomerResponse customerResponse;
     AppWide appWide;
@@ -163,6 +173,12 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
 
             }
         });
+        btnPrint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PrintSalesReturn();
+            }
+        });
         tbUpDown.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -197,6 +213,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
 
 
     }
+
 
     private void saveSR() {// Replace
 
@@ -370,6 +387,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         this.btnNew = findViewById(R.id.btnNew);
         this.tvAmountValue = findViewById(R.id.tvAmountValue);
         this.btnSaveSR = findViewById(R.id.btnSaveSR);
+        this.btnPrint = findViewById(R.id.btnPrint);
     }
 
     public void showInfo(View view) {
@@ -387,7 +405,7 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             if (sop.STATUSFLAG == 0) {
                 tvCustomerName.setText(sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER);
                 String msg = "Name: " + sop.DATA.SALESBILL.CUSTOMERDETAIL.CUSTOMER +
-                        "\nBillNo: " + billNo +"\nLoyaltyCode: "+sop.DATA.SALESBILL.CUSTOMERDETAIL.LOYALTYCODE+ "\nDOCGUID: " + sop.DATA.SALESBILL.SUMMARY.DOCGUID;
+                        "\nBillNo: " + billNo + "\nLoyaltyCode: " + sop.DATA.SALESBILL.CUSTOMERDETAIL.LOYALTYCODE + "\nDOCGUID: " + sop.DATA.SALESBILL.SUMMARY.DOCGUID;
                 tsMessages(msg);
             } else {
                 tsMessages(sop.ERRORMESSAGE);
@@ -647,7 +665,8 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
             }
             return strfromweb;
         }
-//
+
+        //
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
@@ -676,6 +695,126 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         }
     }
 
+    private void PrintSalesReturn() {
+        new PrintSR().execute();
+    }
+
+    private class PrintSR extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(RetailSalesReturnActivity.this);
+            pDialog.setMessage("Fetching SR Data....");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                JSONObject object = new JSONObject();
+                object.put("StoreCode", "2021-DLF-PH1");
+                object.put("SubStoreCode", "MAIN");
+                object.put("UserId", "1");
+                object.put("CounterId", "1");
+                object.put("CustType", "1");
+
+                JSONObject jObject = new JSONObject();
+                jObject.put("INVOICENO", "2021/23/SR-1");
+                //jObject.put("INVOICENO","2021/23/S-58");
+                jObject.put("FORMAT", "1");
+
+
+                URL url = new URL(Url + "GetSalesReturnPrint");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setReadTimeout(15000);
+                connection.setConnectTimeout(180000);
+                connection.setRequestProperty("authkey", "SBRL1467-8950-4215-A5DC-AC04D7620B23");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("StoreCode", "2021-DLF-PH1");
+                connection.setRequestProperty("SubStoreCode", "MAIN");
+                connection.setRequestProperty("UserId", "1");
+                connection.setRequestProperty("CounterId", "1");
+                connection.setRequestProperty("CustType", "1");
+                connection.setRequestProperty("inputxmlstd", object.toString());
+                connection.connect();
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                wr.writeBytes(jObject.toString());
+                wr.flush();
+                wr.close();
+                int responsecode = connection.getResponseCode();
+                if (responsecode == 200) {
+                    try {
+                        InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(streamReader);
+                        StringBuilder sb = new StringBuilder();
+                        String inputLine = "";
+                        while ((inputLine = reader.readLine()) != null) {
+                            sb.append(inputLine);
+                            break;
+                        }
+
+                        reader.close();
+                        strPrintBill = sb.toString();
+                        System.out.println("Print SR Bill Response is " + strPrintBill);
+
+
+                    } finally {
+                        connection.disconnect();
+                    }
+
+                } else {
+                    strerrormsg = connection.getResponseMessage();
+                    strPrintBill = "httperror";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return strPrintBill;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            try {
+                gson = new Gson();
+                //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
+                PrintResponse apiResponse = gson.fromJson(s, PrintResponse.class);
+                if (apiResponse.STATUSFLAG == 0) {
+                    String msg = apiResponse.DATA.BILL;
+                    android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSalesReturnActivity.this);
+                    alertDialogBuilder.setMessage("Print Sales Bill For " + prefs.getString("billNo", "") + "..?");
+                    alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            // dialog.cancel();
+                            startPrint(msg);
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+
+                } else {
+                    tsMessages(apiResponse.ERRORMESSAGE);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void popUp(String msg) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSalesReturnActivity.this);
         alertDialogBuilder.setMessage(msg);
@@ -689,5 +828,61 @@ public class RetailSalesReturnActivity extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setCanceledOnTouchOutside(true);
         alertDialog.show();
+    }
+
+    public boolean isBluetoothEnabled() {
+        BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        return myBluetoothAdapter.isEnabled();
+    }
+
+    //Printing Function
+    private void startPrint(String msg) {
+
+        if (isBluetoothEnabled()) {
+            try {
+                //String temp = "Design and deploy business solutions that are relevant to the needs of the real India.";
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
+                } else {
+                    /*  "[L]" + df.format(new Date()) + "\n","[C]--------------------------------\n" + */
+                    BluetoothConnection connection = BluetoothPrintersConnections.selectFirstPaired();
+                    if (connection != null) {
+                        EscPosPrinter printer = new EscPosPrinter(connection, 210, 48f, 32);
+                        printer.printFormattedText(msg);
+
+                        connection.disconnect();
+                    } else {
+                        //Toast.makeText(this, "No printer was connected...!", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(RetailSalesReturnActivity.this);
+                        alertDialogBuilder.setMessage("Check The Printer Status or Add Printer..!!");
+                        alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int arg1) {
+
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.setCanceledOnTouchOutside(false);
+                        alertDialog.show();
+
+
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("APP", "Can't print", e);
+            }
+
+
+        } else {
+            popUp("Enable bluetooth and try again..!!!");
+        }
+
     }
 }

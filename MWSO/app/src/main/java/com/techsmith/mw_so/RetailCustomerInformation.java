@@ -343,6 +343,13 @@ public class RetailCustomerInformation extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        startActivity(new Intent(RetailCustomerInformation.this,SoMenu.class));
+    }
+
     private void startSave() {
         new SaveData().execute();
     }

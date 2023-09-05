@@ -36,7 +36,6 @@ public class SoMenu extends AppCompatActivity {
     ExpandableListAdapter expandableListAdapter;
     SharedPreferences myPrefs;
     SharedPreferences.Editor editor;
-    String storeName = "Test NAme", className = "";
 
 
     private RecyclerView courseRV;
@@ -47,7 +46,8 @@ public class SoMenu extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
-        startActivity(new Intent(SoMenu.this, Category.class));
+       // startActivity(new Intent(SoMenu.this, Category.class));
+        startActivity(new Intent(SoMenu.this, MainActivity.class));
     }
 
     @Override
@@ -72,15 +72,16 @@ public class SoMenu extends AppCompatActivity {
             public void onClick(View view, int position) {
                 CardModel movie = courseModelArrayList.get(position);
                 // Toast.makeText(getApplicationContext(), movie.getName()+ " is selected!", Toast.LENGTH_SHORT).show();
-                if (movie.getName().equalsIgnoreCase("Create New SO")) {
+                if (movie.getName().equalsIgnoreCase("Sales Bill")) {
                     finish();
-                    startActivity(new Intent(SoMenu.this, CustomerInformation.class));
-                } else if (movie.getName().equalsIgnoreCase("New Payment")) {
-                    startActivity(new Intent(SoMenu.this, PaymentMenu.class));
+                    startActivity(new Intent(SoMenu.this, RetailCustomerInformation.class));
+                    // startActivity(new Intent(SoMenu.this, CustomerInformation.class));
                 } else if (movie.getName().equalsIgnoreCase("Retail Sales")) {
                     startActivity(new Intent(SoMenu.this, RetailCustomerInformation.class));
-                }else if(movie.getName().equalsIgnoreCase("Retail Sales Return")){
+                } else if (movie.getName().equalsIgnoreCase("Sales Return")) {
                     startActivity(new Intent(SoMenu.this, RetailSRBillCustomerInfoActivity.class));
+                } else if (movie.getName().equalsIgnoreCase("Print Copies")) {
+                    startActivity(new Intent(SoMenu.this, Sales_Bill_List_SalesReturn_List.class));
                 } else {
                     Toast.makeText(SoMenu.this, "Function not yet Implemented..", Toast.LENGTH_SHORT).show();
                 }
@@ -121,16 +122,11 @@ public class SoMenu extends AppCompatActivity {
     private void startData() {
         courseModelArrayList = new ArrayList<>();
         int i = R.drawable.ic_list;
-        courseModelArrayList.add(new CardModel("Create New SO", i));
-        courseModelArrayList.add(new CardModel("Retail Sales", i));
-        courseModelArrayList.add(new CardModel("Retail Sales Return", R.drawable.ic_report));
-        // courseModelArrayList.add(new CardModel("View Invoices", R.drawable.ic_report));
-        //courseModelArrayList.add(new CardModel("Party Ledger", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("Test Print", R.drawable.ic_report));
-        courseModelArrayList.add(new CardModel("New Payment", R.drawable.ic_report));
-        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
-        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
-        // courseModelArrayList.add(new CardModel("Stock Register", R.drawable.ic_report));
+        //courseModelArrayList.add(new CardModel("Create New SO", i));
+        courseModelArrayList.add(new CardModel("Sales Bill", i));
+        courseModelArrayList.add(new CardModel("Sales Return", R.drawable.ic_report));
+        courseModelArrayList.add(new CardModel("Print Copies", R.drawable.ic_report));
+        courseModelArrayList.add(new CardModel("DSR", R.drawable.ic_report));
     }
 
     private void createCollection() {

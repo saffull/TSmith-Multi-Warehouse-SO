@@ -42,6 +42,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Sales_Bill_List_SalesReturn_List"
+            android:exported="false" />
+        <activity
             android:name=".RetailSRBillCustomerInfoActivity"
             android:exported="false" />
         <activity

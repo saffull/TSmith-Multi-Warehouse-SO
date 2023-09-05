@@ -2587,7 +2587,7 @@ public class RetailSOActivity extends AppCompatActivity {
                 //customerResponse = gson.fromJson(strCustomer, RetailCustomerResponse.class);
                 PrintResponse apiResponse = gson.fromJson(s, PrintResponse.class);
                 if (apiResponse.STATUSFLAG == 0) {
-                    String msg = apiResponse.DATA.SALESBILL;
+                    String msg = apiResponse.DATA.BILL;
                     android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(RetailSOActivity.this);
                     alertDialogBuilder.setMessage("Print Sales Bill For " + prefs.getString("billNo", "") + "..?");
                     alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

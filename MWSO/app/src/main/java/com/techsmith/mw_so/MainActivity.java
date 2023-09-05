@@ -17,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +31,6 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.techsmith.mw_so.Global.AppWide;
 import com.techsmith.mw_so.SignIn.LoginInResponse;
-import com.techsmith.mw_so.utils.UserPL;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,7 +41,8 @@ import java.util.Base64;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    TextInputEditText etUsername, etPassword;
+    //TextInputEditText etUsername, etPassword;
+    EditText etUsername, etPassword;
     SharedPreferences prefs, prefsD, appPref;
     ProgressDialog pDialog;
     Double tsMsgDialogWindowHeight;
@@ -112,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
     public void Login(View view) {
 
         try {
-            username = etUsername.getText().toString();
-            password = etPassword.getText().toString();
+            username = etUsername.getText().toString().trim();
+            password = etPassword.getText().toString().trim();
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("username", username);
             editor.putString("password", password);
@@ -271,6 +272,8 @@ public class MainActivity extends AppCompatActivity {
                         appWide.setSubStoreId(login.SUMMARY.SUBSTOREID);
                         appWide.setStoreId(login.DETAIL.get(0).STOREID);
                         startActivity(new Intent(MainActivity.this, Category.class));
+                    } else {
+                        popUp(login.ERRORMESSAGE);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
