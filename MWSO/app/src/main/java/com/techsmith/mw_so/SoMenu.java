@@ -93,30 +93,6 @@ public class SoMenu extends AppCompatActivity {
             }
         }));
 
-
-        //  createGroupList();
-        //createCollection();
-        /*expandableListView = findViewById(R.id.elvMobiles);
-        expandableListAdapter = new MyExpandableListAdapter(this, groupList, mobileCollection);
-        expandableListView.setAdapter(expandableListAdapter);
-        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            int lastExpandedPosition = -1;
-            @Override
-            public void onGroupExpand(int i) {
-                if(lastExpandedPosition != -1 && i != lastExpandedPosition){
-                    expandableListView.collapseGroup(lastExpandedPosition);
-                }
-                lastExpandedPosition = i;
-            }
-        });
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-                String selected = expandableListAdapter.getChild(i,i1).toString();
-                Toast.makeText(getApplicationContext(), "Selected: " + selected, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });*/
     }
 
     private void startData() {
@@ -217,4 +193,45 @@ public class SoMenu extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    public void gotoSalesReturn(View view) {
+        finish();
+        startActivity(new Intent(SoMenu.this, RetailSRBillCustomerInfoActivity.class));
+    }
+
+    public void gotoSalesBill(View view) {
+        finish();
+        startActivity(new Intent(SoMenu.this, RetailCustomerInformation.class));
+    }
+
+    public void gotoPrintCopies(View view) {
+        finish();
+        startActivity(new Intent(SoMenu.this, Sales_Bill_List_SalesReturn_List.class));
+    }
 }
+
+
+
+//  createGroupList();
+//createCollection();
+        /*expandableListView = findViewById(R.id.elvMobiles);
+        expandableListAdapter = new MyExpandableListAdapter(this, groupList, mobileCollection);
+        expandableListView.setAdapter(expandableListAdapter);
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            int lastExpandedPosition = -1;
+            @Override
+            public void onGroupExpand(int i) {
+                if(lastExpandedPosition != -1 && i != lastExpandedPosition){
+                    expandableListView.collapseGroup(lastExpandedPosition);
+                }
+                lastExpandedPosition = i;
+            }
+        });
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+                String selected = expandableListAdapter.getChild(i,i1).toString();
+                Toast.makeText(getApplicationContext(), "Selected: " + selected, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });*/

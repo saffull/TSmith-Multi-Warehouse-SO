@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/back"
+    android:orientation="vertical"
     tools:context=".SoMenu">
 
     <!--  android:background="@drawable/ic_bg1"-->
@@ -42,157 +42,207 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="30dp"
                     android:layout_marginRight="30dp"
-                    android:onClick="goToControllerVariables"
                     android:background="@drawable/info"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true"
+                    android:onClick="goToControllerVariables" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
         <FrameLayout
-            android:layout_width="match_parent"
             android:id="@+id/fl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/toolbar1"
-            android:layout_height="wrap_content"/>
+            android:layout_marginTop="25dp">
+
+
+        </FrameLayout>
 
 
         <LinearLayout
             android:id="@+id/rec"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/fl"
             android:layout_centerInParent="true"
-            android:layout_marginTop="25dp"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:visibility="gone">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/my_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:scrollbars="vertical" />
-
-
-            <!-- <androidx.cardview.widget.CardView
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:layout_marginLeft="5dp"
-                 android:layout_marginTop="25dp"
-                 android:layout_marginRight="5dp"
-                 android:onClick="gotoSalesOrder"
-                 app:cardBackgroundColor="@color/new_blue"
-                 app:cardCornerRadius="15dp"
-                 app:cardElevation="10dp"
-                 app:cardMaxElevation="10dp"
-                 app:cardPreventCornerOverlap="true"
-                 app:cardUseCompatPadding="true">
-
-                 <RelativeLayout
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:padding="12dp">
-
-                     <ImageView
-                         android:id="@+id/ivProfilePic2"
-                         android:layout_width="20dp"
-                         android:layout_height="30dp"
-                         android:layout_marginRight="16dp"
-                         app:srcCompat="@drawable/ic_list" />
-
-                     <TextView
-                         android:id="@+id/tvProfileName1"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:layout_toRightOf="@id/ivProfilePic2"
-                         android:onClick="gotoSalesOrder"
-                         android:text="Sales Order"
-                         android:textColor="@color/white"
-                         android:textSize="20sp" />
-
-
-                 </RelativeLayout>
-
-             </androidx.cardview.widget.CardView>
-
-             <androidx.cardview.widget.CardView
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:layout_margin="5dp"
-                 android:onClick="gotoStockRegister"
-                 app:cardBackgroundColor="@color/new_blue"
-                 app:cardCornerRadius="15dp"
-                 app:cardElevation="10dp"
-                 app:cardMaxElevation="10dp"
-                 app:cardPreventCornerOverlap="true"
-                 app:cardUseCompatPadding="true">
-
-                 <RelativeLayout
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:padding="12dp">
-
-                     <ImageView
-                         android:id="@+id/ivProfilePic1"
-                         android:layout_width="20dp"
-                         android:layout_height="30dp"
-                         android:layout_marginRight="16dp"
-                         app:srcCompat="@drawable/ic_report" />
-
-                     <TextView
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:layout_toRightOf="@id/ivProfilePic1"
-                         android:onClick="gotoStockRegister"
-                         android:text="Stock Register"
-                         android:textColor="@color/white"
-                         android:textSize="20sp" />
-
-
-                 </RelativeLayout>
-
-             </androidx.cardview.widget.CardView>
-
-             <androidx.cardview.widget.CardView
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:layout_margin="5dp"
-                 android:onClick="gotosalesReport"
-                 app:cardBackgroundColor="@color/new_blue"
-                 app:cardCornerRadius="15dp"
-                 app:cardElevation="10dp"
-                 app:cardMaxElevation="10dp"
-                 app:cardPreventCornerOverlap="true"
-                 app:cardUseCompatPadding="true">
-
-                 <RelativeLayout
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:padding="12dp">
-
-                     <ImageView
-                         android:id="@+id/ivProfilePic"
-                         android:layout_width="20dp"
-                         android:layout_height="30dp"
-                         android:layout_marginRight="16dp"
-                         app:srcCompat="@drawable/ic_list" />
-
-                     <TextView
-                         android:id="@+id/tvProfileName"
-                         android:layout_width="wrap_content"
-                         android:layout_height="wrap_content"
-                         android:layout_toRightOf="@id/ivProfilePic"
-                         android:onClick="gotosalesReport"
-                         android:text="Sales Report"
-                         android:textColor="@color/white"
-                         android:textSize="20sp" />
-
-
-                 </RelativeLayout>
-
-             </androidx.cardview.widget.CardView>-->
-
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/ll2_new"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rec"
+            android:layout_marginTop="25dp"
+            android:alignmentMode="alignMargins"
+            android:columnOrderPreserved="false"
+            android:weightSum="2">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/new_blue"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="10dp"
+                app:cardMaxElevation="10dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:onClick="gotoSalesBill"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_sales_bill" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Sales Bill"
+                        android:fontFamily="@font/fabrica"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/new_blue"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="10dp"
+                app:cardMaxElevation="10dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:onClick="gotoSalesReturn"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_report" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Sales Return"
+                        android:fontFamily="@font/fabrica"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll2_new"
+            android:alignmentMode="alignMargins"
+            android:columnOrderPreserved="false"
+            android:weightSum="2">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/new_blue"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="10dp"
+                app:cardMaxElevation="10dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:onClick="gotoPrintCopies"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/menu_print" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Print Copies"
+                        android:fontFamily="@font/fabrica"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/new_blue"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="10dp"
+                app:cardMaxElevation="10dp"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_summary_report" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="DSR"
+                        android:fontFamily="@font/fabrica"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
     </RelativeLayout>
 
 
@@ -209,3 +259,122 @@
          android:layout_height="wrap_content" />
      </RelativeLayout>-->
 </LinearLayout>
+
+
+    <!-- <androidx.cardview.widget.CardView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="5dp"
+         android:layout_marginTop="25dp"
+         android:layout_marginRight="5dp"
+         android:onClick="gotoSalesOrder"
+         app:cardBackgroundColor="@color/new_blue"
+         app:cardCornerRadius="15dp"
+         app:cardElevation="10dp"
+         app:cardMaxElevation="10dp"
+         app:cardPreventCornerOverlap="true"
+         app:cardUseCompatPadding="true">
+
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="12dp">
+
+             <ImageView
+                 android:id="@+id/ivProfilePic2"
+                 android:layout_width="20dp"
+                 android:layout_height="30dp"
+                 android:layout_marginRight="16dp"
+                 app:srcCompat="@drawable/ic_list" />
+
+             <TextView
+                 android:id="@+id/tvProfileName1"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_toRightOf="@id/ivProfilePic2"
+                 android:onClick="gotoSalesOrder"
+                 android:text="Sales Order"
+                 android:textColor="@color/white"
+                 android:textSize="20sp" />
+
+
+         </RelativeLayout>
+
+     </androidx.cardview.widget.CardView>
+
+     <androidx.cardview.widget.CardView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_margin="5dp"
+         android:onClick="gotoStockRegister"
+         app:cardBackgroundColor="@color/new_blue"
+         app:cardCornerRadius="15dp"
+         app:cardElevation="10dp"
+         app:cardMaxElevation="10dp"
+         app:cardPreventCornerOverlap="true"
+         app:cardUseCompatPadding="true">
+
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="12dp">
+
+             <ImageView
+                 android:id="@+id/ivProfilePic1"
+                 android:layout_width="20dp"
+                 android:layout_height="30dp"
+                 android:layout_marginRight="16dp"
+                 app:srcCompat="@drawable/ic_report" />
+
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_toRightOf="@id/ivProfilePic1"
+                 android:onClick="gotoStockRegister"
+                 android:text="Stock Register"
+                 android:textColor="@color/white"
+                 android:textSize="20sp" />
+
+
+         </RelativeLayout>
+
+     </androidx.cardview.widget.CardView>
+
+     <androidx.cardview.widget.CardView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_margin="5dp"
+         android:onClick="gotosalesReport"
+         app:cardBackgroundColor="@color/new_blue"
+         app:cardCornerRadius="15dp"
+         app:cardElevation="10dp"
+         app:cardMaxElevation="10dp"
+         app:cardPreventCornerOverlap="true"
+         app:cardUseCompatPadding="true">
+
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:padding="12dp">
+
+             <ImageView
+                 android:id="@+id/ivProfilePic"
+                 android:layout_width="20dp"
+                 android:layout_height="30dp"
+                 android:layout_marginRight="16dp"
+                 app:srcCompat="@drawable/ic_list" />
+
+             <TextView
+                 android:id="@+id/tvProfileName"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_toRightOf="@id/ivProfilePic"
+                 android:onClick="gotosalesReport"
+                 android:text="Sales Report"
+                 android:textColor="@color/white"
+                 android:textSize="20sp" />
+
+
+         </RelativeLayout>
+
+     </androidx.cardview.widget.CardView>-->

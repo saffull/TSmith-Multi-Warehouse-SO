@@ -6,6 +6,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,14 +21,16 @@
                 android:layout_width="70dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:src="@drawable/horse" />
+                android:src="@mipmap/ic_truck_round" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Sign In"
-                android:textSize="17sp"
+                android:text="MWSO"
+                android:fontFamily="@font/ralewaybold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
                 android:textStyle="bold" />
 
             <TextView
@@ -40,25 +43,25 @@
                 android:textSize="12sp" />
 
             <EditText
+                android:id="@+id/etUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:id="@+id/etUsername"
+                android:background="@drawable/edtdesign"
                 android:drawableLeft="@drawable/ic_username"
                 android:drawablePadding="10dp"
-                android:background="@drawable/edtdesign"
                 android:hint="User Name"
                 android:textSize="12sp" />
 
             <EditText
+                android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/edtdesign"
-                android:hint="Password"
                 android:drawableStart="@drawable/ic_password"
                 android:drawablePadding="10dp"
-                android:id="@+id/etPassword"
+                android:hint="Password"
                 android:inputType="textPassword"
                 android:textSize="12sp" />
 
@@ -67,10 +70,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="20dp"
+                android:background="@drawable/btndesign"
                 android:focusable="true"
                 android:fontFamily="@font/fabrica"
                 android:onClick="Login"
-                android:background="@drawable/btndesign"
                 android:text="Login"
                 android:textAllCaps="false" />
 

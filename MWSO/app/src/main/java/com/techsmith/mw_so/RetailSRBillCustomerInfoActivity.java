@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -41,8 +42,8 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
     AutoCompleteTextView acvBillNo;
     ImageButton imgBtnBillByNo;
     AutoCompleteTextView acvLcardNo, acvmobileNo, acvCustomerName;
-    SharedPreferences prefs;
-    SharedPreferences.Editor editor;
+    SharedPreferences prefs, prefsD;
+    SharedPreferences.Editor editor, editor1;
     EditText place, pincode, gstno, cardType, etCustomerGoogleAdrs, cEmail, latLong, state;
     String Url, strCustomer = "", strErrorMsg, editData = "", LoyaltyCardType = "", customerAddress = "", sendTestData = "",
             selectedCustomerName, LoyaltyCode = "", LoyaltyId = "", LoyaltyCardTypeDesc = "", cLatitude = "",
@@ -73,7 +74,7 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
         place = findViewById(R.id.place);
         pincode = findViewById(R.id.pincode);
         state = findViewById(R.id.state);
-        btnCreateSO=findViewById(R.id.btnCreateSO);
+        btnCreateSO = findViewById(R.id.btnCreateSO);
         etCustomerGoogleAdrs = findViewById(R.id.etCustomerGoogleAdrs);
         Url = prefs.getString("MultiSOURL", "");
         uniqueID = UUID.randomUUID().toString();
@@ -86,7 +87,15 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
         if (!prefs.getString("billNo", "").isEmpty())
             acvBillNo.setText(prefs.getString("billNo", ""));
 
+
+        prefsD = getSharedPreferences("pref", Context.MODE_PRIVATE);
+        editor1 = prefsD.edit();
+        editor1.putString("cashSave", "");
+        editor1.putString("cardSave", "");
+        editor1.apply();
+
     }
+
 
     public void gotoSRList(View view) {
         editor = prefs.edit();
@@ -102,11 +111,11 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
     public void CLearALL(View view) {
         acvCustomerName.setText("");
         acvmobileNo.setText("");
-        cEmail .setText("");
+        cEmail.setText("");
         place.setText("");
-        pincode .setText("");
-        state .setText("");
-        etCustomerGoogleAdrs .setText("");
+        pincode.setText("");
+        state.setText("");
+        etCustomerGoogleAdrs.setText("");
         btnCreateSO.setEnabled(false);
         btnCreateSO.setAlpha(0.8f);
     }
@@ -233,6 +242,7 @@ public class RetailSRBillCustomerInfoActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+        startActivity(new Intent(RetailSRBillCustomerInfoActivity.this,SoMenu.class));
     }
 
     private void tsMessages(String msg) {

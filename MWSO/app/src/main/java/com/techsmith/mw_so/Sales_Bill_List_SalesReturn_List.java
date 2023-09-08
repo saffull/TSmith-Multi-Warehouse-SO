@@ -10,6 +10,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -170,6 +171,13 @@ public class Sales_Bill_List_SalesReturn_List extends AppCompatActivity {
         this.billCount=findViewById(R.id.billCount);
         this.btnPrintSO = findViewById(R.id.btnPrintSO);
         this.btnClearAll = findViewById(R.id.btnClearAll);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        startActivity(new Intent(Sales_Bill_List_SalesReturn_List.this,SoMenu.class));
     }
 
     private void updateLabel() {
