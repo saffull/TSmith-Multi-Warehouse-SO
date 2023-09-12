@@ -65,7 +65,8 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     Boolean firstTime = true;
     public static final String ACTION_APPLICATION_DETAILS_SETTINGS = "android.settings.APPLICATION_DETAILS_SETTINGS";
     public static final String[] BLUETOOTH_PERMISSIONS_S = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
-    String permission = Manifest.permission.BLUETOOTH_CONNECT;
+   // String permission = Manifest.permission.BLUETOOTH_CONNECT;
+    String permission = Manifest.permission.BLUETOOTH_SCAN;
     private CheckBox roundingBox;
 
     @Override
@@ -89,13 +90,13 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
         else
             roundingBox.setChecked(false);
 
-        if (EasyPermissions.hasPermissions(this, permission)) {
+        if (EasyPermissions.hasPermissions(this, BLUETOOTH_PERMISSIONS_S)) {
 
 
         } else {
             System.out.println("permission not granted");
             EasyPermissions.requestPermissions(this, "Our App Requires a permission to access your storage", 123
-                    , permission);
+                    , BLUETOOTH_PERMISSIONS_S);
         }
         try {
             String android_Id = android.provider.Settings.Secure.getString(this.getContentResolver(),
@@ -216,10 +217,11 @@ public class Settings extends AppCompatActivity implements EasyPermissions.Permi
     public void testPrint(View view) {
         if (isBluetoothEnabled()) {
             try {
-                //String temp = "Test Print";
-                String temp="Design and deploy business solutions that are relevant to the needs of the real India.";
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+               String temp = "Test Print";
+                //String temp="Design and deploy business solutions that are relevant to the needs of the real India.";
+                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, 1);
+                    System.out.println("Bluettoth build failed");
                 } else {
                     /*  "[L]" + df.format(new Date()) + "\n","[C]--------------------------------\n" + */
                     BluetoothConnection connection = BluetoothPrintersConnections.selectFirstPaired();

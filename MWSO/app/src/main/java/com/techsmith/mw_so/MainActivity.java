@@ -71,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
             String str = "admin1234";
             String encoded = Base64.getEncoder().encodeToString(str.getBytes());
             System.out.println("encoded value is " + encoded);
+        }else{
+            String str = "admin1234";
+            String encoded = Base64.getEncoder().encodeToString(str.getBytes());
+            System.out.println("encoded value is " + encoded);
         }
 
 
@@ -115,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             username = etUsername.getText().toString().trim();
             password = etPassword.getText().toString().trim();
+            System.out.println("Password is "+password);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("username", username);
             editor.putString("password", password);

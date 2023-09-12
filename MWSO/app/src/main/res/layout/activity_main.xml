@@ -6,6 +6,16 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/imgBtnSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+           android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_settings"
+            android:clickable="true"
+            android:layout_marginEnd="30dp"
+            android:focusable="true"
+            android:onClick="SaveUrl" />
 
         <LinearLayout
             android:layout_width="match_parent"

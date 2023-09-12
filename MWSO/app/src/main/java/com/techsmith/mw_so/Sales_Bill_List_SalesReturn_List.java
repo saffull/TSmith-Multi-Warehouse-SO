@@ -69,7 +69,7 @@ public class Sales_Bill_List_SalesReturn_List extends AppCompatActivity {
     TextView billCount;
     ArrayList<SalesReturnListData> sList;
     Gson gson;
-    Button btnClearAll, btnPrintSO;
+    Button btnClearAll, btnExitSO;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet;
     private ToggleButton tbUpDown;
@@ -162,6 +162,14 @@ public class Sales_Bill_List_SalesReturn_List extends AppCompatActivity {
             }
         });
 
+        btnExitSO.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+                startActivity(new Intent(Sales_Bill_List_SalesReturn_List.this,SoMenu.class));
+            }
+        });
+
     }
 
     private void init() {
@@ -169,7 +177,7 @@ public class Sales_Bill_List_SalesReturn_List extends AppCompatActivity {
         this.bottomSheetBehavior = BottomSheetBehavior.from(linearLayoutBSheet);
         this.tbUpDown = findViewById(R.id.toggleButton_SR);
         this.billCount=findViewById(R.id.billCount);
-        this.btnPrintSO = findViewById(R.id.btnPrintSO);
+        this.btnExitSO = findViewById(R.id.btnExitSO);
         this.btnClearAll = findViewById(R.id.btnClearAll);
     }
 
