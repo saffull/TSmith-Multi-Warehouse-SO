@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DailySalesReport">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:id="@+id/llSOToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_weight="0.6"
+                android:fontFamily="@font/fabrica"
+                android:text="Daily Sales Report"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <RelativeLayout
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acvDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Select Date"
+                    android:textColor="@color/custinfo_edittext_color"
+                    android:textSize="18sp" />
+
+
+                <ImageButton
+                    android:id="@+id/imgBtnCustSearchbyDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@+id/acvDate"
+                    android:layout_centerVertical="true"
+                    android:background="@null"
+                    android:src="@drawable/ic_search" />
+            </RelativeLayout>
+
+            <CheckBox
+                android:id="@+id/taxTick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/fabrica"
+                android:text="Show Tax"
+                android:textColor="@color/activity_bg_color"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!--  <View
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:layout_marginLeft="10dp"
+              android:layout_marginRight="10dp"
+              android:layout_marginBottom="5dp"
+              android:background="#000000" />
+
+
+           <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/activity_bg_color"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:fontFamily="@font/fabrica"
+                    android:gravity="start"
+                    android:text="Id"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.7"
+                    android:fontFamily="@font/fabrica"
+                    android:gravity="left"
+                    android:text="Party Name"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                &lt;!&ndash; <TextView
+                     android:layout_width="0dp"
+                     android:layout_height="wrap_content"
+                     android:layout_weight="1.3"
+                     android:fontFamily="@font/fabrica"
+                     android:gravity="center"
+                     android:text="Pay"
+                     android:textColor="@color/black" />&ndash;&gt;
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:fontFamily="@font/fabrica"
+                    android:gravity="start"
+                    android:text="Bill No"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+            </LinearLayout>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <TextView
+                android:id="@+id/tvSlNo"
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:gravity="start"
+                android:text="  #"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="start"
+                android:text="Description"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/transaction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.3"
+                android:gravity="center"
+                android:text="Transaction"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Tender\t\t\t"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/activity_bg_color"
+            android:orientation="horizontal">
+
+            <!--.2 .3 .4 .1-->
+            <TextView
+                android:id="@+id/transactions"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:text="Transaction"
+                android:textColor="@color/black"
+                android:visibility="invisible" />
+
+            <!--<TextView
+                android:id="@+id/tvqty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:textColor="@color/black"
+                app:drawableStartCompat="@drawable/ic_edit" />-->
+
+            <TextView
+                android:id="@+id/tvRate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:text="Rate"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+
+
+            <!--<TextView
+                android:id="@+id/tvQty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:gravity="right"
+                android:paddingRight="30px"
+                android:text="QTY"
+                android:textColor="#152E61" />-->
+
+            <!--<EditText-->
+            <!--android:id="@+id/tvQty"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="0.3"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="#152E61"-->
+            <!--android:textStyle="bold"-->
+            <!--android:paddingRight="30px"-->
+            <!--android:text="QTY"/>-->
+
+            <!-- <TextView
+                 android:id="@+id/tvFreeQty"
+                 android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:layout_weight="0.2"
+                 android:gravity="right"
+                 android:text="0"
+                 android:textColor="@color/black" />-->
+            <!-- <TextView
+                 android:id="@+id/tvTotall"
+                 android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:layout_weight="0.2"
+                 android:gravity="right"
+                 android:text="Total"
+                 android:textColor="@color/black" />-->
+
+            <!-- <TextView
+                 android:id="@+id/tender"
+                 android:layout_width="0dp"
+                 android:layout_height="wrap_content"
+                 android:layout_marginLeft="5dp"
+                 android:layout_weight="0.5"
+                 android:gravity="end"
+                 android:text="Tender\t\t\t\t"
+                 android:textColor="@color/black" />-->
+
+            <ImageButton
+                android:id="@+id/imgBtnRemarksItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/lvCollectionlist"
+            android:layout_width="match_parent"
+            android:layout_height="550dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="10dp"
+            android:saveEnabled="true"
+            android:scrollbars="vertical"
+            android:transcriptMode="normal" />
+    </LinearLayout>
+
+    <include layout="@layout/bottom_dsr" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/back"
     android:layout_height="match_parent">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <ImageButton
             android:id="@+id/imgBtnSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-           android:layout_alignParentEnd="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/ic_settings"
             android:clickable="true"
-            android:layout_marginEnd="30dp"
             android:focusable="true"
             android:onClick="SaveUrl" />
 
@@ -23,7 +26,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginStart="30dp"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="130dp"
+            android:layout_marginTop="100dp"
             android:layout_marginEnd="30dp"
             android:orientation="vertical">
 
@@ -37,10 +40,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="MWSO"
                 android:fontFamily="@font/ralewaybold"
-                android:textSize="20sp"
+                android:text="MWSO"
                 android:textColor="@color/black"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -52,28 +55,43 @@
                 android:textColor="#E92C0C"
                 android:textSize="12sp" />
 
-            <EditText
-                android:id="@+id/etUsername"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/edtdesign"
-                android:drawableLeft="@drawable/ic_username"
-                android:drawablePadding="10dp"
-                android:hint="User Name"
-                android:textSize="12sp" />
+                android:layout_height="match_parent"
+                android:layout_marginTop="15dp">
 
-            <EditText
-                android:id="@+id/etPassword"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_username"
+                    android:drawablePadding="10dp"
+
+                    android:fontFamily="@font/fabrica"
+                    android:hint="Username"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/edtdesign"
-                android:drawableStart="@drawable/ic_password"
-                android:drawablePadding="10dp"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:textSize="12sp" />
+                android:layout_height="match_parent"
+                android:layout_marginTop="15dp"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_password"
+                    android:drawablePadding="10dp"
+                    android:fontFamily="@font/fabrica"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:layout_width="200dp"
@@ -92,7 +110,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:text="Don't have an Account? Register" />
+                android:fontFamily="@font/ukt"
+                android:text="@string/powered_by_techsmith_software_pvt_ltd"
+                android:textColor="@color/violet1"
+                android:textSize="18sp"
+                app:autoSizeMaxTextSize="80sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeStepGranularity="2sp"
+                app:autoSizeTextType="uniform" />
 
         </LinearLayout>
     </RelativeLayout>

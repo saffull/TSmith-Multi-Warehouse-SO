@@ -580,7 +580,8 @@ public class RetailSOActivity extends AppCompatActivity {
                 PAYDETAIL pd = new PAYDETAIL();
                 if (!t1.isEmpty()) {
                     pd.PAYTYPE = "CASH";
-                    pd.AMOUNT = Float.parseFloat(paymentList.cashAmount);
+                    //pd.AMOUNT = Float.parseFloat(paymentList.cashAmount);
+                    pd.AMOUNT = Float.parseFloat(String.valueOf(Math.round(Double.parseDouble(paymentList.cashAmount))));
                 } else {
                     pd.PAYTYPE = "CASH";
                     pd.AMOUNT = 0;
@@ -615,8 +616,8 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
             PAYSUMMARY paysummary = new PAYSUMMARY();
-            paysummary.BILLAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
-            paysummary.PAIDAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+            paysummary.BILLAMOUNT =Math.round(Double.parseDouble(tvAmountValue.getText().toString()));
+            paysummary.PAIDAMOUNT =Math.round( Double.parseDouble(tvAmountValue.getText().toString()));
 
 
             payment.PAYSUMMARY = paysummary;
@@ -1799,7 +1800,8 @@ public class RetailSOActivity extends AppCompatActivity {
 
 
             PAYSUMMARY paysummary = new PAYSUMMARY();
-            paysummary.BILLAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+            //paysummary.BILLAMOUNT = Float.parseFloat(tvAmountValue.getText().toString());
+            paysummary.BILLAMOUNT =Double.parseDouble(tvAmountValue.getText().toString());
             paysummary.PAIDAMOUNT = totalSum;
 
 

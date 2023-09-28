@@ -37,6 +37,7 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_mail.xml" value="0.11" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_password.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_payment_method.xml" value="0.1335" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_pdf.xml" value="0.125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_person.xml" value="0.2203125" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_phone_24.xml" value="0.138" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/drawable/ic_print.xml" value="0.137" />
@@ -70,6 +71,7 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_category.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_collections.xml" value="0.22" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_customer_information.xml" value="0.20416666666666666" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_daily_sales_report.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_delivery.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_listview.xml" value="0.1" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/activity_login.xml" value="0.20416666666666666" />
@@ -96,6 +98,7 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/autocomplete_retail_row.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/autocomplete_view_row.xml" value="0.22" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/autofill_dialog.xml" value="0.20416666666666666" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/bottom_dsr.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/bottom_print_copies.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/bottom_retail_so_sheet.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/bottom_retail_sr_sheet.xml" value="0.20416666666666666" />
@@ -124,6 +127,7 @@
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/fragment_second.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/invoice_list_item.xml" value="0.33" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/invoice_recycler.xml" value="0.20416666666666666" />
+        <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/item_daily_sales_report.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/item_lv_saleorder.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/item_retail_saleorder.xml" value="0.20416666666666666" />
         <entry key="..\:/Android_Studio_Projects_Vishal/MWSO/app/src/main/res/layout/item_retail_schemes_order.xml" value="0.20416666666666666" />

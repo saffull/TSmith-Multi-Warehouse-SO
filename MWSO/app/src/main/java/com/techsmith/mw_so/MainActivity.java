@@ -41,8 +41,8 @@ import java.util.Base64;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    //TextInputEditText etUsername, etPassword;
-    EditText etUsername, etPassword;
+    TextInputEditText etUsername, etPassword;
+   // EditText etUsername, etPassword;
     SharedPreferences prefs, prefsD, appPref;
     ProgressDialog pDialog;
     Double tsMsgDialogWindowHeight;

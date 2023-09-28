@@ -88,8 +88,8 @@
             android:weightSum="2">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 app:cardBackgroundColor="@color/new_blue"
@@ -117,16 +117,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Sales Bill"
                         android:fontFamily="@font/fabrica"
+                        android:text="Sales Bill"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 app:cardBackgroundColor="@color/new_blue"
@@ -154,8 +154,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Sales Return"
                         android:fontFamily="@font/fabrica"
+                        android:text="Sales Return"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
                 </LinearLayout>
@@ -171,8 +171,8 @@
             android:weightSum="2">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 app:cardBackgroundColor="@color/new_blue"
@@ -200,16 +200,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Print Copies"
                         android:fontFamily="@font/fabrica"
+                        android:text="Print Copies"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="200dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 app:cardBackgroundColor="@color/new_blue"
@@ -224,20 +224,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
+                    android:onClick="gotoDSR"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <ImageView
                         android:layout_width="80dp"
                         android:layout_height="80dp"
+
                         android:src="@drawable/ic_summary_report" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="DSR"
                         android:fontFamily="@font/fabrica"
+                        android:text="DSR"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
                 </LinearLayout>

@@ -82,7 +82,9 @@ public class SoMenu extends AppCompatActivity {
                     startActivity(new Intent(SoMenu.this, RetailSRBillCustomerInfoActivity.class));
                 } else if (movie.getName().equalsIgnoreCase("Print Copies")) {
                     startActivity(new Intent(SoMenu.this, Sales_Bill_List_SalesReturn_List.class));
-                } else {
+                }else if (movie.getName().equalsIgnoreCase("DSR")){
+                    startActivity(new Intent(SoMenu.this, DailySalesReport.class));
+                }else {
                     Toast.makeText(SoMenu.this, "Function not yet Implemented..", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -207,6 +209,10 @@ public class SoMenu extends AppCompatActivity {
     public void gotoPrintCopies(View view) {
         finish();
         startActivity(new Intent(SoMenu.this, Sales_Bill_List_SalesReturn_List.class));
+    }
+
+    public void gotoDSR(View view) {
+        startActivity(new Intent(SoMenu.this, DailySalesReport.class));
     }
 }
 
