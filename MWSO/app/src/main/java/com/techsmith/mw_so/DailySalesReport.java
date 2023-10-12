@@ -7,8 +7,10 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,9 +19,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
@@ -37,6 +41,8 @@ import android.widget.ToggleButton;
 import com.dantsu.escposprinter.EscPosPrinter;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothPrintersConnections;
+import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.techsmith.mw_so.Dsr.DailySalesAdapter;
@@ -50,9 +56,16 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,16 +84,17 @@ public class DailySalesReport extends AppCompatActivity {
     DatePickerDialog dialog;
     ProgressDialog pDialog;
     TextView billCount;
-    Button btnClearAll, btnExitSO, paymentBtn, btnPdf;
+    Button btnNew, btnExitSO, paymentBtn, btnPdf;
     private BottomSheetBehavior bottomSheetBehavior;
     private LinearLayout linearLayoutBSheet;
     private ToggleButton tbUpDown;
     ImageButton imgBtnCustSearchbyName;
-    String strErrorMsg = "", strCollections = "", Url = "", pdfUrl = "", type = "", strPrintBill = "", strerrormsg = "", billInputData = "";
+    String strErrorMsg = "", strCollections = "", Url = "", pdfUrl = "", fileName = "", strPrintBill = "", FileName = "", billInputData = "";
     SharedPreferences prefs;
     SimpleDateFormat dff = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     CheckBox taxTick;
     int showTax = 0;
+    URL url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,9 +167,13 @@ public class DailySalesReport extends AppCompatActivity {
         paymentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!strPrintBill.isEmpty())
+                if (!strPrintBill.isEmpty()) {
+                    pDialog = new ProgressDialog(DailySalesReport.this);
+                    pDialog.setMessage("Printing..");
+                    pDialog.setCancelable(false);
+                    pDialog.show();
                     startPrint(strPrintBill);
-                else
+                } else
                     popUp("List Empty");
             }
         });
@@ -176,7 +194,58 @@ public class DailySalesReport extends AppCompatActivity {
             }
         });
 
+        btnNew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File file = new File(Environment.getExternalStorageDirectory()
+                        .getAbsolutePath()
+                        + "/download/" + fileName);
+                if (file.exists())
+                    System.out.println(file.getAbsolutePath());
+                else
+                    System.out.println("file not found");
+
+                // Get the Downloads directory
+                File downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+// Get the URI path for the Downloads directory
+                String downloadsUriPath = Uri.fromFile(downloadsDirectory).toString();
+                System.out.println(downloadsUriPath);
+
+                // Construct the URI for the file in the Downloads folder
+                Uri fileUri = Uri.parse("content://downloads/public_downloads/" + fileName);
+
+
+
+
+                // Create an intent to view the file
+                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setDataAndType(fileUri, "application/pdf");
+
+                // Check if there is an app that can handle the file
+                if (viewIntent.resolveActivity(getPackageManager()) != null) {
+                   // startActivity(viewIntent);
+                } else {
+                    // Handle the case where no app can open the file type
+                    // You can show a message to the user or take appropriate action.
+                    System.out.println("Cannot open file");
+                }
+
+              /*  if (ActivityCompat.checkSelfPermission(DailySalesReport.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(DailySalesReport.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(DailySalesReport.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                            1);
+                } else {
+                    openPdf();
+                }*/
+
+
+
+            }
+        });
     }
+
 
     private void intiSheet() {
         this.linearLayoutBSheet = findViewById(R.id.bottom_dsr);
@@ -186,7 +255,7 @@ public class DailySalesReport extends AppCompatActivity {
         this.btnExitSO = findViewById(R.id.btnExitSO);
         this.btnPdf = findViewById(R.id.btnPdf);
         this.paymentBtn = findViewById(R.id.paymentBtn);
-
+        this.btnNew = findViewById(R.id.btnNew);
     }
 
     private class fetchData extends AsyncTask<String, String, String> {
@@ -281,6 +350,7 @@ public class DailySalesReport extends AppCompatActivity {
                         billCount.setText(String.valueOf(sList.size()));
                         strPrintBill = dsr.PRINTSTRING.PRINTSTRINGVALUE;
                         pdfUrl = dsr.PDFPATH.trim();
+                        fileName = pdfUrl.substring(39, 75);
                         dsa = new DailySalesAdapter(DailySalesReport.this, R.layout.list_row, sList);
                         lvCollectionlist.setAdapter(dsa);
                         dsa.notifyDataSetChanged();
@@ -313,6 +383,10 @@ public class DailySalesReport extends AppCompatActivity {
         }
     }
 
+    private void emailPdf(View view) {
+
+    }
+
     private void updateLabel() {
         String myFormat = "dd/MM/yyyy";
         SimpleDateFormat dateFormat = new SimpleDateFormat(myFormat, Locale.getDefault());
@@ -335,6 +409,47 @@ public class DailySalesReport extends AppCompatActivity {
         alertDialog.show();
     }
 
+    public void openPdf() {
+        dialog.setContentView(R.layout.pdf_viee);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(true);
+        // dialog.getWindow().getAttributes().windowAnimations = R.style.animation;
+        PDFView pdfView = dialog.findViewById(R.id.pdfView);
+        File file = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath()
+                + "/download/" + fileName);
+        System.out.println(file.getAbsolutePath());
+        if (file.exists()) {
+            pdfView.fromFile(file)
+                    //.pages(0, 2, 1, 3, 3, 3) // all pages are displayed by default
+                    .enableSwipe(true)
+                    .swipeHorizontal(true)
+                    .enableDoubletap(true)
+                    .defaultPage(0)
+                    .enableAnnotationRendering(true)
+                    .password(null)
+                    .scrollHandle(null)
+                    .onLoad(new OnLoadCompleteListener() {
+                        @Override
+                        public void loadComplete(int nbPages) {
+                            pdfView.setMinZoom(1f);
+                            pdfView.setMidZoom(5f);
+                            pdfView.setMaxZoom(10f);
+                            pdfView.zoomTo(2f);
+                            pdfView.scrollTo(100, 0);
+                            pdfView.moveTo(0f, 0f);
+                        }
+                    })
+                    .load();
+        } else {
+            System.out.println("File Not Found");
+        }
+
+        dialog.show();
+
+
+    }
+
     public boolean isBluetoothEnabled() {
         BluetoothAdapter myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         return myBluetoothAdapter.isEnabled();
@@ -352,10 +467,13 @@ public class DailySalesReport extends AppCompatActivity {
                     /*  "[L]" + df.format(new Date()) + "\n","[C]--------------------------------\n" + */
                     BluetoothConnection connection = BluetoothPrintersConnections.selectFirstPaired();
                     if (connection != null) {
+
                         EscPosPrinter printer = new EscPosPrinter(connection, 210, 48f, 32);
                         printer.printFormattedText(msg);
-
                         connection.disconnect();
+                        if (pDialog.isShowing()) {
+                            pDialog.dismiss();
+                        }
                     } else {
                         //Toast.makeText(this, "No printer was connected...!", Toast.LENGTH_SHORT).show();
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(DailySalesReport.this);

@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import com.techsmith.mw_so.R;
 import com.techsmith.mw_so.Sales_Return_List.SalesReturnListData;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class DailySalesAdapter extends ArrayAdapter {
@@ -20,6 +21,7 @@ public class DailySalesAdapter extends ArrayAdapter {
     LayoutInflater inflater;
     ArrayList<REPORT> sList;
     TextView tvSlNo, transaction, tender, tvDescription;
+    DecimalFormat df_obj = new DecimalFormat("#.###");
 
     public DailySalesAdapter(@NonNull Context context, int resource, ArrayList<REPORT> sList) {
         super(context, resource);
@@ -40,8 +42,8 @@ public class DailySalesAdapter extends ArrayAdapter {
         try {
             tvSlNo.setText(String.valueOf(" " + sList.get(position).SLNO));
             tvDescription.setText(sList.get(position).DESCRIPTION.trim());
-            tender.setText("\u20B9 " + String.valueOf(sList.get(position).TENDER));
-            transaction.setText("\u20B9 " + String.valueOf(sList.get(position).TRANSACTIONS));
+            tender.setText(df_obj.format(sList.get(position).TENDER));
+            transaction.setText(df_obj.format(sList.get(position).TRANSACTIONS));
         } catch (Exception e) {
             e.printStackTrace();
         }

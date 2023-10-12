@@ -107,7 +107,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Loyalty Card No"
-                        android:inputType="number"
                         android:textColor="@color/custinfo_edittext_color" />
 
                     <ImageButton
@@ -480,7 +479,7 @@
                         android:fontFamily="@font/fabrica"
                         android:onClick="CreateSO"
                         android:paddingLeft="10dp"
-                        android:text="CREATE SO"
+                        android:text="CREATE Sales Bill"
                         android:textColor="@color/white" />
                 </LinearLayout>
 

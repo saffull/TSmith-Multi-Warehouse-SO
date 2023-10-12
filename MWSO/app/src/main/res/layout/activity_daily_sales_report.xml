@@ -281,11 +281,11 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-
+<!--550dp-->
         <ListView
             android:id="@+id/lvCollectionlist"
             android:layout_width="match_parent"
-            android:layout_height="550dp"
+            android:layout_height="150dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginBottom="10dp"
